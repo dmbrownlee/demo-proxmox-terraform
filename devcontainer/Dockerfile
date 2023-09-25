@@ -9,10 +9,12 @@ ARG addonpkgs="vim-nox"
 ARG terraform_version=1.5.7
 ARG arch=amd64
 
+
 RUN apt update -y \
-  && apt install -y curl git lsb-release openssh-client python3 python3-pip python3-venv software-properties-common sshpass sudo ${addonpkgs} unzip \
-  && curl -o /etc/apt/trusted.gpg.d/hashicorp.gpg -fsSL https://apt.releases.hashicorp.com/gpg \
-  && apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
+  && apt install -y curl git gpg lsb-release openssh-client python3 python3-pip python3-venv software-properties-common sshpass sudo ${addonpkgs} unzip \
+  && curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --yes --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg \
+  && chmod 644 /usr/share/keyrings/hashicorp-archive-keyring.gpg \
+  && echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/apt_releases_hashicorp_com.list \
   && apt update -y \
   && apt install -y packer \
   && apt clean -y \
