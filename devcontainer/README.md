@@ -2,9 +2,9 @@
 The end goal of the exercises in this repo is to learn how to automate the provisioning and configuration of virtual machines running in a Proxmox cluster.  To achieve this, we are going to need to use multiple tools including Packer, Terraform, and Ansible.  Rather than try to write instructions for how to install multiple versions of these tools across many different Linux distrubutions, we are going to create a container to give us a consistent, repeatable environment to work with.
 
 # Building the `demo-devcontainer` container image
-The first step is to create a container image.  The `Dockerfile` in this directory will build a container image based on Debian Bookwork and install the tools we need for the rest of the project.
+The first step is to create a container image.  The `Dockerfile` in this directory will build a container image based on Debian Bookworm and install the tools we need for the rest of the project.
 
-> Note: The Open Container Initiative (OCI) has standardized on `Containerfile` as the name of the file used for building container images.  However, `docker` still looks for `Dockerfile` by default, so that file name is used for backwards compatability. Podman will also look for `Dockerfile` if `Containerfile` does not exist.
+> Note: The Open Container Initiative (OCI) has standardized on `Containerfile` as the name of the file used for building container images.  However, `docker` still looks for `Dockerfile` by default. Podman will also look for `Dockerfile` if `Containerfile` does not exist, so that file name is used for backwards compatability.
 
 > Note: The following command needs to download the official Debian container image and then install additional software within it.  Make sure you host as connectivity to the Internet.
 
@@ -53,4 +53,4 @@ If you know you would like to tweak your git config or vim settings before conti
 
 This exercise covered the absolute minimum needed to get a working container.  Consider learning more about containers as time permits.
 - [Podman Documentation](https://podman.io/docs)
-- [Dockerfile refence](https://docs.docker.com/engine/reference/builder/)
+- [Dockerfile reference](https://docs.docker.com/engine/reference/builder/)
