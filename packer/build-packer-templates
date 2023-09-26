@@ -1,0 +1,15 @@
+#!/usr/bin/env ansible-playbook
+---
+- name: Build packer templates
+  hosts: localhost
+  vars_files:
+    - "{{ lookup('env','HOME') }}/.configuration_management.yml"
+    - "{{ lookup('env','HOME') }}/.packer.yml"
+    - "{{ lookup('env','HOME') }}/.proxmox.yml"
+    - "{{ lookup('env','HOME') }}/.site.yml"
+  tasks:
+    - name: Have packer build Proxmox templates
+      ansible.builtin.include_tasks: build-packer-template.yml
+      loop: "{{ packer.proxmox_templates }}"
+      loop_control:
+        label: "{{ item.name }} ({{ item.id }})"

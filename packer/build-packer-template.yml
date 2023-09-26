@@ -1,0 +1,29 @@
+---
+- name: Build steps
+  block:
+    - name: Ensure {{ item.name }} Proxmox template is built
+      shell: >
+        packer build \
+            -var pm_api_url={{ proxmox.api_url }} \
+            -var pm_api_token_id={{ proxmox.api_token_id }} \
+            -var pm_api_token_secret={{ proxmox.api_token_secret }} \
+            -var pm_iso_storage_pool={{ proxmox.iso_storage_pool }} \
+            -var cm_username={{ cm_acct.user.name }} \
+            -var cm_gecos="{{ cm_acct.user.gecos }}" \
+            -var cm_password="{{ cm_acct.user.password }}" \
+            -var keydir="{{ packer.keydir }}" \
+            -var domain={{ site.domain }} \
+            -var container_host_ip=$(getent hosts host.containers.internal | awk '{print $1;}') \
+            -var vm_name={{ item.name }} \
+            -var vm_id={{ item.id }} \
+            -var vm_node={{ item.node }} \
+            -var vm_storage_pool={{ item.storage_pool }} \
+            -var vm_vlan={{ item.vlan }} \
+            -var vm_installer_file={{ item.installer_file }} \
+            -var mirror={{ item.ifvars.mirror }} \
+            {{ item.packer_template }}
+      register: build
+  rescue:
+    - name: Dump build result
+      debug:
+        var: build
