@@ -1,0 +1,15 @@
+# This file contains the configuration for the account you will use to manager
+# your virtual machines remotely. This account will have admin access on the
+# virtual machines. Obviously, you should seet a better password, encrypt this
+# file with ansible-vault, and set permissions so only you can read it.
+---
+cm_acct:
+  group:
+    name: ansible
+    gid: 1000
+  user:
+    name: ansible
+    gecos: "Configuration Management Account"
+    uid: 1000
+    group: ansible
+    password: p@ssw0rd!

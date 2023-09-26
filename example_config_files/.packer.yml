@@ -1,0 +1,40 @@
+# IMPORTANT!
+# Make sure the ID numbers for the virtual machine templates below to not
+# already exist in your cluster. Packer will fail to build a template if the
+# ID number is already in use.
+#
+# IMPORTANT!
+# Packer does not manage virtual machine templates, it only creates them.
+# This means you must manually delete a template of you make changes and
+# want packer to recreate it.
+---
+packer:
+  # keydir is where packer looks for the SSH public key for your configuration
+  # management account in order to add it to the authorized_keys file within
+  # the virtual machine template.
+  keydir: "{{ lookup('env','HOME') }}/keys"
+  # proxmox_templates is list of settings for one more more virtual machine
+  # templates for packer to build.
+  proxmox_templates:
+    - {
+      # The packer template packer should use when building the VM template
+      packer_template: debian12.pkr.hcl,
+      # The name of the VM template
+      name: debian12-minimal,
+      # The unique ID of the VM template within the Proxmox cluster
+      id: 910,
+      # The Proxmox node on which to build the VM template
+      node: pve3,
+      # The storage location where you will create the VM template's disks
+      storage_pool: truenas1,
+      # The VLAN tag for tne primary network, if any
+      vlan: "",
+      # The installer file packer should use to automate installation
+      installer_file: "debian12-minimal.preseed",
+      # The installer_file is a template and, as a convention, we put any
+      # veriables the installer_file needs into its own dictionary.
+      ifvars: {
+        luks_initial_password: "",
+        mirror: "ftp.us.debian.org"
+      }
+    }

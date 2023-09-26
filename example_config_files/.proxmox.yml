@@ -1,0 +1,13 @@
+# You need to create an account for terraform, within Proxmox, that has
+# sufficient administrative rights to create and destroy virtual machines.
+# Then you need to create an API token that will be used to authenticate that
+# account. Detailed instructions for how to do this are here:
+#
+# https://registry.terraform.io/providers/Telmate/proxmox/latest/docs
+---
+proxmox:
+  api_url: https://pve1.example.com:8006/api2/json
+  api_token_id: terraform@pve!test
+  api_token_secret: abcdef01-2345-6789-abcd-ef0123456789
+  # The name of the storage within the cluster where you keep ISO images
+  iso_storage_pool: local-lvm
