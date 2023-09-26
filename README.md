@@ -9,17 +9,7 @@ TL;DR: You will need:
 It is assumed you are familiar with Linux and, obviously, the more you already know about packer, terraform, ansible, containers, etc. the easier it will be for you.
 
 # Getting Started
-The example files here will spin up a Debian virtual machine in Proxmox.  Before we can run them, we need to do some initial setup.  Specifically, we need to:
-- Download the Debian installation media
-- Create a terraform account within Proxmox
-- Build a development container with all the necessary tools
-
-## Download the Debian installation media
-
-## Create a terraform account within Proxmox
-
-## Build a development container with all the necessary tools
-For repeatability, most work will be done from within a container with a specific set of preconfigured tools. Of course, the exception to this is you will need to be able to build and run this development container on your Linux distribution. I'm using podman and Debian, but as far as I know, this should also work with Docker and other Linux distributions.  However, if you use a different Linux distrubtion, the names of the packages and commands to install them may differ and you will need to adjust them accordingly.
+For repeatability, most work will be done from within a container with a specific set of preconfigured tools. You will need to install git and podman (or docker) to build and run this development container. I'm using podman on Debian Linux, but this should also work with Docker and other Linux distributions.  Since we are not yet working with the environment inside the container, you may need to alter these instuctions to fit your particular distribution if you using something different.
 
 1. Install git and podman
    ```shell
@@ -30,4 +20,4 @@ For repeatability, most work will be done from within a container with a specifi
    cd && git clone https://github.com/dmbrownlee/demo-proxmox-terraform.git
    ```
 
-At this point, you should have a copy of this repository locally and you should be able to view the version of podman (or docker) with `podman -v`.  If that looks good, change to the `~/demo-proxmox-terraform/devcontainer` directory and proceed with the instructions in the `README.md` file there.
+At this point, you should have a copy of this repository locally and you should be able to run the 'hello-world' container with podman (or docker) using `podman run hello-world`.  If that looks good, change to the `~/demo-proxmox-terraform/devcontainer` directory and proceed with the instructions in the `README.md` file to build the development container.
