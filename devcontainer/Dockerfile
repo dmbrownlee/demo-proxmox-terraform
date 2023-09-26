@@ -4,8 +4,8 @@ FROM debian:${debian_version}
 ARG username=user
 ARG uid=1000
 ARG gid=1000
-#ARG addonpkgs="tmux vim-nox vim-ale vim-airline vim-airline-themes vim-youcompleteme iputils-ping"
-ARG addonpkgs="vim-nox"
+#ARG addonpkgs="bash-completion tmux vim-nox vim-ale vim-airline vim-airline-themes vim-youcompleteme"
+ARG addonpkgs="bash-completion vim-nox"
 ARG terraform_version=1.5.7
 ARG arch=amd64
 
@@ -31,6 +31,9 @@ RUN mkdir .venv \
   && python3 -m venv .venv/ansible \
   && exec /bin/bash \
   && source .venv/ansible/bin/activate \
-  && pip3 install ansible
+  && pip3 install ansible \
+  && echo -e 'if [ -f ~/.venv/ansible/bin/activate ]; then\n  . ~/.venv/ansible/bin/activate\nfi\n' | tee -a ~/.bashrc \
+  && echo -e 'source $(/usr/bin/ssh-agent -s)' | tee -a ~/.bashrc \
+  && git clone https://github.com/dmbrownlee/demo-proxmox-terraform.git
 
 ENTRYPOINT ["/bin/bash"]
