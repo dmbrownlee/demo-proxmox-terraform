@@ -26,7 +26,7 @@ packer:
       # The Proxmox node on which to build the VM template
       node: pve3,
       # The storage location where you will create the VM template's disks
-      storage_pool: truenas1,
+      storage_pool: local-lvm,
       # The VLAN tag for tne primary network, if any
       vlan: "",
       # The installer file packer should use to automate installation
