@@ -29,6 +29,7 @@ USER ${username}
 WORKDIR /home/${username}
 RUN /bin/echo -e '\nif [ -f ~/.venv/ansible/bin/activate ]; then\n  . ~/.venv/ansible/bin/activate\nfi' | tee -a ~/.bashrc \
   && /bin/echo -e '\neval $(/usr/bin/ssh-agent -s)' | tee -a ~/.bashrc \
+  && /usr/local/bin/terraform -install-autocomplete \
   && /usr/bin/git clone https://github.com/dmbrownlee/demo-proxmox-terraform.git \
   && /usr/bin/mkdir .venv \
   && /usr/bin/python3 -m venv .venv/ansible \
