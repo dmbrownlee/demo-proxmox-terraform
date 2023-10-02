@@ -8,6 +8,17 @@
     - "{{ lookup('env','HOME') }}/.proxmox.yml"
     - "{{ lookup('env','HOME') }}/.site.yml"
   tasks:
+    - name: Ensure our key directory exists
+      ansible.builtin.file:
+        path: "{{ packer.keydir }}"
+        state: directory
+    - name: Ensure our provisioning user has an SSH keypair
+      community.crypto.openssh_keypair:
+        path: "{{ packer.keydir }}/{{ cm_acct.user.name }}"
+        type: rsa
+        size: 4096
+        comment: "{{ cm_acct.user.name }}"
+        passphrase: "{{ cm_acct.user.sshpassphrase }}"
     - name: Have packer build Proxmox templates
       ansible.builtin.include_tasks: build-packer-template.yml
       loop: "{{ packer.proxmox_templates }}"
