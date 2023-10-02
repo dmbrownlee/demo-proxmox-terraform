@@ -1,0 +1,17 @@
+# Rename this file to terraform.tfvars after updating the values as specific to
+# your Proxmox installation.
+my_api_url          = "https://pve1.example.com:8006/api2/json"
+my_api_token_secret = "01234567-89ab-cdef-0123-456789abcdef"
+my_api_token_id     = "terraform@pve!demo"
+
+# You can override the defaults in variables.tf here if you like.
+#cores     = 2
+#memory    = 2048
+#disk_size = "60G"
+#storage   = "myNAS"
+#vlan      = "10"
+
+# You can also specify values for variables without defaults
+# so you don't get prompted.
+#count       = 1
+#target_node = "pve1"
