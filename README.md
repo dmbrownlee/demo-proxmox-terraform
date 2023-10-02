@@ -5,17 +5,25 @@ This project provides example files demonstrating how to automate the creation a
 TL;DR: You will need:
 - a Proxmox cluster (a single node cluster is fine) for which you have admin rights.
 - a Linux client (workstation, laptop, or virtual machine) capable of running OCI Linux containers
+- a local clone of this git repo
 
 It is assumed you are familiar with Linux and, obviously, the more you already know about packer, terraform, ansible, containers, etc. the easier it will be for you.
 
-# Getting Started
+## Create a terraform account within Proxmox
+You will need to create a Proxmox account for Terraform and generate an API token it can use for authentication.  The process for how to do that is here:
+https://github.com/Telmate/terraform-provider-proxmox/blob/master/docs/index.md
+
+Once you have created the account and token, update ~/.proxmox.yml with your specifics.
+
+## Install podman (or docker)
 For repeatability, most work will be done from within a container with a specific set of preconfigured tools. You will need to install git and podman (or docker) to build and run this development container. I'm using podman on Debian Linux, but this should also work with Docker and other Linux distributions.  Since we are not yet working with the environment inside the container, you may need to alter these instuctions to fit your particular distribution if you using something different.
 
-1. Install git and podman
    ```shell
    sudo apt install -y git podman
    ```
-1. Clone this repository to your home directory
+
+## Clone this repository to your home directory
+You need a local copy of this repo so you can create a development container for the rest of the exercises.
    ```shell
    cd && git clone https://github.com/dmbrownlee/demo-proxmox-terraform.git
    ```
