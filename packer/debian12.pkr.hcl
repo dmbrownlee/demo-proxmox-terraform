@@ -116,11 +116,11 @@ variable "timezone" {
 }
 variable "http_port_max" {
   type    = string
-  default = "9000"
+  default = "8300"
 }
 variable "http_port_min" {
   type    = string
-  default = "8000"
+  default = "8300"
 }
 variable "start_retry_timeout" {
   type    = string
