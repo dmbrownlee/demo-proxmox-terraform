@@ -39,3 +39,8 @@ resource "proxmox_vm_qemu" "vms" {
     tag    = "${var.vlan}"
   }
 }
+
+resource "local_file" "ansible_inventory" {
+  content = templatefile("ansible-inventory.tftpl", { vmlist = proxmox_vm_qemu.vms[*]})
+  filename = "../ansible/terraform-inventory.yml"
+}
