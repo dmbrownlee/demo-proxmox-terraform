@@ -1,0 +1,39 @@
+---
+# tasks file for baseline
+- name: Configure the hostname
+  ansible.builtin.hostname:
+    name: "{{inventory_hostname}}"
+- name: Ensure hostname is fixed in /etc/hosts as well
+  ansible.builtin.lineinfile:
+    line: "127.0.1.1  {{inventory_hostname}}.{{ansible_dns.domain}} {{inventory_hostname}}"
+    regexp: '^127\.0\.1\.1.*$'
+    path: /etc/hosts
+- name: Ensure apt cache is updated
+  ansible.builtin.apt:
+    upgrade: safe
+    update_cache: true
+    cache_valid_time: 300
+- name: Ensure firewalld is installed
+  ansible.builtin.apt:
+    name: firewalld
+- name: Ensure firewalld is enabled at boot
+  ansible.builtin.systemd:
+    name: firewalld
+    state: started
+    enabled: true
+- name: Ensure SELinux is installed
+  ansible.builtin.apt:
+    name:
+      - selinux-basics
+      - selinux-policy-default
+      - auditd
+  register: selinux_installation
+- name: Ensure new SELinux installations are activated
+  ansible.builtin.command:
+    cmd: /usr/sbin/selinux-activate
+  when: selinux_installation.changed
+  register: selinux_activation
+- name: Ensure new SELinux activations are rebooted
+  ansible.builtin.reboot:
+    test_command: /usr/sbin/check-selinux-installation
+  when: selinux_activation.changed

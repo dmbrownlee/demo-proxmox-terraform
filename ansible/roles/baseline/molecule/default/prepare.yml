@@ -1,0 +1,13 @@
+---
+# This playbook prepares the testing containers on the localhost
+- name: Prerequisite configuration for the testing containers (prepare.yml)
+  hosts: all
+  tasks:
+    - name: Ensure the usage of this playbook is clear
+      debug:
+        msg: |
+          This playbook can be used to ensure any assumptions the role has
+          about the state of the host can be configured in the test environment
+          for the role is applied.  For example, you could install common
+          software or add lines to /etc/hosts to override real hostnames for
+          testing.

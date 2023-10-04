@@ -1,0 +1,11 @@
+---
+- name: Ensure all hosts have the same standard operating environment
+  hosts: all
+  vars_files:
+    - "{{ lookup('env','HOME') }}/.configuration_management.yml"
+    - "{{ lookup('env','HOME') }}/.site.yml"
+  remote_user: "{{ cm_acct.user.name }}"
+  become: true
+  gather_facts: true
+  roles:
+    - baseline

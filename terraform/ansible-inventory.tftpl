@@ -1,7 +1,5 @@
 all:
   hosts:
-    localhost:
-      ansible_connection: local
 %{ for vm in vmlist ~}
     ${vm.name}:
       ansible_host: ${vm.default_ipv4_address}
