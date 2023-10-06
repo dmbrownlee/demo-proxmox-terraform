@@ -9,7 +9,7 @@ The first step is to create a container image.  The `Dockerfile` in this directo
 > Note: The following command needs to download the official Debian container image and then install additional software within it.  Make sure you host as connectivity to the Internet.
 
 ```shell
- podman build -t demo-devcontainer:2023092301 -p 8300:8300 --build-arg username=$USER --build-arg uid=$(id -u $USER) --build-arg gid=$(id -g $USER) --squash-all .
+ podman build -t demo-devcontainer:2023092301 --build-arg username=$USER --build-arg uid=$(id -u $USER) --build-arg gid=$(id -g $USER) --squash-all .
  ```
 
 The command to build a container image is `podman build`.  Here is a description of the other options:
@@ -31,7 +31,7 @@ podman image ls
 The container image is like a hard drive waiting to be booted.  To start a container based on this image and get a shell prompt, you use the `podman container run...` command.
 
 ```shell
-podman container run -it --rm --name mydevcontainer -v mydevhome:/home/$USER localhost/demo-devcontainer:2023092301
+podman container run -it --rm --name mydevcontainer -v mydevhome:/home/$USER -p 8300:8300 localhost/demo-devcontainer:2023092301
 ```
 
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Option&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|Explanation|
