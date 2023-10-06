@@ -1,0 +1,65 @@
+# A simple example that creates multiple text files in the current directory.
+
+terraform {
+  required_version = ">= 1.5.7"
+  required_providers {
+    local = {
+      source  = "hashicorp/local"
+      version = ">= 2.4.0"
+    }
+  }
+}
+
+# Here is another variable.  One difference is this variable expects a value
+# of "type" number rather than a string.  Otherwise, it's the same as before.
+# If you specify you want three files, that is how many you get.
+# Because there is no default value for filecount, terraform will prompt
+# you for a number.
+
+variable "filecount" {
+  description = "The number of files"
+  type        = number
+}
+
+# You may have noticed we removed the extension from the default value.  That
+# is because the value of the variable here will now be used as the filename
+# prefix and we will append a number to the file name before appending the
+# extension after that.  See the explanation below.
+
+variable "myfilename" {
+  description = "The name of the file PREFIX to manage."
+  type        = string
+  default     = "data_file"
+}
+
+# Ok, this is a little bit weird.  You have been warned.
+# This resource block *WOULD* be defining a single, local file to manage
+# *EXCEPT* for the fact that there is a "count" attribute which makes
+# this block a list of reousources, all conforming to the rest of the block.
+# "count" is set to the number of copies of this resource block you want and
+# terraform essentially repeats this block that many times.  Additionally,
+# the "count" variable has an "index" attribute that increments with each
+# itteration such that count.index is the number of the current block.
+# Run:
+#   terraform apply
+#
+
+resource "local_file" "my_local_files" {
+  count           = var.filecount
+  content         = "This is file ${var.myfilename}${count.index}.txt."
+  filename        = "${var.myfilename}${count.index}.txt"
+  file_permission = "0644"
+}
+
+# Note, the resource terraform is managing, local_file.my_local_files, is
+# a list of files now, rather than a single file.  If you run "terraform
+# apply" and specify a larger number of files than before, terraform
+# will only create the files needed to bring the file count up to the
+# new total number.  Similarly, if you specify a lower count, terraform
+# will delete the files it no longer needs.
+
+# Remember that:
+#   terraform destroy
+#
+# will remove all the files in local_file.my_local_files regardless
+# of what value you specify when prompted.

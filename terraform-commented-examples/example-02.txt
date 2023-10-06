@@ -1,0 +1,32 @@
+# A simple example that creates a text file in the current directory.
+
+# Here is our terraform block again, only this time, we have specified 
+# which version of terraform the .tf file requires.  If you have an
+# older version of terraform installed, it will complain about your
+# version being too old.
+
+# We've also added a required_providers block.  Providers are plugins
+# that extend terraform's functionality.  The "local" provider is an
+# official provider from HashiCorp that allows terraform to manage
+# local files.  You can also require specific versions of the providers
+# you use as we did here.  Since providers are downloaded and installed
+# when you run "terraform init", you will need to re-run that command
+# if you make changes to these blocks.
+
+# Run this now:
+#   terraform init
+
+terraform {
+  required_version = ">= 1.5.7"
+  required_providers {
+    local = {
+      source = "hashicorp/local"
+      version = ">= 2.4.0"
+    }
+  }
+}
+
+# TIP: terraform maintains a hidden file, .terraform.lock.hcl, that
+# pins the versions of terraform and your providers when you run
+# terraform init.
+

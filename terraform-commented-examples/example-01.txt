@@ -1,0 +1,39 @@
+# This is as simple as it gets, an empty terraform block.  When you run terraform,
+# it concatenates all the files with a .tf extension and uses that combined file
+# as its configuration file.
+
+# In order to run this example file, you need to rename it with a .tf extension or
+# create a symbolic link to it with a .tf extension.
+# Example:
+#   ln -s example-01.txt main.tf
+
+# First, run:
+#   terraform init
+#
+# This tells terraform to initialize itself.  If we had defined addinational
+# providers (think plugins), terraform init would download and install them.
+# 
+# Next, you can run:
+#   terraform validate
+#
+# This causes terraform to check the syntax of your combined .tf files for
+# syntax errors.  This file is so empty, there isn't any room for errors.
+#
+# Next, you can run:
+#   terraform apply
+#
+# This tells terraform to compare the resources defined in the .tf files with
+# what actually exists and will offer to create any missing reosources and
+# modify existing resources if their attributes are different than what we
+# specified.  Since we didn't define any resources, nothing needs to be 
+# created.
+#
+# Finally, you can run:
+#   terraform destroy
+#
+# This tells terraform to destroy any resources it manages.  In this case,
+# it will tell you no resources need to be destroyed because none have
+# been created.
+
+terraform {
+}

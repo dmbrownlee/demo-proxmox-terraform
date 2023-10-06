@@ -1,0 +1,68 @@
+# Another simple example that creates a text file in the current directory.
+
+terraform {
+  required_version = ">= 1.5.7"
+  required_providers {
+    local = {
+      source  = "hashicorp/local"
+      version = ">= 2.4.0"
+    }
+  }
+}
+
+# This time, we will introduce some flexibility in the resource definition
+# by creating a variable to store the name of the file. First, we need to
+# define a variable in a "variable" block and give the variable an arbitrary
+# name, "myfilename" in this case.  We specify the type of the values stored
+# in this variable should be a string.  We could also specify a default
+# value, but that is commented out for the moment.
+
+variable "myfilename" {
+  description = "The name of the file to manage."
+  type        = string
+  #default     = "data_file.txt"
+}
+
+# To use the value stored in the "myfilename" variable, use "var.myfilename"
+# as shown below in the "filename" attribute.  If you want to do string
+# interpolation, that is, use the value stored in a variable within a string,
+# you need to wrap the name of the variable within ${ and } as shown below on
+# in the "content" attribute.
+
+resource "local_file" "my_local_file" {
+  content         = "This is file ${var.myfilename}.\n"
+  filename        = var.myfilename
+  file_permission = "0644"
+}
+
+# Now run:
+#   terraform apply
+#
+# Since no default filename was specified in the the "variable" block,
+# terraform will prompt you for a value and use that as the filename.
+# Now run "terraform apply" again and chose a different filename.
+# Notice that terraform, in addition to creating the file with the new name,
+# also deletes the file with the first name.  That is because there in
+# only one resource being managed by terraform, local_file.my_local_file,
+# and the filename of that resource (local_file.my_local_file.filename) has
+# changed.  That is to say, you instructed terraform to rename the file,
+# not create a second file.
+#
+# Now run:
+#   terraform destroy
+# 
+# When prompted for a filename, pick yet another name. Regardless of which
+# filename you use during "terraform destroy", terraform will destroy
+# the local_file.my_local_file resource using whatever filename terraform
+# used when creating it.  The only reason you are prompted for a filename
+# is because we have defined a variable without specifying a default value.
+# Uncomment the "default" line in the "variable" block above and run:
+#   terraform apply
+#
+# This time it runs without prompting for value and uses the default filename.
+# You can override the default value of a variable like this:
+#   terraform apply -var myfilename=somefile.txt
+#
+# Note: the -var option and its argument must come after "apply", not before.
+# When you think you got the gist of variables, move on after running:
+#   terraform destroy
