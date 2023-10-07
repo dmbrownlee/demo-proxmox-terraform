@@ -19,6 +19,10 @@
         size: 4096
         comment: "{{ cm_acct.user.name }}"
         passphrase: "{{ cm_acct.user.sshpassphrase }}"
+    - name: Ensure packer proxmox plugin has been installed
+      ansible.builtin.command:
+        cmd: /usr/bin/packer init proxmox.pkr.hcl
+        creates: "{{ lookup('env','HOME') }}/.config/packer/plugins/github.com/hashicorp/proxmox"
     - name: Have packer build Proxmox templates
       ansible.builtin.include_tasks: build-packer-template.yml
       loop: "{{ packer.proxmox_templates }}"
