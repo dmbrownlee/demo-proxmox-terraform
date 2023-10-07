@@ -52,6 +52,6 @@ variable "storage" {
 
 variable "vlan" {
   description = "The VLAN tag for the primary network interface"
-  type        = string
-  default     = ""
+  type        = number
+  default     = null
 }

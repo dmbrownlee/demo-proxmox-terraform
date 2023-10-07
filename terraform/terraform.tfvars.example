@@ -9,9 +9,9 @@ my_api_token_id     = "terraform@pve!demo"
 #memory    = 2048
 #disk_size = "60G"
 #storage   = "myNAS"
-#vlan      = "10"
+#vlan      = 10
 
 # You can also specify values for variables without defaults
 # so you don't get prompted.
-#count       = 1
+#vm_count       = 1
 #target_node = "pve1"
