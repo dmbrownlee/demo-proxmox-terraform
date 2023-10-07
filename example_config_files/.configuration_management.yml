@@ -13,3 +13,4 @@ cm_acct:
     uid: 1000
     group: ansible
     password: p@ssw0rd!
+    sshpassphrase: p@ssw0rd!
