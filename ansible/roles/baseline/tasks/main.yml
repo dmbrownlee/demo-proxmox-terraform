@@ -37,3 +37,7 @@
   ansible.builtin.reboot:
     test_command: /usr/sbin/check-selinux-installation
   when: selinux_activation.changed
+- name: Ensure SELinux is in Enforcing mode
+  ansible.posix.selinux:
+    state: enforcing
+    policy: default
