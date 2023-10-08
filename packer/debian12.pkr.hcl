@@ -215,7 +215,7 @@ build {
 
   provisioner "file" {
     source      = "${var.keydir}/${var.cm_username}.pub"
-    destination = "/home/${var.cm_username}/.ssh/authorized_keys2"
+    destination = "/home/${var.cm_username}/.ssh/authorized_keys"
   }
 
   provisioner "shell" {
