@@ -1,0 +1,17 @@
+---
+# This playbook is for post-role verificationl
+- name: Verify ROLE_NAME role actually works (verify.yml)
+  hosts: all
+  tasks:
+    - name: Ensure the usage of this playbook is clear
+      debug:
+        msg: |
+          This playbook can be used to verify the role has met its objectives.
+          The the tasks of the role may not have failed, there may still be
+          semantic problems, for example, the playbook is missing a task to
+          start a service ot open a port in the host's firewall.  The assert
+          module can be useful here.
+    - name: Ensure there is a silly example demonstrating assert
+      ansible.builtin.assert:
+        that:
+          - true
