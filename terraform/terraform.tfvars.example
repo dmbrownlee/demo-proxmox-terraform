@@ -1,5 +1,15 @@
 # Rename this file to terraform.tfvars after updating the values as specific to
 # your Proxmox installation.
+#
+# Note, if you don't want these stored in a .tfvars file, you could
+# also set these values in environment variables with TF_VAR_ prepended
+# to the variable names here.
+#
+# Example:
+#   export TF_VAR_my_api_url="https://pve1.example.com:8006/api2/json"
+#   export TF_VAR_my_api_token_secret="01234567-89ab-cdef-0123-456789abcdef"
+#   export TF_VAR_my_api_token_id="terraform@pve!demo"
+#
 my_api_url          = "https://pve1.example.com:8006/api2/json"
 my_api_token_secret = "01234567-89ab-cdef-0123-456789abcdef"
 my_api_token_id     = "terraform@pve!demo"
