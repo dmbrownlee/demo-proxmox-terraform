@@ -33,6 +33,7 @@ RUN /bin/echo -e '\nif [ -f ~/.venv/ansible/bin/activate ]; then\n  . ~/.venv/an
   && /usr/bin/git clone https://github.com/dmbrownlee/demo-proxmox-terraform.git \
   && /usr/bin/mkdir .venv \
   && /usr/bin/python3 -m venv .venv/ansible \
-  && /bin/bash -c 'source ~/.venv/ansible/bin/activate && /usr/bin/env pip3 install ansible'
+  && /bin/bash -c 'source ~/.venv/ansible/bin/activate && /usr/bin/env pip3 install ansible' \
+  && /bin/bash -c '~/.venv/ansible/bin/ansible-galaxy collection install cloud.terraform'
 
 ENTRYPOINT ["/bin/bash"]
