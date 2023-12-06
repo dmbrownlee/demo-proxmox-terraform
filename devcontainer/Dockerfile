@@ -6,7 +6,7 @@ ARG uid=1000
 ARG gid=1000
 #ARG addonpkgs="bash-completion tmux vim-nox vim-ale vim-airline vim-airline-themes vim-youcompleteme"
 ARG addonpkgs="bash-completion jq python3-paramiko vim-nox"
-ARG terraform_version=1.6.1
+ARG terraform_version=1.6.5
 ARG arch=amd64
 
 
