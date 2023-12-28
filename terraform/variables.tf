@@ -1,15 +1,15 @@
 # These variables are for the Proxmox provider
-variable "my_api_url" {
+variable "pm_api_url" {
   description = "URL of the Proxmox cluster API"
   type        = string
 }
 
-variable "my_api_token_secret" {
+variable "pm_api_token_secret" {
   description = "Proxmox API token secret"
   type        = string
 }
 
-variable "my_api_token_id" {
+variable "pm_api_token_id" {
   description = "Proxmox API token ID"
   type        = string
 }
