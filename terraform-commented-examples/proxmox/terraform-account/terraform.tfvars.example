@@ -1,0 +1,2 @@
+# Provider variables
+endpoint            = "https://pve1.example.com:8006/"
