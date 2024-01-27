@@ -1,7 +1,7 @@
 # A simple example that creates multiple text files in the current directory.
 
 terraform {
-  required_version = ">= 1.5.7"
+  required_version = ">= 1.7.1"
   required_providers {
     local = {
       source  = "hashicorp/local"
