@@ -19,20 +19,20 @@ resource "proxmox_vm_qemu" "vms" {
   boot                   = "order=scsi0;ide2;net0"
   cores                  = var.cores
   define_connection_info = true
-  full_clone             = false
+  full_clone             = true
   memory                 = var.memory
-  oncreate               = true
   qemu_os                = "l26"
   scsihw                 = "virtio-scsi-single"
-  disk {
-    backup   = true
-    discard  = "on"
-    iothread = 1
-    size     = var.disk_size
-    ssd      = 1
-    storage  = var.storage
-    type     = "scsi"
-  }
+  vm_state               = "running"
+  /* disk { */
+/* #    backup   = true */
+/* #    discard  = "on" */
+/* #    iothread = 1 */
+  /*   size     = var.disk_size */
+/* #    ssd      = 1 */
+  /*   storage  = var.storage */
+  /*   type     = "scsi" */
+  /* } */
   network {
     bridge = "vmbr0"
     model  = "virtio"
