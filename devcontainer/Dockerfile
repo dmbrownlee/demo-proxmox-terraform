@@ -7,6 +7,7 @@ ARG gid=1000
 #ARG addonpkgs="bash-completion tmux vim-nox vim-ale vim-airline vim-airline-themes vim-youcompleteme"
 ARG addonpkgs="bash-completion jq python3-paramiko tmux vim-ale vim-airline vim-common vim-fugitive vim-nox vim-youcompleteme"
 ARG terraform_version=1.7.4
+ARG helm_version=3.14.2
 ARG arch=amd64
 
 
@@ -21,6 +22,10 @@ RUN /usr/bin/apt update -y \
   && /usr/bin/curl -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/${terraform_version}/terraform_${terraform_version}_linux_${arch}.zip \
   && /usr/bin/unzip -d /usr/local/bin /tmp/terraform.zip \
   && /usr/bin/rm /tmp/terraform.zip \
+  && /usr/bin/curl -o /root/helm.tar.gz https://get.helm.sh/helm-v${helm_version}-linux-amd64.tar.gz \
+  && /usr/bin/tar xvf /root/helm.tar.gz -C /root \
+  && /usr/bin/cp /root/linux-amd64/helm /usr/local/bin/helm \
+  && /usr/bin/rm -rf /root/helm.tar.gz /root/linux-amd64 \
   && /usr/sbin/groupadd -g ${gid} ${username} \
   && /usr/sbin/useradd -m -d /home/${username} -g ${username} -G sudo -s /bin/bash -u ${uid} ${username} \
   && /bin/echo "${username} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/99${username}

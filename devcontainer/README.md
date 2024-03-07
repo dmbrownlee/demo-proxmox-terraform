@@ -9,7 +9,7 @@ The first step is to create a container image.  The `Dockerfile` in this directo
 > Note: The following command needs to download the official Debian container image and then install additional software within it.  Make sure you host as connectivity to the Internet.
 
 ```shell
- podman build -t demo-devcontainer:$(date '+%Y%m%d%H%M') --build-arg username=$USER --build-arg uid=$(id -u $USER) --build-arg gid=$(id -g $USER) --squash-all .
+ podman build -t demo-devcontainer:$(date '+%Y%m%d%H%M') -t demo-devcontainer:latest --build-arg username=$USER --build-arg uid=$(id -u $USER) --build-arg gid=$(id -g $USER) --squash-all .
  ```
 
 The command to build a container image is `podman build`.  Here is a description of the other options:
@@ -31,7 +31,7 @@ podman image ls
 The container image is like a hard drive waiting to be booted.  To start a container based on this image and get a shell prompt, you use the `podman container run...` command.
 
 ```shell
-podman container run -it --rm --name mydevcontainer -v mydevhome:/home/$USER -p 8300:8300 localhost/demo-devcontainer:202310071205
+podman container run -it --rm --name mydevcontainer -v mydevhome:/home/$USER -p 8300:8300 localhost/demo-devcontainer:latest
 ```
 
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Option&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|Explanation|
@@ -41,7 +41,7 @@ podman container run -it --rm --name mydevcontainer -v mydevhome:/home/$USER -p 
 |`--name ...`|The `--name mydevcontainer` option just assigns a name to the container which could be anything.  If you don't specify a name, a name will be randomly generated so this isn't necessary, but it is helpful in identifying the container if you have other containers running on the same machine.|
 |`-v ...`|The `-v mydevhome:/home/$USER` option attaches a persistent volume named `mydevhome` (which is created if it doesn't exist) to the `/home/$USER` directory inside the container.  This means changes within your home directory inside the container will be available in future containers so long as they are also started with this same option.  Note, since we are removing the container on exit, any changes outside of the home directory are lost.  This is great for ensuring a consistent set of utilities within the container while still allowing you save custom tweaks to your editor and git configurations.|
 
-After the command line options, the `localhost/demo-devcontainer:202310071205` argument specifies which image we want to start. This should match the name of the image from when you built it (`podman image ls` will list your images if you are not sure of the name).
+After the command line options, the `localhost/demo-devcontainer:latest` argument specifies which image we want to start. This should match the name of the image from when you built it (`podman image ls` will list your images if you are not sure of the name).
 
 > Note: The hostname within the container is the first part of the container's ID so the host part of your shell prompt will be a hexideecimal string.
 
