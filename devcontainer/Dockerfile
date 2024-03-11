@@ -12,7 +12,7 @@ ARG arch=amd64
 
 
 RUN /usr/bin/apt update -y \
-  && /usr/bin/apt install -y curl git gpg lsb-release openssh-client python3 python3-pip python3-venv python3-bcrypt software-properties-common sshpass sudo ${addonpkgs} unzip \
+  && /usr/bin/apt install -y bind9-dnsutils curl git gpg inetutils-ping lsb-release openssh-client python3 python3-pip python3-venv python3-bcrypt software-properties-common sshpass sudo ${addonpkgs} unzip \
   && /usr/bin/curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --yes --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg \
   && /usr/bin/chmod 644 /usr/share/keyrings/hashicorp-archive-keyring.gpg \
   && /bin/echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/apt_releases_hashicorp_com.list \
