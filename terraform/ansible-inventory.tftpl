@@ -1,6 +1,0 @@
-all:
-  hosts:
-%{ for vm in vmlist ~}
-    ${vm.name}:
-      ansible_host: ${vm.default_ipv4_address}
-%{ endfor ~}

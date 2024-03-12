@@ -1,0 +1,292 @@
+# Rename this file to terraform.tfvars after supplying your own site
+# specific values.
+#=============
+# Proxmox
+#=============
+# Here is where we specify the URL for the web API for the Proxmox cluster.
+endpoint = "https://pve1.example.com:8006/"
+
+# Here we specify which Proxmox node on which to store the VM templates and
+# the name of the storage we use for storing ISO images (actually qcow2
+# cloud-init images ).
+vm_storage = "truenas1"
+vm_template_storage = {
+  node = "pve3",
+  name = "truenas1"
+}
+iso_storage = {
+  node = "pve3",
+  name = "truenas1"
+}
+
+# Here is where we specify the node interface to which we add the VLANs. The
+# switch port patched to this interface should be configured as a VLAN trunk.
+node_vlan_interfaces = {
+  pve1 = "vmbr0"
+  pve2 = "vmbr0"
+  pve3 = "vmbr0"
+}
+
+#=============
+# Cloud-init
+#=============
+# This is where we specify the user credentials for the administrative user
+# cloud-init will create on each VM cloned from a cloud-init template image.
+# Since we will be using Ansible for configuration management, it makes sense
+# for this to be the "ansible" user.  If any other users need to be configured,
+# Ansible can do that.  After Terraform has created and booted the VM, it will
+# run Ansible to do further machine configuration.  The corresponding private
+# SSH key should be added to your SSH agent as SSH is usually configured to
+# disallow password logins.  Note, the public key does not include the comment
+# you see at the end of the line in the .pub file.
+ciuser     = "ansible"
+cipassword = "AGoodPassword"
+cipubkey   = ["ssh-rsa aaabbbcccdddeeefffggghhhiiijjjkkklllmmmnnnooopppqqqrrrssstttuuuvvvwwwxxxyyyzzzAAABBBCCCDDDEEEFFFGGGHHHIIIJJJKKKLLLMMMNNNOOOPPPQQQRRRSSSTTTUUUVVVWWWXXXYYYZZZ111222333444555666777888999000=="]
+
+#=============
+# Ansible
+#=============
+# ssh_private_key_files is a map of paths to SSH private key files indexed by
+# username.  Here, we specify the location of the "ansible" user's private
+# SSH key that needs to be known when Terraform runs ansible-playbook.
+ssh_private_key_files = {
+  ansible = "~/keys/ansible"
+}
+
+#=============
+# Site VLANs
+#=============
+# vlans is a map of site VLAN objects indexed by name.  Besides the VLAN ID,
+# each VLAN specifies networking configuration for the netblock the VLAN uses
+# in case the virtual machines connected to the VLAN do not use DHCP for
+# network configuration.
+vlans = [
+  {
+    vlan_id = 10,
+    comment = "PROVISIONING",
+    ipv4_gateway = "192.168.10.254",
+    ipv4_dns_servers = [ "192.168.10.254" ]
+  },
+  {
+    vlan_id = 1000,
+    comment = "LABS",
+    ipv4_gateway = "192.168.80.254",
+    ipv4_dns_servers = [ "192.168.80.254" ]
+  },
+  {
+    vlan_id = 80,
+    comment = "DMZ",
+    ipv4_gateway = "192.168.83.254",
+    ipv4_dns_servers = [ "192.168.83.254" ]
+  },
+]
+
+#=========================
+# cloud-init image files
+#=========================
+# cloud_init_images stores a map of distro cloud-init images that should exist
+# within Proxmox storage.  Terraform will download these to the Proxmox
+# cluster's ISO storage.  Note, Proxmox does not recognize the .qcow2 extension
+# so the resulting filename, as it appears in the Proxmox ISO storage, needs to
+# end in .img.
+cloud_init_images = {
+  debian12-genericcloud-20240102 = {
+    url       = "https://cloud.debian.org/images/cloud/bookworm/20240102-1614/debian-12-genericcloud-amd64-20240102-1614.qcow2",
+    file_name = "debian-12-genericcloud-amd64-20240102.qcow2.img"
+  },
+  debian12-genericcloud-20240211 = {
+    url       = "https://cloud.debian.org/images/cloud/bookworm/20240211-1654/debian-12-genericcloud-amd64-20240211-1654.qcow2",
+    file_name = "debian-12-genericcloud-amd64-20240211.qcow2.img"
+  }
+}
+
+#============================
+# Template virtual machines
+#============================
+# vm_templates describes a map of virtual machine templates Terraform will
+# create from the disk images listed above in cloud_init_images. The keys for
+# the map are the names of the template virtual machines and the objects they
+# refer to contain the name of the cloud-init image to use, the Proxmox VM id
+# to use, and the VLAN the template will default to using.
+vm_templates = {
+  debian12-genericcloud-20240102 = {
+    vm_id            = 999,
+    cloud_init_image = "debian12-genericcloud-20240102",
+  },
+  debian12-genericcloud-20240211 = {
+    vm_id            = 998,
+    cloud_init_image = "debian12-genericcloud-20240211",
+  }
+}
+
+#============================
+# Site virtual machines
+#============================
+# Here is where we specify the details of the VMs we will clone.
+vms = [
+  {
+    vm_id            = 400,
+    hostname         = "ns1",
+    role             = "dnsmasq",
+    pve_node         = "pve1",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    hardware         = {
+      cpu_cores = 1,
+      memory    = 512,
+      disk      = 20
+    }
+    mac_address      = "ca:fe:01:07:01:01",
+    vlan_id          = 80,
+    ipv4_address     = "192.168.83.3/24"
+  },
+  {
+    vm_id            = 401,
+    hostname         = "ns2",
+    role             = "dnsmasq",
+    pve_node         = "pve2",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    hardware         = {
+      cpu_cores = 1,
+      memory    = 512,
+      disk      = 20
+    }
+    mac_address      = "ca:fe:01:07:02:01",
+    vlan_id          = 80,
+    ipv4_address     = "192.168.83.4/24"
+  },
+  {
+    vm_id            = 402,
+    hostname         = "lb1",
+    role             = "load_balancer",
+    pve_node         = "pve1",
+    cloud_init_image = "debian12-genericcloud-20240211",
+    hardware         = {
+      cpu_cores = 1,
+      memory    = 512,
+      disk      = 20
+    }
+    mac_address      = "ca:fe:01:06:01:01",
+    vlan_id          = 80,
+    ipv4_address     = "192.168.83.251/24"
+  },
+  {
+    vm_id            = 403,
+    hostname         = "lb2",
+    role             = "load_balancer",
+    pve_node         = "pve2",
+    cloud_init_image = "debian12-genericcloud-20240211",
+    hardware         = {
+      cpu_cores = 1,
+      memory    = 512,
+      disk      = 20
+    }
+    mac_address      = "ca:fe:01:06:02:01",
+    vlan_id          = 80,
+    ipv4_address     = "192.168.83.252/24"
+  },
+  {
+    vm_id            = 404,
+    hostname         = "k8scp1",
+    role             = "k8s_control_plane",
+    pve_node         = "pve1",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    hardware         = {
+      cpu_cores = 2,
+      memory    = 8192,
+      disk      = 60
+    }
+    mac_address      = "ca:fe:01:05:01:01",
+    vlan_id          = 80,
+    ipv4_address     = "192.168.83.91/24"
+  },
+  {
+    vm_id            = 405,
+    hostname         = "k8scp2",
+    role             = "k8s_control_plane",
+    pve_node         = "pve2",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    hardware         = {
+      cpu_cores = 2,
+      memory    = 8192,
+      disk      = 60
+    }
+    mac_address      = "ca:fe:01:05:02:01",
+    vlan_id          = 80,
+    ipv4_address     = "192.168.83.92/24"
+  },
+  {
+    vm_id            = 406,
+    hostname         = "k8scp3",
+    role             = "k8s_control_plane",
+    pve_node         = "pve3",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    hardware         = {
+      cpu_cores = 2,
+      memory    = 8192,
+      disk      = 60
+    }
+    mac_address      = "ca:fe:01:05:03:01",
+    vlan_id          = 80,
+    ipv4_address     = "192.168.83.93/24"
+  },
+  {
+    vm_id            = 407,
+    hostname         = "k8sw1",
+    role             = "k8s_worker",
+    pve_node         = "pve1",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    hardware         = {
+      cpu_cores = 2,
+      memory    = 8192,
+      disk      = 60
+    }
+    mac_address      = "ca:fe:01:05:04:01",
+    vlan_id          = 80,
+    ipv4_address     = "192.168.83.94/24"
+  },
+  {
+    vm_id            = 408,
+    hostname         = "k8sw2",
+    role             = "k8s_worker",
+    pve_node         = "pve2",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    hardware         = {
+      cpu_cores = 2,
+      memory    = 8192,
+      disk      = 60
+    }
+    mac_address      = "ca:fe:01:05:05:01",
+    vlan_id          = 80,
+    ipv4_address     = "192.168.83.95/24"
+  },
+  {
+    vm_id            = 409,
+    hostname         = "k8sw3",
+    role             = "k8s_worker",
+    pve_node         = "pve3",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    hardware         = {
+      cpu_cores = 2,
+      memory    = 8192,
+      disk      = 60
+    }
+    mac_address      = "ca:fe:01:05:06:01",
+    vlan_id          = 80,
+    ipv4_address     = "192.168.83.96/24"
+  },
+  {
+    vm_id            = 410,
+    hostname         = "minikube",
+    role             = "minikube",
+    pve_node         = "pve1",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    hardware         = {
+      cpu_cores = 8,
+      memory    = 16384,
+      disk      = 40
+    }
+    mac_address      = "ca:fe:01:05:00:01",
+    vlan_id          = 1000,
+    ipv4_address     = "192.168.80.90/24"
+  }
+]
