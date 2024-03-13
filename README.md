@@ -1,31 +1,17 @@
 # demo-proxmox-terraform Summary
-This project provides example files demonstrating how to automate the creation and configuration of Proxmox virtual machines using a combination of Packer, Terraform and Ansible.  There is a lot learn when setting this up and, rather than being an exhaustive explanation, this project aims to provide a working example to tinker with while you explore the pieces you find interesting.
+This project provides example files demonstrating how to automate the configuration of Proxmox and creation of virtual machines.  There is a lot learn when setting this up and, rather than being an exhaustive explanation, this project aims to provide a working example to tinker with while you explore the pieces you find interesting.
 
-# Prerequisites
+## Prerequisites
 TL;DR: You will need:
 - a Proxmox cluster (a single node cluster is fine) for which you have admin rights.
-- a Linux client (workstation, laptop, or virtual machine) capable of running OCI Linux containers
-- a local clone of this git repo
+- Terraform and Ansible installed (alternatively, you can use my demo devcontainer which has been moved to its own repo: https://github.com/dmbrownlee/demo-containers/tree/main/devcontainer)
 
-It is assumed you are familiar with Linux and, obviously, the more you already know about packer, terraform, ansible, containers, etc. the easier it will be for you.
+It is assumed you are familiar with Linux and, obviously, the more you already know about terraform, ansible, containers, etc. the easier it will be for you.
 
 ## Create a terraform account within Proxmox
-You will need to create a Proxmox account for Terraform and generate an API token it can use for authentication.  The process for how to do that is here:
-https://github.com/Telmate/terraform-provider-proxmox/blob/master/docs/index.md
+By default, Proxmox has a root account and you could use an API token with that.  However, it's probably a better idea to create a Proxmox account specifically for Terraform and generate an API token it can use for authentication.  Given the types of configuration changes we will make with Terraform, the Terraform account will still have extensive prrivileges, but we can restritct it where possible and disable it entirely if need be without affecting the root account.
 
-Once you have created the account and token, update ~/.proxmox.yml with your specifics.
+Since you only need to do this once, there is a separate directory with Terraform configs that will create the Terraform role and account with the necessary permissions to make setup easier.  This is the only Terraform configuration that needs to use the root account.  After that, the Terrafrom account will be used.  Follow the directions in that directory's [README.md](terraform/proxmox-users/README.md) before proceeding.
 
-## Install podman (or docker)
-For repeatability, most work will be done from within a container with a specific set of preconfigured tools. You will need to install git and podman (or docker) to build and run this development container. I'm using podman on Debian Linux, but this should also work with Docker and other Linux distributions.  Since we are not yet working with the environment inside the container, you may need to alter these instuctions to fit your particular distribution if you using something different.
-
-   ```shell
-   sudo apt install -y git podman
-   ```
-
-## Clone this repository to your home directory
-You need a local copy of this repo so you can create a development container for the rest of the exercises.
-   ```shell
-   cd && git clone https://github.com/dmbrownlee/demo-proxmox-terraform.git
-   ```
-
-At this point, you should have a copy of this repository locally and you should be able to run the 'hello-world' container with podman (or docker) using `podman run hello-world`.  If that looks good, change to the `~/demo-proxmox-terraform/devcontainer` directory and proceed with the instructions in the `README.md` file to build the development container.
+## Configure Proxmox using the Terraform demo project
+The demo project will configure VLANs, build template virtual machines from cloud-init images, clone those templates to various virtual machines, and then use Ansible to configure those virtual machines for different roles.  It is an evolving work in progress.  See the [README.md](terraform/proxmox/README.md) in the project's directory for the latest info.

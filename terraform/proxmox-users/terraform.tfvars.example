@@ -1,0 +1,2 @@
+# "endpoint" is the URL for the Proxmox web UI.
+endpoint = "https://pve1.example.com:8006/"
