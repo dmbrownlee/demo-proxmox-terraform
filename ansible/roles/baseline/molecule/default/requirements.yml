@@ -1,4 +1,0 @@
----
-# List colections and roles the molecule playbooks need here
-collections:
-  - containers.podman

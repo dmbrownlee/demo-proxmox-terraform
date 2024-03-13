@@ -1,3 +1,0 @@
----
-- name: baseline
-  import_playbook: role_baseline.yml
