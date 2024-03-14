@@ -1,10 +1,14 @@
 # Rename this file to terraform.tfvars after supplying your own site
 # specific values.
-#=============
-# Proxmox
-#=============
+#==========================================
+# Proxmox connectivity and authentication
+#==========================================
 # Here is where we specify the URL for the web API for the Proxmox cluster.
 endpoint = "https://pve1.example.com:8006/"
+
+# The API Token is the combination of the ID and secret:
+api_token = "terraform@pve!demo=12345678-90ab-cdef-1234-567890abcdef"
+
 
 # Here we specify which Proxmox node on which to store the VM templates and
 # the name of the storage we use for storing ISO images (actually qcow2
@@ -62,22 +66,40 @@ ssh_private_key_files = {
 # network configuration.
 vlans = [
   {
-    vlan_id = 10,
-    comment = "PROVISIONING",
-    ipv4_gateway = "192.168.10.254",
-    ipv4_dns_servers = [ "192.168.10.254" ]
+    vlan_id          = 10,
+    comment          = "PROVISIONING",
+    ipv4_gateway     = "192.168.0.254",
+    ipv4_dns_servers = ["192.168.80.254"]
+  },
+  /* { */
+  /*   vlan_id          = 20, */
+  /*   comment          = "SERVER", */
+  /*   ipv4_gateway     = "192.168.16.254", */
+  /*   ipv4_dns_servers = ["192.168.16.254"] */
+  /* }, */
+  {
+    vlan_id          = 30,
+    comment          = "WIRED",
+    ipv4_gateway     = "192.168.32.254",
+    ipv4_dns_servers = ["192.168.32.254"]
   },
   {
-    vlan_id = 1000,
-    comment = "LABS",
-    ipv4_gateway = "192.168.80.254",
-    ipv4_dns_servers = [ "192.168.80.254" ]
+    vlan_id          = 80,
+    comment          = "LAB_80",
+    ipv4_gateway     = "192.168.80.254",
+    ipv4_dns_servers = ["192.168.80.254"]
   },
   {
-    vlan_id = 80,
-    comment = "DMZ",
-    ipv4_gateway = "192.168.83.254",
-    ipv4_dns_servers = [ "192.168.83.254" ]
+    vlan_id          = 81,
+    comment          = "LAB_81",
+    ipv4_gateway     = "192.168.81.254",
+    ipv4_dns_servers = ["192.168.81.254"]
+  },
+  {
+    vlan_id          = 82,
+    comment          = "LAB_82",
+    ipv4_gateway     = "192.168.82.254",
+    ipv4_dns_servers = ["192.168.82.254"]
   },
 ]
 
@@ -90,10 +112,6 @@ vlans = [
 # so the resulting filename, as it appears in the Proxmox ISO storage, needs to
 # end in .img.
 cloud_init_images = {
-  debian12-genericcloud-20240102 = {
-    url       = "https://cloud.debian.org/images/cloud/bookworm/20240102-1614/debian-12-genericcloud-amd64-20240102-1614.qcow2",
-    file_name = "debian-12-genericcloud-amd64-20240102.qcow2.img"
-  },
   debian12-genericcloud-20240211 = {
     url       = "https://cloud.debian.org/images/cloud/bookworm/20240211-1654/debian-12-genericcloud-amd64-20240211-1654.qcow2",
     file_name = "debian-12-genericcloud-amd64-20240211.qcow2.img"
@@ -109,10 +127,6 @@ cloud_init_images = {
 # refer to contain the name of the cloud-init image to use, the Proxmox VM id
 # to use, and the VLAN the template will default to using.
 vm_templates = {
-  debian12-genericcloud-20240102 = {
-    vm_id            = 999,
-    cloud_init_image = "debian12-genericcloud-20240102",
-  },
   debian12-genericcloud-20240211 = {
     vm_id            = 998,
     cloud_init_image = "debian12-genericcloud-20240211",
@@ -130,14 +144,14 @@ vms = [
     role             = "dnsmasq",
     pve_node         = "pve1",
     cloud_init_image = "debian12-genericcloud-20240211"
-    hardware         = {
+    hardware = {
       cpu_cores = 1,
       memory    = 512,
       disk      = 20
     }
-    mac_address      = "ca:fe:01:07:01:01",
-    vlan_id          = 80,
-    ipv4_address     = "192.168.83.3/24"
+    mac_address  = "ca:fe:01:07:01:01",
+    vlan_id      = 80,
+    ipv4_address = "192.168.80.3/24"
   },
   {
     vm_id            = 401,
@@ -145,14 +159,14 @@ vms = [
     role             = "dnsmasq",
     pve_node         = "pve2",
     cloud_init_image = "debian12-genericcloud-20240211"
-    hardware         = {
+    hardware = {
       cpu_cores = 1,
       memory    = 512,
       disk      = 20
     }
-    mac_address      = "ca:fe:01:07:02:01",
-    vlan_id          = 80,
-    ipv4_address     = "192.168.83.4/24"
+    mac_address  = "ca:fe:01:07:02:01",
+    vlan_id      = 80,
+    ipv4_address = "192.168.80.4/24"
   },
   {
     vm_id            = 402,
@@ -160,14 +174,14 @@ vms = [
     role             = "load_balancer",
     pve_node         = "pve1",
     cloud_init_image = "debian12-genericcloud-20240211",
-    hardware         = {
+    hardware = {
       cpu_cores = 1,
       memory    = 512,
       disk      = 20
     }
-    mac_address      = "ca:fe:01:06:01:01",
-    vlan_id          = 80,
-    ipv4_address     = "192.168.83.251/24"
+    mac_address  = "ca:fe:01:06:01:01",
+    vlan_id      = 80,
+    ipv4_address = "192.168.80.251/24"
   },
   {
     vm_id            = 403,
@@ -175,118 +189,208 @@ vms = [
     role             = "load_balancer",
     pve_node         = "pve2",
     cloud_init_image = "debian12-genericcloud-20240211",
-    hardware         = {
+    hardware = {
       cpu_cores = 1,
       memory    = 512,
       disk      = 20
     }
-    mac_address      = "ca:fe:01:06:02:01",
-    vlan_id          = 80,
-    ipv4_address     = "192.168.83.252/24"
+    mac_address  = "ca:fe:01:06:02:01",
+    vlan_id      = 80,
+    ipv4_address = "192.168.80.252/24"
   },
   {
-    vm_id            = 404,
+    vm_id            = 410,
     hostname         = "k8scp1",
     role             = "k8s_control_plane",
     pve_node         = "pve1",
     cloud_init_image = "debian12-genericcloud-20240211"
-    hardware         = {
+    hardware = {
       cpu_cores = 2,
       memory    = 8192,
       disk      = 60
     }
-    mac_address      = "ca:fe:01:05:01:01",
-    vlan_id          = 80,
-    ipv4_address     = "192.168.83.91/24"
+    mac_address  = "ca:fe:01:80:01:01",
+    vlan_id      = 80,
+    ipv4_address = "192.168.80.90/24"
   },
   {
-    vm_id            = 405,
+    vm_id            = 411,
     hostname         = "k8scp2",
     role             = "k8s_control_plane",
     pve_node         = "pve2",
     cloud_init_image = "debian12-genericcloud-20240211"
-    hardware         = {
+    hardware = {
       cpu_cores = 2,
       memory    = 8192,
       disk      = 60
     }
-    mac_address      = "ca:fe:01:05:02:01",
-    vlan_id          = 80,
-    ipv4_address     = "192.168.83.92/24"
+    mac_address  = "ca:fe:01:80:02:01",
+    vlan_id      = 80,
+    ipv4_address = "192.168.80.91/24"
   },
   {
-    vm_id            = 406,
+    vm_id            = 412,
     hostname         = "k8scp3",
     role             = "k8s_control_plane",
     pve_node         = "pve3",
     cloud_init_image = "debian12-genericcloud-20240211"
-    hardware         = {
+    hardware = {
       cpu_cores = 2,
       memory    = 8192,
       disk      = 60
     }
-    mac_address      = "ca:fe:01:05:03:01",
-    vlan_id          = 80,
-    ipv4_address     = "192.168.83.93/24"
+    mac_address  = "ca:fe:01:80:03:01",
+    vlan_id      = 80,
+    ipv4_address = "192.168.80.92/24"
   },
   {
-    vm_id            = 407,
+    vm_id            = 413,
     hostname         = "k8sw1",
     role             = "k8s_worker",
     pve_node         = "pve1",
     cloud_init_image = "debian12-genericcloud-20240211"
-    hardware         = {
+    hardware = {
       cpu_cores = 2,
       memory    = 8192,
       disk      = 60
     }
-    mac_address      = "ca:fe:01:05:04:01",
-    vlan_id          = 80,
-    ipv4_address     = "192.168.83.94/24"
+    mac_address  = "ca:fe:01:80:04:01",
+    vlan_id      = 80,
+    ipv4_address = "192.168.80.93/24"
   },
   {
-    vm_id            = 408,
+    vm_id            = 414,
     hostname         = "k8sw2",
     role             = "k8s_worker",
     pve_node         = "pve2",
     cloud_init_image = "debian12-genericcloud-20240211"
-    hardware         = {
+    hardware = {
       cpu_cores = 2,
       memory    = 8192,
       disk      = 60
     }
-    mac_address      = "ca:fe:01:05:05:01",
-    vlan_id          = 80,
-    ipv4_address     = "192.168.83.95/24"
+    mac_address  = "ca:fe:01:80:05:01",
+    vlan_id      = 80,
+    ipv4_address = "192.168.80.94/24"
   },
   {
-    vm_id            = 409,
+    vm_id            = 415,
     hostname         = "k8sw3",
     role             = "k8s_worker",
     pve_node         = "pve3",
     cloud_init_image = "debian12-genericcloud-20240211"
-    hardware         = {
+    hardware = {
       cpu_cores = 2,
       memory    = 8192,
       disk      = 60
     }
-    mac_address      = "ca:fe:01:05:06:01",
-    vlan_id          = 80,
-    ipv4_address     = "192.168.83.96/24"
+    mac_address  = "ca:fe:01:80:06:01",
+    vlan_id      = 80,
+    ipv4_address = "192.168.80.95/24"
   },
   {
-    vm_id            = 410,
+    vm_id            = 510,
     hostname         = "minikube",
     role             = "minikube",
     pve_node         = "pve1",
     cloud_init_image = "debian12-genericcloud-20240211"
-    hardware         = {
+    hardware = {
       cpu_cores = 8,
       memory    = 16384,
       disk      = 40
     }
-    mac_address      = "ca:fe:01:05:00:01",
-    vlan_id          = 1000,
-    ipv4_address     = "192.168.80.90/24"
-  }
+    mac_address  = "ca:fe:01:81:00:01",
+    vlan_id      = 81,
+    ipv4_address = "192.168.81.90/24"
+  },
+  {
+    vm_id            = 610,
+    hostname         = "k3scp1",
+    role             = "k3s_control_plane",
+    pve_node         = "pve1",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    hardware = {
+      cpu_cores = 2,
+      memory    = 8192,
+      disk      = 60
+    }
+    mac_address  = "ca:fe:01:80:01:01",
+    vlan_id      = 80,
+    ipv4_address = "192.168.82.90/24"
+  },
+  {
+    vm_id            = 611,
+    hostname         = "k3scp2",
+    role             = "k3s_control_plane",
+    pve_node         = "pve2",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    hardware = {
+      cpu_cores = 2,
+      memory    = 8192,
+      disk      = 60
+    }
+    mac_address  = "ca:fe:01:80:02:01",
+    vlan_id      = 80,
+    ipv4_address = "192.168.82.91/24"
+  },
+  {
+    vm_id            = 612,
+    hostname         = "k3scp3",
+    role             = "k3s_control_plane",
+    pve_node         = "pve3",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    hardware = {
+      cpu_cores = 2,
+      memory    = 8192,
+      disk      = 60
+    }
+    mac_address  = "ca:fe:01:80:03:01",
+    vlan_id      = 80,
+    ipv4_address = "192.168.82.92/24"
+  },
+  {
+    vm_id            = 613,
+    hostname         = "k3sw1",
+    role             = "k3s_worker",
+    pve_node         = "pve1",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    hardware = {
+      cpu_cores = 2,
+      memory    = 8192,
+      disk      = 60
+    }
+    mac_address  = "ca:fe:01:80:04:01",
+    vlan_id      = 80,
+    ipv4_address = "192.168.82.93/24"
+  },
+  {
+    vm_id            = 614,
+    hostname         = "k3sw2",
+    role             = "k3s_worker",
+    pve_node         = "pve2",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    hardware = {
+      cpu_cores = 2,
+      memory    = 8192,
+      disk      = 60
+    }
+    mac_address  = "ca:fe:01:80:05:01",
+    vlan_id      = 80,
+    ipv4_address = "192.168.82.94/24"
+  },
+  {
+    vm_id            = 615,
+    hostname         = "k3sw3",
+    role             = "k3s_worker",
+    pve_node         = "pve3",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    hardware = {
+      cpu_cores = 2,
+      memory    = 8192,
+      disk      = 60
+    }
+    mac_address  = "ca:fe:01:80:06:01",
+    vlan_id      = 80,
+    ipv4_address = "192.168.82.95/24"
+  },
 ]
