@@ -61,8 +61,11 @@ resource "proxmox_virtual_environment_vm" "minikube" {
     agent = true
     host  = self.name
   }
+  provisioner "local-exec" {
+    command = "sleep 40"
+  }
   provisioner "remote-exec" {
-    inline = ["ip a"]
+    inline = ["hostnamectl"]
   }
   vga {
     type = "qxl"
