@@ -1,0 +1,29 @@
+vrrp_instance {{ vrrp_instance1_name }} {
+  state {{ vrrp_instance1_state }}
+  interface eth0
+  virtual_router_id {{ vrrp_instance1_router_id }}
+  priority {{ vrrp_instance1_priority }}
+  advert_int 1
+  authentication {
+    auth_type PASS
+    auth_pass {{ vrrp_instance1_pw }}
+  }
+  virtual_ipaddress {
+    {{ vrrp_instance1_ip }}
+  }
+}
+
+vrrp_instance {{ vrrp_instance2_name }} {
+  state {{ vrrp_instance2_state }}
+  interface eth0
+  virtual_router_id {{ vrrp_instance2_router_id }}
+  priority {{ vrrp_instance2_priority }}
+  advert_int 1
+  authentication {
+    auth_type PASS
+    auth_pass {{ vrrp_instance2_pw }}
+  }
+  virtual_ipaddress {
+    {{ vrrp_instance2_ip }}
+  }
+}
