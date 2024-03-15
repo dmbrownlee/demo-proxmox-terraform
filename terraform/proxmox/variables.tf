@@ -79,6 +79,11 @@ variable "ssh_private_key_files" {
   type        = map(string)
 }
 
+variable "sleep_seconds_before_remote_provisioning" {
+  description = "The number of seconds to wait after booting before trying SSH"
+  type        = number
+}
+
 #=========================
 # cloud-init image files
 #=========================

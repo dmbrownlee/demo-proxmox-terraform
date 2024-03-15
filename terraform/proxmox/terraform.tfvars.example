@@ -31,6 +31,10 @@ node_vlan_interfaces = {
   pve3 = "vmbr0"
 }
 
+# This delay, in seconds, is to reduce output of failed connections attempts
+# while we're waiting for the SSH service to start.
+sleep_seconds_before_remote_provisioning = 40
+
 #=============
 # Cloud-init
 #=============

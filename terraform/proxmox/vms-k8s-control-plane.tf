@@ -63,7 +63,7 @@ resource "proxmox_virtual_environment_vm" "k8s_control_plane" {
     host  = self.name
   }
   provisioner "local-exec" {
-    command = "sleep 40"
+    command = "sleep ${var.sleep_seconds_before_remote_provisioning}"
   }
   provisioner "remote-exec" {
     inline = ["hostnamectl"]
