@@ -19,6 +19,7 @@ resource "proxmox_virtual_environment_vm" "k8s_workers" {
   cpu {
     sockets = 1
     cores   = each.value.hardware.cpu_cores
+    type    = "x86-64-v2-AES"
   }
   disk {
     datastore_id = var.vm_storage

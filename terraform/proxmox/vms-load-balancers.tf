@@ -19,6 +19,7 @@ resource "proxmox_virtual_environment_vm" "load_balancers" {
   cpu {
     sockets = 1
     cores   = each.value.hardware.cpu_cores
+    type    = "x86-64-v2-AES"
   }
   disk {
     datastore_id = var.vm_storage
