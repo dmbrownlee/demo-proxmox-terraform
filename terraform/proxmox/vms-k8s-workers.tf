@@ -40,9 +40,9 @@ resource "proxmox_virtual_environment_vm" "k8s_workers" {
       }
     }
     user_account {
-      username = var.ciuser
-      password = var.cipassword
-      keys     = var.cipubkey
+      username = var.ci_user
+      password = var.ci_password
+      keys     = [trimspace(data.local_file.ci_ssh_public_key_file.content)]
     }
   }
   memory {
@@ -57,7 +57,7 @@ resource "proxmox_virtual_environment_vm" "k8s_workers" {
   on_boot = true
   connection {
     type  = "ssh"
-    user  = var.ciuser
+    user  = var.ci_user
     agent = true
     host  = self.name
   }

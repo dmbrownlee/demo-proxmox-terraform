@@ -2,6 +2,12 @@ variable "node_vlan_interfaces" {
   type = map(string)
 }
 
+variable "ssh_keystore" {
+  description = "Path to directory of SSH keys"
+  type        = string
+  default     = "~/keys"
+}
+
 variable "vlans" {
   description = "Map of VLAN objects indexed on name"
   type = list(object({
@@ -56,21 +62,16 @@ variable "endpoint" {
   default     = "https://pve1.example.com:8006/"
 }
 
-variable "ciuser" {
+variable "ci_user" {
   description = "Default cloud-init account"
   type        = string
   default     = "ansible"
 }
 
-variable "cipassword" {
+variable "ci_password" {
   description = "Password for cloud-init account"
   type        = string
   sensitive   = true
-}
-
-variable "cipubkey" {
-  description = "Cloud-init public key"
-  type        = list(string)
 }
 
 variable "ssh_private_key_files" {
