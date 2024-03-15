@@ -1,0 +1,77 @@
+---
+- name: Prepare minikube nodes
+  hosts: all
+  become: yes
+  tasks:
+    - name: Wait until the lock file is removed
+      ansible.builtin.wait_for:
+        path: /var/lock/file.lock
+        state: absent
+    - name: Ensure package cache is updated
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+    - name: Wait until the lock file is removed
+      ansible.builtin.wait_for:
+        path: /var/lock/file.lock
+        state: absent
+    - name: Ensure default system packages are up to date
+      ansible.builtin.apt:
+        upgrade: yes
+        autoclean: yes
+    - name: Ensure GPG and some other handy items are installed
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - bash-completion
+          - ca-certificates
+          - curl
+          - git
+          - gnupg
+          - vim
+    - name: Install minikube .deb package from the internet
+      ansible.builtin.apt:
+        deb: https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb 
+    - name: Ensure the GPG key for the docker apt repo is installed
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        keyring: /etc/apt/trusted.gpg.d/docker.gpg
+    - name: Ensure docker registry is configured
+      ansible.builtin.apt_repository:
+        repo: deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker.gpg] https://download.docker.com/linux/debian bookworm stable
+        filename: docker
+      register: docker_repo
+    - name: Wait until the lock file is removed
+      ansible.builtin.wait_for:
+        path: /var/lock/file.lock
+        state: absent
+    - name: Ensure package cache and default system packages are up to date
+      ansible.builtin.apt:
+        update_cache: yes
+      when: docker_repo.changed
+    - name: Wait until the lock file is removed
+      ansible.builtin.wait_for:
+        path: /var/lock/file.lock
+        state: absent
+    - name: Ensure containerd is installed
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+    - name: Ensure the ansible user is added to the docker group
+      ansible.builtin.user:
+        name: ansible
+        groups: docker
+        append: yes
+    - name: Ensure kustomize is installed
+      ansible.builtin.unarchive:
+        src: https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.3.0/kustomize_v5.3.0_linux_amd64.tar.gz
+        dest: /usr/local/bin
+        remote_src: yes
+        owner: root
+        group: root
+        mode: '0755'
+        creates: /usr/local/bin/kustomize
+
