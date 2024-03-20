@@ -1,87 +1,87 @@
 # Append this to ~/.ssh/config since the host keys for the VMs managed by
 # Terraform will change whenever you destroy and recreate them.
 
-Host ns1.example.com
+Host ns1
   StrictHostKeyChecking no
   User ansible
   UserKnownHostsFile /dev/null
 
-Host ns2.example.com
+Host ns2
   StrictHostKeyChecking no
   User ansible
   UserKnownHostsFile /dev/null
 
-Host lb1.example.com
+Host lb1
   StrictHostKeyChecking no
   User ansible
   UserKnownHostsFile /dev/null
 
-Host lb2.example.com
+Host lb2
   StrictHostKeyChecking no
   User ansible
   UserKnownHostsFile /dev/null
 
-Host k8scp1.example.com
+Host k8scp1
   StrictHostKeyChecking no
   User ansible
   UserKnownHostsFile /dev/null
 
-Host k8scp2.example.com
+Host k8scp2
   StrictHostKeyChecking no
   User ansible
   UserKnownHostsFile /dev/null
 
-Host k8scp3.example.com
+Host k8scp3
   StrictHostKeyChecking no
   User ansible
   UserKnownHostsFile /dev/null
 
-Host k8sw1.example.com
+Host k8sw1
   StrictHostKeyChecking no
   User ansible
   UserKnownHostsFile /dev/null
 
-Host k8sw2.example.com
+Host k8sw2
   StrictHostKeyChecking no
   User ansible
   UserKnownHostsFile /dev/null
 
-Host k8sw3.example.com
+Host k8sw3
   StrictHostKeyChecking no
   User ansible
   UserKnownHostsFile /dev/null
 
-Host minikube.example.com
+Host minikube
   StrictHostKeyChecking no
   User ansible
   UserKnownHostsFile /dev/null
 
-Host k3scp1.example.com
+Host k3scp1
   StrictHostKeyChecking no
   User ansible
   UserKnownHostsFile /dev/null
 
-Host k3scp2.example.com
+Host k3scp2
   StrictHostKeyChecking no
   User ansible
   UserKnownHostsFile /dev/null
 
-Host k3scp3.example.com
+Host k3scp3
   StrictHostKeyChecking no
   User ansible
   UserKnownHostsFile /dev/null
 
-Host k3sw1.example.com
+Host k3sw1
   StrictHostKeyChecking no
   User ansible
   UserKnownHostsFile /dev/null
 
-Host k3sw2.example.com
+Host k3sw2
   StrictHostKeyChecking no
   User ansible
   UserKnownHostsFile /dev/null
 
-Host k3sw3.example.com
+Host k3sw3
   StrictHostKeyChecking no
   User ansible
   UserKnownHostsFile /dev/null
