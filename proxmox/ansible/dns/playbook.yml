@@ -1,0 +1,38 @@
+---
+- name: Prepare DNS virtual machines
+  hosts: all
+  become: yes
+  tasks:
+    - name: Wait until the lock file is removed
+      ansible.builtin.wait_for:
+        path: /var/lock/file.lock
+        state: absent
+    - name: Ensure package cache is updated
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+    - name: Ensure common packages are installed
+      ansible.builtin.apt:
+        name:
+          - bash-completion
+          - ca-certificates
+          - curl
+          - vim
+    - name: Ensure role specific packages are installed
+      ansible.builtin.apt:
+        name:
+          - bind9
+          - bind9-dnsutils
+    # - name: Ensure named is configured correctly
+    #   ansible.builtin.template:
+    #     dest: /etc/containerd/config.toml
+    #     owner: root
+    #     group: root
+    #     mode: '-644'
+    #     src: config.toml.j2
+    #   register: containerd_config
+    # - name: Ensure containerd is restarted if its configuration changed
+    #   ansible.builtin.systemd:
+    #     name: containerd
+    #     state: restarted
+    #   when: containerd_config.changed

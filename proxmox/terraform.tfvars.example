@@ -144,7 +144,7 @@ vms = [
   {
     vm_id            = 400,
     hostname         = "ns1",
-    role             = "dnsmasq",
+    role             = "dns",
     pve_node         = "pve1",
     cloud_init_image = "debian12-genericcloud-20240211"
     hardware = {
@@ -159,7 +159,7 @@ vms = [
   {
     vm_id            = 401,
     hostname         = "ns2",
-    role             = "dnsmasq",
+    role             = "dns",
     pve_node         = "pve2",
     cloud_init_image = "debian12-genericcloud-20240211"
     hardware = {

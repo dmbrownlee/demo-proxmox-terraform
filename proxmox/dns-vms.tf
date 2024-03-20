@@ -1,6 +1,6 @@
-resource "proxmox_virtual_environment_vm" "dnsmasq" {
+resource "proxmox_virtual_environment_vm" "dns" {
   depends_on  = [proxmox_virtual_environment_vm.vm_templates]
-  for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "dnsmasq" }
+  for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "dns" }
   name        = each.key
   description = "Managed by Terraform"
   tags        = ["terraform", each.value.cloud_init_image, each.value.role]
