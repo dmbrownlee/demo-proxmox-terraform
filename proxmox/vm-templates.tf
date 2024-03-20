@@ -1,4 +1,7 @@
 resource "proxmox_virtual_environment_download_file" "cloud_init_images" {
+  depends_on = [
+    proxmox_virtual_environment_network_linux_vlan.vlans
+  ]
   for_each     = toset(keys(var.cloud_init_images))
   content_type = "iso"
   overwrite    = true
@@ -11,7 +14,6 @@ resource "proxmox_virtual_environment_download_file" "cloud_init_images" {
 resource "proxmox_virtual_environment_vm" "vm_templates" {
   depends_on = [
     proxmox_virtual_environment_download_file.cloud_init_images,
-    proxmox_virtual_environment_network_linux_vlan.vlans
   ]
   for_each        = var.vm_templates
   acpi            = true

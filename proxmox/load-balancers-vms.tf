@@ -1,7 +1,6 @@
 resource "proxmox_virtual_environment_vm" "load_balancers" {
   depends_on = [
-    proxmox_virtual_environment_vm.vm_templates,
-    proxmox_virtual_environment_vm.dns
+    ansible_playbook.dns
   ]
   for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "load_balancer" }
   name        = each.key

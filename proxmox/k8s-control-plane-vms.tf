@@ -1,7 +1,6 @@
 resource "proxmox_virtual_environment_vm" "k8s_control_plane" {
   depends_on = [
-    proxmox_virtual_environment_vm.vm_templates,
-    proxmox_virtual_environment_vm.dns
+    ansible_playbook.load-balancers
   ]
   for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "k8s_control_plane" }
   name        = each.key
