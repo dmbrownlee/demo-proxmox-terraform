@@ -1,6 +1,6 @@
 resource "proxmox_virtual_environment_vm" "minikube" {
   depends_on = [
-    ansible_playbook.load-balancers
+    ansible_playbook.load_balancers
   ]
   for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "minikube" }
   name        = each.key
