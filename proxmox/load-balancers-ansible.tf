@@ -17,7 +17,7 @@ resource "ansible_playbook" "load_balancers" {
   for_each                = { for vm in var.vms : vm.hostname => vm if vm.role == "load_balancer" }
   name                    = each.key
   playbook                = "ansible/load-balancers/playbook.yml"
-  replayable              = true
+  replayable              = var.ansible_replayable
   ignore_playbook_failure = true
   var_files = [
     "ansible/load-balancers/${each.key}_vrrp.yml"

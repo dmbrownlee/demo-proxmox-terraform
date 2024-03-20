@@ -59,6 +59,8 @@ ci_password = "AGoodPassword"
 ssh_private_key_files = {
   ansible = "~/keys/ansible"
 }
+# Uncomment if you don't want Ansible playbooks to be run after the first time.
+#ansible_replayable = false
 
 #=============
 # Site VLANs

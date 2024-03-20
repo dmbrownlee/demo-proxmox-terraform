@@ -18,6 +18,12 @@ variable "vlans" {
   }))
 }
 
+variable "ansible_replayable" {
+  description = "Flag whether or not Ansible playbooks can be run again."
+  type        = bool
+  default     = true
+}
+
 variable "vm_templates" {
   description = "Map of VM template objects keyed on template name"
   type = map(object({

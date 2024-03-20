@@ -11,7 +11,7 @@ resource "ansible_playbook" "minikube" {
   for_each                = { for vm in var.vms : vm.hostname => vm if vm.role == "minikube" }
   playbook                = "ansible/minikube/playbook.yml"
   name                    = each.key
-  replayable              = true
+  replayable              = var.ansible_replayable
   ignore_playbook_failure = true
   extra_vars = {
     private_key      = var.ssh_private_key_files[var.ci_user]
