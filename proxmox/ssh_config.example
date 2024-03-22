@@ -56,6 +56,11 @@ Host minikube
   User ansible
   UserKnownHostsFile /dev/null
 
+Host yunohost
+  StrictHostKeyChecking no
+  User ansible
+  UserKnownHostsFile /dev/null
+
 Host k3scp1
   StrictHostKeyChecking no
   User ansible

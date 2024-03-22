@@ -13,6 +13,7 @@
 192.168.80.251  lb1.example.com       lb1
 192.168.80.252  lb2.example.com       lb2
 192.168.81.90   minikube.example.com  minikube
+192.168.81.91   yunohost.example.com  yunohost
 192.168.82.90   k3scp1.example.com    k3scp1
 192.168.82.91   k3scp2.example.com    k3scp2
 192.168.82.92   k3scp3.example.com    k3scp3

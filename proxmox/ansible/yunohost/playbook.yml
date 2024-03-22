@@ -1,0 +1,48 @@
+---
+- name: Prepare yunohost
+  hosts: all
+  become: yes
+  tasks:
+    - name: Ensure default system packages are up to date
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+        upgrade: yes
+        autoclean: yes
+    - name: Ensure common packages are installed
+      ansible.builtin.apt:
+        name:
+          - bash-completion
+          - curl
+          - vim
+    - name: Ensure the yunohost installer script is downloaded
+      ansible.builtin.get_url:
+        url: https://install.yunohost.org/
+        dest: /root/yunohost_installer.sh
+        owner: root
+        group: root
+        mode: '0755'
+      register: yunohost_installer_download
+    - name: Ensure yunohost installer is run once
+      ansible.builtin.command:
+        cmd: /root/yunohost_installer.sh -a
+      when: yunohost_installer_download.changed
+      register: yunohost_installer_run
+    - name: Ensure yunohost post install tool is run
+      ansible.builtin.command:
+        argv:
+          - yunohost
+          - tools
+          - postinstall
+          - -d
+          - "yunohost.example.com"
+          - -u
+          - yunohost
+          - -p
+          - y!P455w0rDz
+          - -F
+          - yunohost
+      when: yunohost_installer_run.changed
+      register: postinstall
+    - debug:
+        var: postinstall.stdout_lines
