@@ -43,3 +43,8 @@ terraform.log
 
 # Terraform generated Ansible inventory
 terraform-inventory.yml
+
+# Local DNS zone files
+proxmox/ansible/dns/files/dns-zone-files/zones.local
+proxmox/ansible/dns/files/dns-zone-files/db.*
+

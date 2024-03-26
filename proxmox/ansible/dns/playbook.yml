@@ -23,16 +23,29 @@
         name:
           - bind9
           - bind9-dnsutils
-    # - name: Ensure named is configured correctly
-    #   ansible.builtin.template:
-    #     dest: /etc/containerd/config.toml
-    #     owner: root
-    #     group: root
-    #     mode: '-644'
-    #     src: config.toml.j2
-    #   register: containerd_config
-    # - name: Ensure containerd is restarted if its configuration changed
-    #   ansible.builtin.systemd:
-    #     name: containerd
-    #     state: restarted
-    #   when: containerd_config.changed
+    - name: Ensure named is configured to include the local zone files
+      ansible.builtin.template:
+        dest: /etc/bind/named.conf.local
+        owner: root
+        group: root
+        mode: '0644'
+        src: named.conf.local.j2
+      register: local_zone_config
+    - name: Ensure the local zone files are copied
+      ansible.builtin.copy:
+        dest: /etc/bind/
+        owner: root
+        group: root
+        mode: '0644'
+        src: files/dns-zone-files/
+      register: local_zone_db_files
+    - name: Ensure named is reloaded if the zone files changed
+      ansible.builtin.systemd:
+        name: named
+        state: restarted
+      when: local_zone_config.changed or local_zone_db_files.changed
+    - name: Ensure systemd-resolved is disabled
+      ansible.builtin.systemd:
+        name: systemd-resolved
+        state: stopped
+        enabled: false
