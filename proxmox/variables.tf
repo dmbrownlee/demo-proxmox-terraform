@@ -1,3 +1,22 @@
+# Set to true if you want Terraform to provision the K8S control plane nodes
+# and worker nodes as well as the associated load balancers.
+variable "want_k8s" {
+  type    = bool
+  default = false
+}
+
+# Set to true if you want Terraform to provision minikube
+variable "want_minikube" {
+  type    = bool
+  default = false
+}
+
+# Set to true if you want Terraform to provision yunohost
+variable "want_yunohost" {
+  type    = bool
+  default = false
+}
+
 variable "node_vlan_interfaces" {
   type = map(string)
 }

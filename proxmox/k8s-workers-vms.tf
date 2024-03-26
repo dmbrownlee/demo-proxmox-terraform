@@ -2,7 +2,7 @@ resource "proxmox_virtual_environment_vm" "k8s_workers" {
   depends_on = [
     ansible_playbook.load_balancers
   ]
-  for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "k8s_worker" }
+  for_each    = { for vm in var.vms : vm.hostname => vm if var.want_k8s && vm.role == "k8s_worker" }
   name        = each.key
   description = "Managed by Terraform"
   tags        = ["terraform", each.value.cloud_init_image, each.value.role]

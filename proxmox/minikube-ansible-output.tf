@@ -1,3 +1,3 @@
 output "playbook_output_minikube" {
-  value = ansible_playbook.minikube
+  value = var.want_minikube ? ansible_playbook.minikube : null
 }

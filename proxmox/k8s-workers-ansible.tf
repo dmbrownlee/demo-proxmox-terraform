@@ -1,5 +1,5 @@
 resource "ansible_host" "k8s_workers" {
-  for_each = { for vm in var.vms : vm.hostname => vm if vm.role == "k8s_worker" }
+  for_each = { for vm in var.vms : vm.hostname => vm if var.want_k8s && vm.role == "k8s_worker" }
   name     = each.key
   groups   = ["worker_nodes"]
   depends_on = [
@@ -8,7 +8,7 @@ resource "ansible_host" "k8s_workers" {
 }
 
 resource "ansible_playbook" "k8s_workers" {
-  for_each                = { for vm in var.vms : vm.hostname => vm if vm.role == "k8s_worker" }
+  for_each                = { for vm in var.vms : vm.hostname => vm if var.want_k8s && vm.role == "k8s_worker" }
   playbook                = "ansible/kubernetes/playbook.yml"
   name                    = each.key
   replayable              = var.ansible_replayable

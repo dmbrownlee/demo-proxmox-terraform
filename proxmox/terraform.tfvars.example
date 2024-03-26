@@ -1,5 +1,15 @@
 # Rename this file to terraform.tfvars after supplying your own site
 # specific values.
+
+
+#==========================================
+# Uncomment to enable optional VMs
+#==========================================
+#want_k8s      = true
+#want_minikube = true
+#want_yunohost = true
+
+
 #==========================================
 # Proxmox connectivity and authentication
 #==========================================
@@ -117,6 +127,10 @@ vlans = [
 # so the resulting filename, as it appears in the Proxmox ISO storage, needs to
 # end in .img.
 cloud_init_images = {
+  debian11-genericcloud-20240211 = {
+    url       = "https://cloud.debian.org/images/cloud/bullseye/20240211-1654/debian-11-genericcloud-amd64-20240211-1654.qcow2",
+    file_name = "debian-11-genericcloud-amd64-20240211.qcow2.img",
+  }
   debian12-genericcloud-20240211 = {
     url       = "https://cloud.debian.org/images/cloud/bookworm/20240211-1654/debian-12-genericcloud-amd64-20240211-1654.qcow2",
     file_name = "debian-12-genericcloud-amd64-20240211.qcow2.img",
@@ -132,6 +146,10 @@ cloud_init_images = {
 # refer to contain the name of the cloud-init image to use, the Proxmox VM id
 # to use, and the VLAN the template will default to using.
 vm_templates = {
+  debian11-genericcloud-20240211 = {
+    vm_id            = 999,
+    cloud_init_image = "debian11-genericcloud-20240211",
+  }
   debian12-genericcloud-20240211 = {
     vm_id            = 998,
     cloud_init_image = "debian12-genericcloud-20240211",
@@ -307,6 +325,21 @@ vms = [
     mac_address  = "ca:fe:01:81:00:01",
     vlan_id      = 81,
     ipv4_address = "192.168.81.90/24"
+  },
+  {
+    vm_id            = 511,
+    hostname         = "yunohost",
+    role             = "yunohost",
+    pve_node         = "pve1",
+    cloud_init_image = "debian11-genericcloud-20240211"
+    hardware = {
+      cpu_cores = 8,
+      memory    = 16384,
+      disk      = 40
+    }
+    mac_address  = "ca:fe:01:81:01:01",
+    vlan_id      = 81,
+    ipv4_address = "192.168.81.91/24"
   },
   {
     vm_id            = 610,

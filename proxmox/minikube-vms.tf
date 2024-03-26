@@ -2,7 +2,7 @@ resource "proxmox_virtual_environment_vm" "minikube" {
   depends_on = [
     ansible_playbook.load_balancers
   ]
-  for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "minikube" }
+  for_each    = { for vm in var.vms : vm.hostname => vm if var.want_minikube && vm.role == "minikube" }
   name        = each.key
   description = "Managed by Terraform"
   tags        = ["terraform", each.value.cloud_init_image, each.value.role]

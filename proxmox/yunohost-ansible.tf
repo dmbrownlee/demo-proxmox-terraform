@@ -1,5 +1,5 @@
 resource "ansible_host" "yunohost" {
-  for_each = { for vm in var.vms : vm.hostname => vm if vm.role == "yunohost" }
+  for_each = { for vm in var.vms : vm.hostname => vm if var.want_yunohost && vm.role == "yunohost" }
   name     = each.key
   groups   = ["yunohost"]
   depends_on = [
@@ -8,7 +8,7 @@ resource "ansible_host" "yunohost" {
 }
 
 resource "ansible_playbook" "yunohost" {
-  for_each                = { for vm in var.vms : vm.hostname => vm if vm.role == "yunohost" }
+  for_each                = { for vm in var.vms : vm.hostname => vm if var.want_yunohost && vm.role == "yunohost" }
   playbook                = "ansible/yunohost/playbook.yml"
   name                    = each.key
   replayable              = var.ansible_replayable
