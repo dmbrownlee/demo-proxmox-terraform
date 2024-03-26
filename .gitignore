@@ -1,4 +1,5 @@
 *.swp
+*.save
 
 # Local .terraform directories
 **/.terraform/*
