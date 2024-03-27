@@ -11,6 +11,12 @@ variable "want_minikube" {
   default = false
 }
 
+# Set to true if you want Terraform to provision k3s
+variable "want_k3s" {
+  type    = bool
+  default = false
+}
+
 # Set to true if you want Terraform to provision yunohost
 variable "want_yunohost" {
   type    = bool

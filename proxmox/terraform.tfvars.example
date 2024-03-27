@@ -7,6 +7,7 @@
 #==========================================
 #want_k8s      = true
 #want_minikube = true
+#want_k3s      = true
 #want_yunohost = true
 
 
