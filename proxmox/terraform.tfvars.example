@@ -7,7 +7,10 @@
 #==========================================
 #want_k8s      = true
 #want_minikube = true
-#want_k3s      = true
+#want_k3s = true
+#want_k3s_master = false     # you should leaave this commented out
+#want_k3s_servers = false
+#want_k3s_agents = false
 #want_yunohost = true
 
 
@@ -72,6 +75,11 @@ ssh_private_key_files = {
 }
 # Uncomment if you don't want Ansible playbooks to be run after the first time.
 #ansible_replayable = false
+
+#=============
+# Site Config
+#=============
+site_domain = "site1.example.com"
 
 #=============
 # Site VLANs
@@ -345,7 +353,7 @@ vms = [
   {
     vm_id            = 610,
     hostname         = "k3scp1",
-    role             = "k3s_control_plane",
+    role             = "k3s_master",
     pve_node         = "pve1",
     cloud_init_image = "debian12-genericcloud-20240211"
     hardware = {
@@ -354,13 +362,13 @@ vms = [
       disk      = 60
     }
     mac_address  = "ca:fe:01:80:01:01",
-    vlan_id      = 80,
+    vlan_id      = 82,
     ipv4_address = "192.168.82.90/24"
   },
   {
     vm_id            = 611,
     hostname         = "k3scp2",
-    role             = "k3s_control_plane",
+    role             = "k3s_server",
     pve_node         = "pve2",
     cloud_init_image = "debian12-genericcloud-20240211"
     hardware = {
@@ -369,13 +377,13 @@ vms = [
       disk      = 60
     }
     mac_address  = "ca:fe:01:80:02:01",
-    vlan_id      = 80,
+    vlan_id      = 82,
     ipv4_address = "192.168.82.91/24"
   },
   {
     vm_id            = 612,
     hostname         = "k3scp3",
-    role             = "k3s_control_plane",
+    role             = "k3s_server",
     pve_node         = "pve3",
     cloud_init_image = "debian12-genericcloud-20240211"
     hardware = {
@@ -384,13 +392,13 @@ vms = [
       disk      = 60
     }
     mac_address  = "ca:fe:01:80:03:01",
-    vlan_id      = 80,
+    vlan_id      = 82,
     ipv4_address = "192.168.82.92/24"
   },
   {
     vm_id            = 613,
     hostname         = "k3sw1",
-    role             = "k3s_worker",
+    role             = "k3s_agent",
     pve_node         = "pve1",
     cloud_init_image = "debian12-genericcloud-20240211"
     hardware = {
@@ -399,13 +407,13 @@ vms = [
       disk      = 60
     }
     mac_address  = "ca:fe:01:80:04:01",
-    vlan_id      = 80,
+    vlan_id      = 82,
     ipv4_address = "192.168.82.93/24"
   },
   {
     vm_id            = 614,
     hostname         = "k3sw2",
-    role             = "k3s_worker",
+    role             = "k3s_agent",
     pve_node         = "pve2",
     cloud_init_image = "debian12-genericcloud-20240211"
     hardware = {
@@ -414,13 +422,13 @@ vms = [
       disk      = 60
     }
     mac_address  = "ca:fe:01:80:05:01",
-    vlan_id      = 80,
+    vlan_id      = 82,
     ipv4_address = "192.168.82.94/24"
   },
   {
     vm_id            = 615,
     hostname         = "k3sw3",
-    role             = "k3s_worker",
+    role             = "k3s_agent",
     pve_node         = "pve3",
     cloud_init_image = "debian12-genericcloud-20240211"
     hardware = {
@@ -429,7 +437,7 @@ vms = [
       disk      = 60
     }
     mac_address  = "ca:fe:01:80:06:01",
-    vlan_id      = 80,
+    vlan_id      = 82,
     ipv4_address = "192.168.82.95/24"
   },
 ]
