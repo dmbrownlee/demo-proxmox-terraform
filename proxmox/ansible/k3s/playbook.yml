@@ -1,114 +1,33 @@
 ---
 - name: Common
   hosts: all
+  environment:
+    INSTALL_K3S_SKIP_START: true
+    INSTALL_K3S_VERSION: "{{ k3s_version }}"
+    K3S_TOKEN: "{{ k3s_token }}"
   tasks:
-    # - name: Ensure /etc/hosts includes k3s nodes
-    #   ansible.builtin.blockinfile:
-    #     path: /etc/cloud/templates/hosts.debian.tmpl
-    #     block: |
-    #       10.48.80.90  k3s-server-1.lab1.site1.thebrownleefamily.net k3s-server-1.lab1 rancher.lab1.site1.thebrownleefamily.net rancher.lab1
-    #       10.48.80.91  k3s-server-2.lab1.site1.thebrownleefamily.net k3s-server-2.lab1
-    #       10.48.80.92  k3s-server-3.lab1.site1.thebrownleefamily.net k3s-server-3.lab1
-    #       10.48.80.93  k3s-agent-1.lab1.site1.thebrownleefamily.net k3s-agent-1.lab1
-    #       10.48.80.94  k3s-agent-2.lab1.site1.thebrownleefamily.net k3s-agent-2.lab1
-    #   become: true
-    #   register: hosts_edit1
-    # - name: Ensure /etc/hosts is updated
-    #   ansible.builtin.lineinfile:
-    #     path: /etc/cloud/templates/hosts.debian.tmpl
-    #     regexp: '^(127\.0\.1\.1 .*)$'
-    #     line: '#\1'
-    #     backrefs: true
-    #   become: true
-    #   register: hosts_edit2
-    # - name: Ensure host is rebooted if /etc/hosts was changed
-    #   ansible.builtin.reboot:
-    #   when: hosts_edit1.changed or hosts_edit2.changed
-    #   become: true
-    - name: Ensure common packages are installed
-      ansible.builtin.apt:
-        update_cache: true
-        cache_valid_time: 3000
-      become: true
     - name: Ensure common packages are installed
       ansible.builtin.apt:
         name:
-          - policycoreutils
-          - autofs
+          - python3-kubernetes
+        lock_timeout: 180
       become: true
-    - name: Ensure automounts are configured
-      ansible.builtin.lineinfile:
-        path: /etc/auto.master
-        regexp: '^#(/net.*)$'
-        line: '\1'
-        backrefs: true
-      become: true
-      register: auto_master
-    - name: Ensure autofs is restarted
-      ansible.builtin.systemd:
-        state: restarted
-        name: autofs
-      become: true
-      when: auto_master.changed
-- name: Configure initial k3s server
-  hosts: k3s_initial_cp
-  environment:
-    INSTALL_K3S_VERSION: "{{ k3s_version }}"
-  tasks:
-    - name: Ensure initial cluster server is installed
-      ansible.builtin.shell:
-        cmd: curl -sfL https://get.k3s.io | K3S_TOKEN={{ k3s_token }} sh -s - server --cluster-init
-      args:
-        creates: /etc/rancher/k3s/k3s.yaml
-      become: true
-    - name: Ensure ansible user has a ~/.kube directory
+    - name: Ensure the K3S drop-in configuration directory exists
       ansible.builtin.file:
-        path: /home/ansible/.kube
+        path: /etc/rancher/k3s/config.yaml.d
         state: directory
-        owner: ansible
-        group: ansible
-        mode: '0700'
-    - name: Ensure ansible user has kubectl setup
-      ansible.builtin.copy:
-        src: /etc/rancher/k3s/k3s.yaml
-        dest: /home/ansible/.kube/config
-        remote_src: true
-        owner: ansible
-        group: ansible
-        mode: '0600'
+        owner: root
+        group: root
+        mode: '0755'
       become: true
-    - name: Ensure git is installed for helm plugins
-      ansible.builtin.apt:
-        name:
-          - git
+    - name: Ensure the K3S configuration file exists
+      ansible.builtin.template:
+        dest: /etc/rancher/k3s/config.yaml
+        src: k3s.config.yaml.j2
+        owner: root
+        group: root
+        mode: '0644'
       become: true
-    - name: Ensure helm is installed
-      ansible.builtin.shell:
-        cmd: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-      args:
-        creates: /usr/local/bin/helm
-      become: true
-- name: Configure additional k3s servers
-  hosts: k3s_cp
-  serial: 1
-  environment:
-    INSTALL_K3S_VERSION: "{{ k3s_version }}"
-  tasks:
-    - name: Ensure additional k3s servers are configured for the cluster
-      ansible.builtin.shell:
-        cmd: curl -sfL https://get.k3s.io | K3S_TOKEN={{ k3s_token }} sh -s - server --server=https://k3s-server-1.lab1.site1.thebrownleefamily.net:6443
-      args:
-        creates: /etc/systemd/system/k3s.service
-      become: true
-- name: Configure k3s agents
-  hosts: k3s_workers
-  serial: 1
-  environment:
-    INSTALL_K3S_VERSION: "{{ k3s_version }}"
-  tasks:
-    - name: Ensure k3s agents are configured for the cluster
-      ansible.builtin.shell:
-        cmd: curl -sfL https://get.k3s.io | K3S_TOKEN={{ k3s_token }} sh -s - agent --server=https://k3s-server-1.lab1.site1.thebrownleefamily.net:6443
-      args:
-        creates: /etc/systemd/system/k3s-agent.service
-      become: true
+    - name: Include role-specific tasks
+      ansible.builtin.include_tasks:
+        file: tasks-{{ k3s_role }}.yml

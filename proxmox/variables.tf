@@ -17,10 +17,34 @@ variable "want_k3s" {
   default = false
 }
 
+# Set to true if you want Terraform to provision k3s
+variable "want_k3s_master" {
+  type    = bool
+  default = true
+}
+
+# Set to true if you want Terraform to provision k3s
+variable "want_k3s_servers" {
+  type    = bool
+  default = true
+}
+
+# Set to true if you want Terraform to provision k3s
+variable "want_k3s_agents" {
+  type    = bool
+  default = true
+}
+
 # Set to true if you want Terraform to provision yunohost
 variable "want_yunohost" {
   type    = bool
   default = false
+}
+
+variable "site_domain" {
+  description = "The DNS domain (used in cloud-init data when creating VMs)"
+  type        = string
+  default     = "example.com"
 }
 
 variable "node_vlan_interfaces" {

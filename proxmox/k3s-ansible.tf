@@ -1,117 +1,133 @@
+variable "k3s_token" {
+  description = "Join token for K3S (any string)"
+  type        = string
+}
+
 variable "k3s_version" {
   description = "Version of K3S to install"
   type        = string
-  default     = "v1.29.2+k3s1"
 }
 
-variable "k3s_token" {
-  description = "Join token for K3S"
+variable "k3s_api_url" {
+  description = "Version of K3S to install"
   type        = string
 }
 
-resource "ansible_host" "k3s_initial_cp" {
-  for_each = { for vm in var.vms : vm.hostname => vm if var.want_k3s && vm.role == "k3s_initial_cp" }
+variable "k3s_local_kubeconfig_path" {
+  description = "Path to kubeconfig on the Ansible controller"
+  type        = string
+}
+
+resource "ansible_host" "k3s_master" {
+  for_each = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_master && vm.role == "k3s_master" }
   name     = each.key
-  groups   = ["k3s_initial_cp"]
+  groups   = ["k3s_master"]
   depends_on = [
-    resource.proxmox_virtual_environment_vm.k3s
+    resource.proxmox_virtual_environment_vm.k3s_master
   ]
 }
 
-resource "ansible_group" "k3s_initial_cp" {
-  name     = "k3s_initial_cp"
-  children = [for vm in var.vms : vm.hostname if var.want_k3s && vm.role == "k3s_initial_cp"]
+resource "ansible_group" "k3s_master" {
+  name     = "k3s_master"
+  children = [for vm in var.vms : vm.hostname if var.want_k3s && var.want_k3s_master && vm.role == "k3s_master"]
   depends_on = [
-    resource.proxmox_virtual_environment_vm.k3s
+    resource.proxmox_virtual_environment_vm.k3s_master
   ]
 }
 
-resource "ansible_playbook" "k3s_initial_cp" {
-  for_each                = { for vm in var.vms : vm.hostname => vm if var.want_k3s && vm.role == "k3s_initial_cp" }
+resource "ansible_playbook" "k3s_master" {
+  for_each                = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_master && vm.role == "k3s_master" }
   playbook                = "ansible/k3s/playbook.yml"
   name                    = each.key
   replayable              = var.ansible_replayable
-  groups                  = ["k3s_initial_cp"]
+  groups                  = ["k3s_master"]
+  ignore_playbook_failure = true
+  extra_vars = {
+    private_key               = var.ssh_private_key_files[var.ci_user]
+    ansible_ssh_user          = var.ci_user
+    k3s_token                 = var.k3s_token
+    k3s_version               = var.k3s_version
+    k3s_api_url               = var.k3s_api_url
+    k3s_role                  = each.value.role
+    k3s_local_kubeconfig_path = var.k3s_local_kubeconfig_path
+  }
+  depends_on = [
+    resource.ansible_host.k3s_master,
+  ]
+}
+
+resource "ansible_host" "k3s_servers" {
+  for_each = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_servers && vm.role == "k3s_server" }
+  name     = each.key
+  groups   = ["k3s_servers"]
+  depends_on = [
+    resource.proxmox_virtual_environment_vm.k3s_servers
+  ]
+}
+
+resource "ansible_group" "k3s_servers" {
+  name     = "k3s_servers"
+  children = [for vm in var.vms : vm.hostname if var.want_k3s && var.want_k3s_servers && vm.role == "k3s_server"]
+  depends_on = [
+    resource.proxmox_virtual_environment_vm.k3s_servers
+  ]
+}
+
+resource "ansible_playbook" "k3s_servers" {
+  for_each                = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_servers && vm.role == "k3s_server" }
+  playbook                = "ansible/k3s/playbook.yml"
+  name                    = each.key
+  replayable              = var.ansible_replayable
+  groups                  = ["k3s_servers"]
   ignore_playbook_failure = true
   extra_vars = {
     private_key      = var.ssh_private_key_files[var.ci_user]
     ansible_ssh_user = var.ci_user
     k3s_token        = var.k3s_token
     k3s_version      = var.k3s_version
+    k3s_api_url      = var.k3s_api_url
+    k3s_role         = each.value.role
   }
   depends_on = [
-    resource.ansible_host.k3s_initial_cp,
+    resource.ansible_host.k3s_servers,
+    resource.ansible_playbook.k3s_master,
   ]
 }
 
-resource "ansible_host" "k3s_cp" {
-  for_each = { for vm in var.vms : vm.hostname => vm if var.want_k3s && vm.role == "k3s_cp" }
+resource "ansible_host" "k3s_agents" {
+  for_each = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_agents && vm.role == "k3s_agent" }
   name     = each.key
-  groups   = ["k3s_cp"]
+  groups   = ["k3s_agent"]
   depends_on = [
-    resource.proxmox_virtual_environment_vm.k3s
+    resource.proxmox_virtual_environment_vm.k3s_agents
   ]
 }
 
-resource "ansible_group" "k3s_cp" {
-  name     = "k3s_cp"
-  children = [for vm in var.vms : vm.hostname if var.want_k3s && vm.role == "k3s_cp"]
+resource "ansible_group" "k3s_agents" {
+  name     = "k3s_agents"
+  children = [for vm in var.vms : vm.hostname if var.want_k3s && var.want_k3s_agents && vm.role == "k3s_agent"]
   depends_on = [
-    resource.proxmox_virtual_environment_vm.k3s
+    resource.proxmox_virtual_environment_vm.k3s_agents
   ]
 }
 
-resource "ansible_playbook" "k3s_cp" {
-  for_each                = { for vm in var.vms : vm.hostname => vm if var.want_k3s && vm.role == "k3s_cp" }
+resource "ansible_playbook" "k3s_agents" {
+  for_each                = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_agents && vm.role == "k3s_agent" }
   playbook                = "ansible/k3s/playbook.yml"
   name                    = each.key
   replayable              = var.ansible_replayable
-  groups                  = ["k3s_cp"]
+  groups                  = ["k3s_agents"]
   ignore_playbook_failure = true
   extra_vars = {
     private_key      = var.ssh_private_key_files[var.ci_user]
     ansible_ssh_user = var.ci_user
     k3s_token        = var.k3s_token
     k3s_version      = var.k3s_version
+    k3s_api_url      = var.k3s_api_url
+    k3s_role         = each.value.role
   }
   depends_on = [
-    resource.ansible_host.k3s_cp,
-    resource.ansible_playbook.k3s_initial_cp,
-  ]
-}
-
-resource "ansible_host" "k3s_workers" {
-  for_each = { for vm in var.vms : vm.hostname => vm if var.want_k3s && vm.role == "k3s_worker" }
-  name     = each.key
-  groups   = ["k3s_worker"]
-  depends_on = [
-    resource.proxmox_virtual_environment_vm.k3s
-  ]
-}
-
-resource "ansible_group" "k3s_workers" {
-  name     = "k3s_workers"
-  children = [for vm in var.vms : vm.hostname if var.want_k3s && vm.role == "k3s_worker"]
-  depends_on = [
-    resource.proxmox_virtual_environment_vm.k3s
-  ]
-}
-
-resource "ansible_playbook" "k3s_workers" {
-  for_each                = { for vm in var.vms : vm.hostname => vm if var.want_k3s && vm.role == "k3s_worker" }
-  playbook                = "ansible/k3s/playbook.yml"
-  name                    = each.key
-  replayable              = var.ansible_replayable
-  groups                  = ["k3s_workers"]
-  ignore_playbook_failure = true
-  extra_vars = {
-    private_key      = var.ssh_private_key_files[var.ci_user]
-    ansible_ssh_user = var.ci_user
-    k3s_token        = var.k3s_token
-    k3s_version      = var.k3s_version
-  }
-  depends_on = [
-    resource.ansible_host.k3s_workers,
-    resource.ansible_playbook.k3s_cp,
+    resource.ansible_host.k3s_agents,
+    resource.ansible_playbook.k3s_servers,
   ]
 }

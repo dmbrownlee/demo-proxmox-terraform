@@ -1,0 +1,14 @@
+---
+- name: Ensure k3s agents are configured for the cluster
+  ansible.builtin.shell:
+    cmd: curl -sfL https://get.k3s.io | sh -s - agent --server={{ k3s_api_url }}
+  args:
+    creates: /etc/systemd/system/k3s-agent.service
+  become: true
+- name: Ensure K3S service is started
+  ansible.builtin.systemd:
+    name: k3s-agent
+    state: started
+    enabled: true
+    daemon_reload: true
+  become: true

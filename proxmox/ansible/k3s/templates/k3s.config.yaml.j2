@@ -1,0 +1,6 @@
+token: superfoo
+{% if k3s_role == "k3s_master" -%}tls-san:
+  - 10.48.82.89
+  - k3s
+  - k3s.labs.site1.thebrownleefamily.net{%- endif %}
+{% if k3s_role == "k3s_server" or k3s_role == "k3s_agent" -%}server: {{ k3s_api_url }}{%- endif %}
