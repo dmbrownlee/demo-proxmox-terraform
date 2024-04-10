@@ -186,3 +186,32 @@ resource "ansible_playbook" "k3s_agents" {
 output "playbook_output_k3s_agents" {
   value = var.want_ansible_output && var.want_k3s_agents ? ansible_playbook.k3s_agents : null
 }
+
+
+###############################################################################
+##
+##  Longhorn storage provisioner
+##
+###############################################################################
+resource "ansible_playbook" "k3s_longhorn" {
+  playbook                = "ansible/k3s/playbook-longhorn.yml"
+  name                    = "localhost"
+  replayable              = var.ansible_replayable
+  ignore_playbook_failure = true
+  extra_vars = {
+    ansible_hostname          = "localhost"
+    ansible_connection        = "local"
+    private_key               = var.ssh_private_key_files[var.ci_user]
+    ansible_ssh_user          = var.ci_user
+    k3s_local_kubeconfig_path = var.k3s_local_kubeconfig_path
+  }
+  depends_on = [
+    resource.ansible_playbook.k3s_master,
+    resource.ansible_playbook.k3s_servers,
+    resource.ansible_playbook.k3s_agents,
+  ]
+}
+
+output "playbook_output_k3s_longhorn" {
+  value = var.want_ansible_output && var.want_k3s ? ansible_playbook.k3s_longhorn : null
+}
