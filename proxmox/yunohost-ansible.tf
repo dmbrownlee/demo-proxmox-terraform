@@ -21,3 +21,7 @@ resource "ansible_playbook" "yunohost" {
     resource.ansible_host.yunohost,
   ]
 }
+
+output "playbook_output_yunohost" {
+  value = var.want_ansible_output && var.want_yunohost ? ansible_playbook.yunohost : null
+}

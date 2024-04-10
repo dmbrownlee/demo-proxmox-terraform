@@ -5,6 +5,12 @@ variable "want_k8s" {
   default = false
 }
 
+# Set to true if you want to see the output of ansible playbooks
+variable "want_ansible_output" {
+  type    = bool
+  default = false
+}
+
 # Set to true if you want Terraform to provision minikube
 variable "want_minikube" {
   type    = bool

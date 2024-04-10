@@ -21,3 +21,7 @@ resource "ansible_playbook" "minikube" {
     resource.ansible_host.minikube
   ]
 }
+
+output "playbook_output_minikube" {
+  value = var.want_ansible_output && var.want_minikube ? ansible_playbook.minikube : null
+}

@@ -27,6 +27,12 @@ resource "ansible_host" "k3s_master" {
   ]
 }
 
+
+###############################################################################
+##
+##  K3S Master node
+##
+###############################################################################
 resource "ansible_group" "k3s_master" {
   name     = "k3s_master"
   children = [for vm in var.vms : vm.hostname if var.want_k3s && var.want_k3s_master && vm.role == "k3s_master"]
@@ -56,6 +62,16 @@ resource "ansible_playbook" "k3s_master" {
   ]
 }
 
+output "playbook_output_k3s_master" {
+  value = var.want_ansible_output && var.want_k3s_master ? ansible_playbook.k3s_master : null
+}
+
+
+###############################################################################
+##
+##  Additional K3S control plane nodes (k3s servers)
+##
+###############################################################################
 resource "ansible_host" "k3s_servers" {
   for_each = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_servers && vm.role == "k3s_server" }
   name     = each.key
@@ -94,6 +110,16 @@ resource "ansible_playbook" "k3s_servers" {
   ]
 }
 
+output "playbook_output_k3s_servers" {
+  value = var.want_ansible_output && var.want_k3s_servers ? ansible_playbook.k3s_servers : null
+}
+
+
+###############################################################################
+##
+##  Additional K3S worker nodes (k3s agents)
+##
+###############################################################################
 resource "ansible_host" "k3s_agents" {
   for_each = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_agents && vm.role == "k3s_agent" }
   name     = each.key
@@ -130,4 +156,8 @@ resource "ansible_playbook" "k3s_agents" {
     resource.ansible_host.k3s_agents,
     resource.ansible_playbook.k3s_servers,
   ]
+}
+
+output "playbook_output_k3s_agents" {
+  value = var.want_ansible_output && var.want_k3s_agents ? ansible_playbook.k3s_agents : null
 }

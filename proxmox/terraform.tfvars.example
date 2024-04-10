@@ -5,14 +5,17 @@
 #==========================================
 # Uncomment to enable optional VMs
 #==========================================
-#want_k8s      = true
-#want_minikube = true
-#want_k3s = true
-#want_k3s_master = false     # you should leaave this commented out
-#want_k3s_servers = false
-#want_k3s_agents = false
-#want_yunohost = true
+#want_k8s          = true
+#want_minikube     = true
+#want_k3s          = true  # including longhorn, kube-vip, prometheus, and grafana
+#want_yunohost     = true
 
+
+# These are only for development
+want_ansible_output = true
+#want_k3s_master     = false
+#want_k3s_servers    = false
+#want_k3s_agents     = false
 
 #==========================================
 # Proxmox connectivity and authentication
