@@ -20,14 +20,6 @@
         group: root
         mode: '0755'
       become: true
-    - name: Ensure the K3S configuration file exists
-      ansible.builtin.template:
-        dest: /etc/rancher/k3s/config.yaml
-        src: k3s.config.yaml.j2
-        owner: root
-        group: root
-        mode: '0644'
-      become: true
     - name: Include role-specific tasks
       ansible.builtin.include_tasks:
         file: tasks-{{ k3s_role }}.yml

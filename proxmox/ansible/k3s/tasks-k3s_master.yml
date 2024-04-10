@@ -1,4 +1,12 @@
 ---
+- name: Ensure the K3S configuration file exists
+  ansible.builtin.template:
+    dest: /etc/rancher/k3s/config.yaml
+    src: k3s.config.yaml.j2
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
 - name: Ensure initial cluster server is installed
   ansible.builtin.shell:
     cmd: curl -sfL https://get.k3s.io | sh -s - server --cluster-init
