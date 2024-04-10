@@ -10,6 +10,7 @@
       ansible.builtin.apt:
         name:
           - python3-kubernetes
+          - ipvsadm
         lock_timeout: 180
       become: true
     - name: Ensure the K3S drop-in configuration directory exists

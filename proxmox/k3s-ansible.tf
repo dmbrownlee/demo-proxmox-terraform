@@ -18,6 +18,22 @@ variable "k3s_local_kubeconfig_path" {
   type        = string
 }
 
+variable "k3s_vip_ip" {
+  description = "Floating virtual IP of the external loadbalancer"
+  type        = string
+}
+
+variable "k3s_vip_hostname" {
+  description = "Hostname associated with the floating VIP"
+  type        = string
+}
+
+variable "k3s_vip_domain" {
+  description = "The site domain"
+  type        = string
+}
+
+
 resource "ansible_host" "k3s_master" {
   for_each = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_master && vm.role == "k3s_master" }
   name     = each.key
@@ -56,6 +72,9 @@ resource "ansible_playbook" "k3s_master" {
     k3s_api_url               = var.k3s_api_url
     k3s_role                  = each.value.role
     k3s_local_kubeconfig_path = var.k3s_local_kubeconfig_path
+    k3s_vip_ip                = var.k3s_vip_ip
+    k3s_vip_hostname          = var.k3s_vip_hostname
+    k3s_vip_domain            = var.k3s_vip_domain
   }
   depends_on = [
     resource.ansible_host.k3s_master,
@@ -103,6 +122,9 @@ resource "ansible_playbook" "k3s_servers" {
     k3s_version      = var.k3s_version
     k3s_api_url      = var.k3s_api_url
     k3s_role         = each.value.role
+    k3s_vip_ip       = var.k3s_vip_ip
+    k3s_vip_hostname = var.k3s_vip_hostname
+    k3s_vip_domain   = var.k3s_vip_domain
   }
   depends_on = [
     resource.ansible_host.k3s_servers,
@@ -151,6 +173,9 @@ resource "ansible_playbook" "k3s_agents" {
     k3s_version      = var.k3s_version
     k3s_api_url      = var.k3s_api_url
     k3s_role         = each.value.role
+    k3s_vip_ip       = var.k3s_vip_ip
+    k3s_vip_hostname = var.k3s_vip_hostname
+    k3s_vip_domain   = var.k3s_vip_domain
   }
   depends_on = [
     resource.ansible_host.k3s_agents,
