@@ -10,8 +10,22 @@
       ansible.builtin.apt:
         name:
           - python3-kubernetes
+          - cryptsetup
           - ipvsadm
+          - jq
+          - nfs-common
+          - open-iscsi
         lock_timeout: 180
+      become: true
+    - name: Ensure the iscsi_tcp module is loaded before iscsid is started
+      community.general.modprobe:
+        name: iscsi_tcp
+      become: true
+    - name: Ensure the iscsid service is enabled and started for longhorn
+      ansible.builtin.systemd:
+        name: iscsid
+        state: restarted
+        enabled: true
       become: true
     - name: Ensure the K3S drop-in configuration directory exists
       ansible.builtin.file:
