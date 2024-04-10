@@ -47,6 +47,12 @@ variable "want_yunohost" {
   default = false
 }
 
+# Set to true if you want Terraform to provision photos (immich) in k3s
+variable "want_k3s_photos" {
+  type    = bool
+  default = false
+}
+
 variable "site_domain" {
   description = "The DNS domain (used in cloud-init data when creating VMs)"
   type        = string
