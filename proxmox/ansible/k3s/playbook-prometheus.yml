@@ -1,0 +1,22 @@
+---
+- name: Install Prometheus into the cluster
+  hosts: localhost
+  tasks:
+    - name: Ensure the helm repo for prometheus is added
+      kubernetes.core.helm_repository:
+        kubeconfig: "{{ k3s_local_kubeconfig_path }}"
+        name: prometheus-community
+        repo_url: "https://prometheus-community.github.io/helm-charts"
+    - name: Ensure the prometheus helm chart is installed
+      kubernetes.core.helm:
+        kubeconfig: "{{ k3s_local_kubeconfig_path }}"
+        name: prometheus
+        chart_ref: prometheus-community/prometheus
+        release_namespace: monitoring
+        create_namespace: true
+        values: "{{ lookup('file','prometheus-values.yaml') | from_yaml }}"
+    - name: Ensure the ingress configuration for the alertmanager has been applied
+      kubernetes.core.k8s:
+        kubeconfig: "{{ k3s_local_kubeconfig_path }}"
+        state: present
+        src: prometheus-ingress.yaml
