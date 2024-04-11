@@ -40,6 +40,7 @@ resource "proxmox_virtual_environment_vm" "minikube" {
         gateway = var.vlans[index(var.vlans.*.vlan_id, each.value.vlan_id)].ipv4_gateway
       }
     }
+    upgrade = false
     user_account {
       username = var.ci_user
       password = var.ci_password
