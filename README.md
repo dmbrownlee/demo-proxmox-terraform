@@ -3,7 +3,7 @@ This project provides example files demonstrating how to automate the configurat
 
 ## Prerequisites
 TL;DR: You will need:
-- a Proxmox cluster (a single node cluster is fine) for which you have admin rights.
+- a Proxmox cluster (a single node is fine, a three node cluster is better) for which you have admin rights.
 - Terraform and Ansible installed (alternatively, you can use my demo devcontainer which has been moved to its own repo: https://github.com/dmbrownlee/demo-containers/tree/main/devcontainer)
 
 It is assumed you are familiar with Linux and, obviously, the more you already know about terraform, ansible, containers, etc. the easier it will be for you.
@@ -13,5 +13,8 @@ By default, Proxmox has a root account and you could use an API token with that.
 
 Since you only need to do this once, there is a separate directory with Terraform configs that will create the Terraform role and account with the necessary permissions to make setup easier.  This is the only Terraform configuration that needs to use the root account.  After that, the Terrafrom account will be used.  Follow the directions in that directory's [README.md](proxmox-users/README.md) before proceeding.
 
-## Configure Proxmox using the Terraform demo project
-The demo project will configure VLANs, build template virtual machines from cloud-init images, clone those templates to various virtual machines, and then use Ansible to configure those virtual machines for different roles.  It is an evolving work in progress.  See the [README.md](proxmox/README.md) in the project's directory for the latest info.
+## Create the cloud-init template VMs.
+The virtual lab networks in the project directories create virtual machines by cloning templates.  Before you try to spin up a lab network, make sure you have already run ```terraform apply``` from within the ```proxmox-cloud-init``` directory.
+
+## Configure one (or more) virtual lab networks in Proxmox using Terraform
+The Terraform configs in the various lab-* directories will configure VLANs, clone VM templates to various virtual machines, and then use Ansible to configure those virtual machines for different roles.  It is an evolving work in progress.  See the README.md in each project's directory for the latest info.
