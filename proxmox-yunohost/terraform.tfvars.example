@@ -1,0 +1,154 @@
+###############################################################################
+###############################################################################
+##
+##  Ansible
+##
+###############################################################################
+###############################################################################
+# Uncomment if you don't want Ansible playbooks to be run after the first time.
+#ansible_replayable = false
+
+# This delay, in seconds, is to reduce output of failed connections attempts
+# while we're waiting for the SSH service to start.
+sleep_seconds_before_remote_provisioning = 40
+
+# ssh_private_key_files is a map of paths to SSH private key files indexed by
+# username.  Here, we specify the location of the "ansible" user's private
+# SSH key that needs to be known when Terraform runs ansible-playbook.
+ssh_private_key_files = {
+  ansible = "~/keys/ansible"
+}
+
+
+###############################################################################
+###############################################################################
+##
+##  Cloud-init
+##
+###############################################################################
+###############################################################################
+# This is where we specify the user credentials for the administrative user
+# cloud-init will create on each VM cloned from a cloud-init template image.
+# Since we will be using Ansible for configuration management, it makes sense
+# for this to be the "ansible" user.  If any other users need to be configured,
+# Ansible can do that.  After Terraform has created and booted the VM, it will
+# run Ansible to do further machine configuration.  The corresponding private
+# SSH key should be added to your SSH agent as SSH is usually configured to
+# disallow password logins.  Note, the public key does not include the comment
+# you see at the end of the line in the .pub file.
+ci_user     = "ansible"
+ci_password = "password"
+
+
+###############################################################################
+###############################################################################
+##
+##  Control host
+##
+###############################################################################
+###############################################################################
+#===========================================================
+# These variables are specific to your control host
+ssh_keystore = "~/keys"
+
+
+###############################################################################
+###############################################################################
+##
+##  Flags for development and testing
+##
+###############################################################################
+###############################################################################
+# Uncomment lines to override default values.
+want_ansible_output = true
+
+
+###############################################################################
+###############################################################################
+##
+##  Proxmox
+##
+###############################################################################
+###############################################################################
+# Here is where we specify the URL for the web API for the Proxmox cluster.
+endpoint = "https://pve1.site1.example.com:8006/"
+
+# The API Token is the combination of the ID and secret:
+api_token = "terraform@pve!demo=01234567-89ab-cdef-0123-456789abcdef"
+
+# Here is where we specify the node interface to which we add the VLANs. The
+# switch port patched to this interface should be configured as a VLAN trunk.
+node_vlan_interfaces = {
+  pve1 = "vmbr0"
+  pve2 = "vmbr0"
+  pve3 = "vmbr0"
+}
+
+# This is the Proxmox storage location where you want VM disks to reside.  The
+# default is "local-lvm", but you can override it to specify a shared storage
+# location, such as NFS storage.
+vm_storage = "local-lvm"
+
+# This is the same as the above except this is for VM template images that will
+# get cloned rather then VMs.
+vm_template_storage = {
+  node = "pve3",
+  name = "local-lvm"
+}
+
+
+###############################################################################
+###############################################################################
+##
+##  Site-specific data
+##
+###############################################################################
+###############################################################################
+site_domain = "labs.site1.example.com"
+
+
+###############################################################################
+###############################################################################
+##
+##  VLANs
+##
+###############################################################################
+###############################################################################
+# vlans is a map of project VLAN objects indexed by name.  Besides the VLAN ID,
+# each VLAN specifies networking configuration for the netblock the VLAN uses
+# in case the virtual machines connected to the VLAN do not use DHCP for
+# network configuration.
+vlans = [
+  {
+    vlan_id          = 84,
+    comment          = "LAB_84_YUNOHOST",
+    ipv4_gateway     = "10.48.84.254",
+    ipv4_dns_servers = ["10.48.84.254"]
+  },
+]
+
+
+###############################################################################
+###############################################################################
+##
+##  Virtual Machines
+##
+###############################################################################
+###############################################################################
+vms = [
+  {
+    vm_id            = 511,
+    hostname         = "yunohost",
+    role             = "yunohost",
+    pve_node         = "pve1",
+    cloud_init_image = "debian11-genericcloud-20240211"
+    hardware = {
+      cpu_cores = 8,
+      memory    = 16384,
+      disk      = 40
+    }
+    mac_address  = "ca:fe:01:84:01:01",
+    vlan_id      = 84,
+    ipv4_address = "10.48.84.91/24"
+  },
+]

@@ -1,6 +1,6 @@
 resource "ansible_playbook" "k3s_photos" {
-  count                   = var.want_k3s && var.want_k3s_photos ? 1 : 0
-  playbook                = "ansible/k3s/playbook-immich.yml"
+  count                   = var.want_k3s_photos ? 1 : 0
+  playbook                = "ansible/playbook-immich.yml"
   name                    = "localhost"
   replayable              = var.ansible_replayable
   ignore_playbook_failure = true

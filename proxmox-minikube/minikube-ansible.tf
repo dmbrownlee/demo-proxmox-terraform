@@ -1,5 +1,5 @@
 resource "ansible_host" "minikube" {
-  for_each = { for vm in var.vms : vm.hostname => vm if var.want_minikube && vm.role == "minikube" }
+  for_each = { for vm in var.vms : vm.hostname => vm if vm.role == "minikube" }
   name     = each.key
   groups   = ["minikube_nodes"]
   depends_on = [
@@ -8,8 +8,8 @@ resource "ansible_host" "minikube" {
 }
 
 resource "ansible_playbook" "minikube" {
-  for_each                = { for vm in var.vms : vm.hostname => vm if var.want_minikube && vm.role == "minikube" }
-  playbook                = "ansible/minikube/playbook.yml"
+  for_each                = { for vm in var.vms : vm.hostname => vm if vm.role == "minikube" }
+  playbook                = "ansible/playbook.yml"
   name                    = each.key
   replayable              = var.ansible_replayable
   ignore_playbook_failure = true
@@ -23,5 +23,5 @@ resource "ansible_playbook" "minikube" {
 }
 
 output "playbook_output_minikube" {
-  value = var.want_ansible_output && var.want_minikube ? ansible_playbook.minikube : null
+  value = var.want_ansible_output ? ansible_playbook.minikube : null
 }

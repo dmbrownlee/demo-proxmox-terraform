@@ -9,7 +9,7 @@ resource "ansible_host" "dns" {
 
 resource "ansible_playbook" "dns" {
   for_each                = { for vm in var.vms : vm.hostname => vm if vm.role == "dns" }
-  playbook                = "ansible/dns/playbook.yml"
+  playbook                = "ansible/playbook.yml"
   name                    = each.key
   replayable              = var.ansible_replayable
   ignore_playbook_failure = true
@@ -20,4 +20,8 @@ resource "ansible_playbook" "dns" {
   depends_on = [
     resource.ansible_host.dns
   ]
+}
+
+output "playbook_output_dns" {
+  value = var.want_ansible_output ? ansible_playbook.dns : null
 }

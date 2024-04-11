@@ -1,8 +1,9 @@
 resource "proxmox_virtual_environment_vm" "k3s_master" {
   depends_on = [
-    ansible_playbook.load_balancers
+    proxmox_virtual_environment_network_linux_vlan.vlans,
+    data.proxmox_virtual_environment_vms.cloud_init_template
   ]
-  for_each    = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_master && vm.role == "k3s_master" }
+  for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_master" }
   name        = each.key
   description = "Managed by Terraform"
   tags        = ["terraform", each.value.cloud_init_image, each.value.role]
@@ -12,7 +13,7 @@ resource "proxmox_virtual_environment_vm" "k3s_master" {
   clone {
     datastore_id = var.vm_template_storage.name
     node_name    = var.vm_template_storage.node
-    vm_id        = var.vm_templates[each.value.cloud_init_image].vm_id
+    vm_id        = data.proxmox_virtual_environment_vms.cloud_init_template.vms[index(data.proxmox_virtual_environment_vms.cloud_init_template.vms[*].name, each.value.cloud_init_image)].vm_id
     full         = true
   }
   cpu {
@@ -77,9 +78,10 @@ resource "proxmox_virtual_environment_vm" "k3s_master" {
 
 resource "proxmox_virtual_environment_vm" "k3s_servers" {
   depends_on = [
-    ansible_playbook.load_balancers
+    proxmox_virtual_environment_network_linux_vlan.vlans,
+    data.proxmox_virtual_environment_vms.cloud_init_template
   ]
-  for_each    = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_servers && vm.role == "k3s_server" }
+  for_each    = { for vm in var.vms : vm.hostname => vm if var.want_k3s_servers && vm.role == "k3s_server" }
   name        = each.key
   description = "Managed by Terraform"
   tags        = ["terraform", each.value.cloud_init_image, each.value.role]
@@ -89,7 +91,7 @@ resource "proxmox_virtual_environment_vm" "k3s_servers" {
   clone {
     datastore_id = var.vm_template_storage.name
     node_name    = var.vm_template_storage.node
-    vm_id        = var.vm_templates[each.value.cloud_init_image].vm_id
+    vm_id        = data.proxmox_virtual_environment_vms.cloud_init_template.vms[index(data.proxmox_virtual_environment_vms.cloud_init_template.vms[*].name, each.value.cloud_init_image)].vm_id
     full         = true
   }
   cpu {
@@ -154,9 +156,10 @@ resource "proxmox_virtual_environment_vm" "k3s_servers" {
 
 resource "proxmox_virtual_environment_vm" "k3s_agents" {
   depends_on = [
-    ansible_playbook.load_balancers
+    proxmox_virtual_environment_network_linux_vlan.vlans,
+    data.proxmox_virtual_environment_vms.cloud_init_template
   ]
-  for_each    = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_agents && vm.role == "k3s_agent" }
+  for_each    = { for vm in var.vms : vm.hostname => vm if var.want_k3s_agents && vm.role == "k3s_agent" }
   name        = each.key
   description = "Managed by Terraform"
   tags        = ["terraform", each.value.cloud_init_image, each.value.role]
@@ -166,7 +169,7 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
   clone {
     datastore_id = var.vm_template_storage.name
     node_name    = var.vm_template_storage.node
-    vm_id        = var.vm_templates[each.value.cloud_init_image].vm_id
+    vm_id        = data.proxmox_virtual_environment_vms.cloud_init_template.vms[index(data.proxmox_virtual_environment_vms.cloud_init_template.vms[*].name, each.value.cloud_init_image)].vm_id
     full         = true
   }
   cpu {

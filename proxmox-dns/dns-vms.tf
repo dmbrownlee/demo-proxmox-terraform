@@ -1,5 +1,8 @@
 resource "proxmox_virtual_environment_vm" "dns" {
-  depends_on  = [proxmox_virtual_environment_vm.vm_templates]
+  depends_on = [
+    proxmox_virtual_environment_network_linux_vlan.vlans,
+    data.proxmox_virtual_environment_vms.cloud_init_template
+  ]
   for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "dns" }
   name        = each.key
   description = "Managed by Terraform"
@@ -10,7 +13,7 @@ resource "proxmox_virtual_environment_vm" "dns" {
   clone {
     datastore_id = var.vm_template_storage.name
     node_name    = var.vm_template_storage.node
-    vm_id        = var.vm_templates[each.value.cloud_init_image].vm_id
+    vm_id        = data.proxmox_virtual_environment_vms.cloud_init_template.vms[index(data.proxmox_virtual_environment_vms.cloud_init_template.vms[*].name, each.value.cloud_init_image)].vm_id
     full         = true
   }
   cpu {

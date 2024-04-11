@@ -1,8 +1,9 @@
-resource "proxmox_virtual_environment_vm" "k8s_control_plane" {
+resource "proxmox_virtual_environment_vm" "minikube" {
   depends_on = [
-    ansible_playbook.load_balancers
+    proxmox_virtual_environment_network_linux_vlan.vlans,
+    data.proxmox_virtual_environment_vms.cloud_init_template
   ]
-  for_each    = { for vm in var.vms : vm.hostname => vm if var.want_k8s && vm.role == "k8s_control_plane" }
+  for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "minikube" }
   name        = each.key
   description = "Managed by Terraform"
   tags        = ["terraform", each.value.cloud_init_image, each.value.role]
@@ -12,7 +13,7 @@ resource "proxmox_virtual_environment_vm" "k8s_control_plane" {
   clone {
     datastore_id = var.vm_template_storage.name
     node_name    = var.vm_template_storage.node
-    vm_id        = var.vm_templates[each.value.cloud_init_image].vm_id
+    vm_id        = data.proxmox_virtual_environment_vms.cloud_init_template.vms[index(data.proxmox_virtual_environment_vms.cloud_init_template.vms[*].name, each.value.cloud_init_image)].vm_id
     full         = true
   }
   cpu {
@@ -54,7 +55,7 @@ resource "proxmox_virtual_environment_vm" "k8s_control_plane" {
     mac_address = each.value.mac_address
     vlan_id     = each.value.vlan_id
   }
-  on_boot = true
+  on_boot = false
   connection {
     type  = "ssh"
     user  = var.ci_user

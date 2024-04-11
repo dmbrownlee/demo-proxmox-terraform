@@ -1,41 +1,5 @@
-variable "k3s_token" {
-  description = "Join token for K3S (any string)"
-  type        = string
-}
-
-variable "k3s_version" {
-  description = "Version of K3S to install"
-  type        = string
-}
-
-variable "k3s_api_url" {
-  description = "Version of K3S to install"
-  type        = string
-}
-
-variable "k3s_local_kubeconfig_path" {
-  description = "Path to kubeconfig on the Ansible controller"
-  type        = string
-}
-
-variable "k3s_vip_ip" {
-  description = "Floating virtual IP of the external loadbalancer"
-  type        = string
-}
-
-variable "k3s_vip_hostname" {
-  description = "Hostname associated with the floating VIP"
-  type        = string
-}
-
-variable "k3s_vip_domain" {
-  description = "The site domain"
-  type        = string
-}
-
-
 resource "ansible_host" "k3s_master" {
-  for_each = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_master && vm.role == "k3s_master" }
+  for_each = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_master" }
   name     = each.key
   groups   = ["k3s_master"]
   depends_on = [
@@ -51,15 +15,15 @@ resource "ansible_host" "k3s_master" {
 ###############################################################################
 resource "ansible_group" "k3s_master" {
   name     = "k3s_master"
-  children = [for vm in var.vms : vm.hostname if var.want_k3s && var.want_k3s_master && vm.role == "k3s_master"]
+  children = [for vm in var.vms : vm.hostname if vm.role == "k3s_master"]
   depends_on = [
     resource.proxmox_virtual_environment_vm.k3s_master
   ]
 }
 
 resource "ansible_playbook" "k3s_master" {
-  for_each                = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_master && vm.role == "k3s_master" }
-  playbook                = "ansible/k3s/playbook.yml"
+  for_each                = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_master" }
+  playbook                = "ansible/playbook.yml"
   name                    = each.key
   replayable              = var.ansible_replayable
   groups                  = ["k3s_master"]
@@ -82,7 +46,7 @@ resource "ansible_playbook" "k3s_master" {
 }
 
 output "playbook_output_k3s_master" {
-  value = var.want_ansible_output && var.want_k3s_master ? ansible_playbook.k3s_master : null
+  value = var.want_ansible_output ? ansible_playbook.k3s_master : null
 }
 
 
@@ -92,7 +56,7 @@ output "playbook_output_k3s_master" {
 ##
 ###############################################################################
 resource "ansible_host" "k3s_servers" {
-  for_each = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_servers && vm.role == "k3s_server" }
+  for_each = { for vm in var.vms : vm.hostname => vm if var.want_k3s_servers && vm.role == "k3s_server" }
   name     = each.key
   groups   = ["k3s_servers"]
   depends_on = [
@@ -102,15 +66,15 @@ resource "ansible_host" "k3s_servers" {
 
 resource "ansible_group" "k3s_servers" {
   name     = "k3s_servers"
-  children = [for vm in var.vms : vm.hostname if var.want_k3s && var.want_k3s_servers && vm.role == "k3s_server"]
+  children = [for vm in var.vms : vm.hostname if var.want_k3s_servers && vm.role == "k3s_server"]
   depends_on = [
     resource.proxmox_virtual_environment_vm.k3s_servers
   ]
 }
 
 resource "ansible_playbook" "k3s_servers" {
-  for_each                = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_servers && vm.role == "k3s_server" }
-  playbook                = "ansible/k3s/playbook.yml"
+  for_each                = { for vm in var.vms : vm.hostname => vm if var.want_k3s_servers && vm.role == "k3s_server" }
+  playbook                = "ansible/playbook.yml"
   name                    = each.key
   replayable              = var.ansible_replayable
   groups                  = ["k3s_servers"]
@@ -143,7 +107,7 @@ output "playbook_output_k3s_servers" {
 ##
 ###############################################################################
 resource "ansible_host" "k3s_agents" {
-  for_each = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_agents && vm.role == "k3s_agent" }
+  for_each = { for vm in var.vms : vm.hostname => vm if var.want_k3s_agents && vm.role == "k3s_agent" }
   name     = each.key
   groups   = ["k3s_agent"]
   depends_on = [
@@ -153,15 +117,15 @@ resource "ansible_host" "k3s_agents" {
 
 resource "ansible_group" "k3s_agents" {
   name     = "k3s_agents"
-  children = [for vm in var.vms : vm.hostname if var.want_k3s && var.want_k3s_agents && vm.role == "k3s_agent"]
+  children = [for vm in var.vms : vm.hostname if var.want_k3s_agents && vm.role == "k3s_agent"]
   depends_on = [
     resource.proxmox_virtual_environment_vm.k3s_agents
   ]
 }
 
 resource "ansible_playbook" "k3s_agents" {
-  for_each                = { for vm in var.vms : vm.hostname => vm if var.want_k3s && var.want_k3s_agents && vm.role == "k3s_agent" }
-  playbook                = "ansible/k3s/playbook.yml"
+  for_each                = { for vm in var.vms : vm.hostname => vm if var.want_k3s_agents && vm.role == "k3s_agent" }
+  playbook                = "ansible/playbook.yml"
   name                    = each.key
   replayable              = var.ansible_replayable
   groups                  = ["k3s_agents"]
@@ -194,7 +158,7 @@ output "playbook_output_k3s_agents" {
 ##
 ###############################################################################
 resource "ansible_playbook" "k3s_longhorn" {
-  playbook                = "ansible/k3s/playbook-longhorn.yml"
+  playbook                = "ansible/playbook-longhorn.yml"
   name                    = "localhost"
   replayable              = var.ansible_replayable
   ignore_playbook_failure = true
@@ -213,7 +177,7 @@ resource "ansible_playbook" "k3s_longhorn" {
 }
 
 output "playbook_output_k3s_longhorn" {
-  value = var.want_ansible_output && var.want_k3s ? ansible_playbook.k3s_longhorn : null
+  value = var.want_ansible_output ? ansible_playbook.k3s_longhorn : null
 }
 
 
@@ -223,7 +187,7 @@ output "playbook_output_k3s_longhorn" {
 ##
 ###############################################################################
 resource "ansible_playbook" "k3s_prometheus" {
-  playbook                = "ansible/k3s/playbook-prometheus.yml"
+  playbook                = "ansible/playbook-prometheus.yml"
   name                    = "localhost"
   replayable              = var.ansible_replayable
   ignore_playbook_failure = true
@@ -240,5 +204,5 @@ resource "ansible_playbook" "k3s_prometheus" {
 }
 
 output "playbook_output_k3s_prometheus" {
-  value = var.want_ansible_output && var.want_k3s ? ansible_playbook.k3s_prometheus : null
+  value = var.want_ansible_output ? ansible_playbook.k3s_prometheus : null
 }
