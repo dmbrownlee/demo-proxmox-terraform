@@ -122,6 +122,7 @@ resource "proxmox_virtual_environment_vm" "k3s_servers" {
         gateway = var.vlans[index(var.vlans.*.vlan_id, each.value.vlan_id)].ipv4_gateway
       }
     }
+    upgrade = false
     user_account {
       username = var.ci_user
       password = var.ci_password
@@ -200,6 +201,7 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
         gateway = var.vlans[index(var.vlans.*.vlan_id, each.value.vlan_id)].ipv4_gateway
       }
     }
+    upgrade = false
     user_account {
       username = var.ci_user
       password = var.ci_password
