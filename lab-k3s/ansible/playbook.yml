@@ -15,6 +15,7 @@
           - jq
           - nfs-common
           - open-iscsi
+        cache_valid_time: 300
         lock_timeout: 180
       become: true
     - name: Ensure the iscsi_tcp module is loaded before iscsid is started
