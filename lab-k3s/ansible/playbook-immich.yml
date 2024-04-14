@@ -1,5 +1,5 @@
 ---
-- name: Install Longhorn into the cluster
+- name: Install immich into the cluster
   hosts: localhost
   vars_files:
     - cnames.yaml
