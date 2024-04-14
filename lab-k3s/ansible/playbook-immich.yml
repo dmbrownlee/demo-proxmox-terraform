@@ -1,18 +1,19 @@
 ---
 - name: Install Longhorn into the cluster
   hosts: localhost
+  vars_files:
+    - cnames.yaml
   tasks:
     - name: Ensure the helm repo for immich is added
       kubernetes.core.helm_repository:
         kubeconfig: "{{ k3s_local_kubeconfig_path }}"
         name: immich
         repo_url: "https://immich-app.github.io/immich-charts"
-    - name: Ensure the immich prerequisite configuration has been applied
+    - name: Ensure the immich PVC configuration has been applied
       kubernetes.core.k8s:
         kubeconfig: "{{ k3s_local_kubeconfig_path }}"
         state: present
-        src: immich-prereq.yaml
-    # helm install immich immich/immich --namespace immich -f immich-values.yml
+        src: immich-pvc.yaml
     - name: Ensure the immich helm chart is installed
       kubernetes.core.helm:
         kubeconfig: "{{ k3s_local_kubeconfig_path }}"
@@ -20,4 +21,21 @@
         chart_ref: immich/immich
         release_namespace: immich
         create_namespace: true
-        values: "{{ lookup('file','immich-values.yaml') | from_yaml }}"
+        values:
+          immich:
+            persistence:
+              library:
+                existingClaim: longhorn-immich-pvc
+          postgresql:
+            enabled: true
+          redis:
+            enabled: true
+          machine-learning:
+            persistence:
+              cache:
+                storageClass: longhorn
+    - name: Ensure the photos ingress configuration has been applied
+      kubernetes.core.k8s:
+        kubeconfig: "{{ k3s_local_kubeconfig_path }}"
+        state: present
+        template: photos-ingress.yaml

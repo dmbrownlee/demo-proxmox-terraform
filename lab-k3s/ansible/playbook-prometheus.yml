@@ -1,6 +1,8 @@
 ---
 - name: Install Prometheus into the cluster
   hosts: localhost
+  vars_files:
+    - cnames.yaml
   tasks:
     - name: Ensure the helm repo for prometheus is added
       kubernetes.core.helm_repository:
@@ -14,9 +16,15 @@
         chart_ref: prometheus-community/prometheus
         release_namespace: monitoring
         create_namespace: true
-        values: "{{ lookup('file','prometheus-values.yaml') | from_yaml }}"
+        values:
+          server:
+            ingress:
+              enabled: true
+              ingressClassName: traefik
+              hosts:
+                - "{{ cnames.prometheus }}"
     - name: Ensure the ingress configuration for the alertmanager has been applied
       kubernetes.core.k8s:
         kubeconfig: "{{ k3s_local_kubeconfig_path }}"
         state: present
-        src: prometheus-ingress.yaml
+        template: prometheus-ingress.yaml

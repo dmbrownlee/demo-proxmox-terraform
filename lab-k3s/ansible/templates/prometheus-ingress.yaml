@@ -19,7 +19,7 @@ items:
   spec:
     ingressClassName: traefik
     rules:
-    - host: prometheus.site1.thebrownleefamily.net
+    - host: {{ cnames.prometheus }}
       http:
         paths:
         - backend:
@@ -29,7 +29,7 @@ items:
                 number: 80
           path: /
           pathType: Prefix
-    - host: alertmanager.site1.thebrownleefamily.net
+    - host: {{ cnames.alertmanager }}
       http:
         paths:
         - backend:

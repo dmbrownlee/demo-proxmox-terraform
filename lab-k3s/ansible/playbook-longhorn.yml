@@ -1,6 +1,8 @@
 ---
 - name: Install Longhorn into the cluster
   hosts: localhost
+  vars_files:
+    - cnames.yaml
   tasks:
     - name: Ensure the helm repo for longhorn is added
       kubernetes.core.helm_repository:
@@ -14,9 +16,8 @@
         chart_ref: longhorn/longhorn
         release_namespace: longhorn-system
         create_namespace: true
-        values: "{{ lookup('template', 'longhorn-values.yaml.j2') | from_yaml }}"
     - name: Ensure the longhorn ingress configuration has been applied
       kubernetes.core.k8s:
         kubeconfig: "{{ k3s_local_kubeconfig_path }}"
         state: present
-        src: longhorn-ingress.yaml
+        template: longhorn-ingress.yaml
