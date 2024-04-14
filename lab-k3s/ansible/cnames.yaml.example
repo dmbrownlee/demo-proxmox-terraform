@@ -4,3 +4,4 @@ cnames:
   alertmanager: alertmanager.site1.example.com
   photos: photos.site1.example.com
   grafana: grafana.site1.example.com
+  gitea: gitea.site1.example.com
