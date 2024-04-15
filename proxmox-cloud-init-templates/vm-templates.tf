@@ -2,13 +2,13 @@ resource "proxmox_virtual_environment_download_file" "cloud_init_images" {
   depends_on = [
     proxmox_virtual_environment_network_linux_vlan.vlans
   ]
-  for_each     = toset(keys(var.cloud_init_images))
+  for_each     = var.vm_templates
   content_type = "iso"
   overwrite    = true
   datastore_id = var.iso_storage.name
-  file_name    = var.cloud_init_images[each.value].file_name
+  file_name    = each.value.file_name
   node_name    = var.iso_storage.node
-  url          = var.cloud_init_images[each.value].url
+  url          = each.value.url
 }
 
 resource "proxmox_virtual_environment_vm" "vm_templates" {
@@ -62,10 +62,10 @@ resource "proxmox_virtual_environment_vm" "vm_templates" {
   disk {
     datastore_id = var.vm_template_storage.name
     discard      = "on"
-    file_id      = proxmox_virtual_environment_download_file.cloud_init_images[each.value.cloud_init_image].id
+    file_id      = proxmox_virtual_environment_download_file.cloud_init_images[each.key].id
     interface    = "scsi0"
     iothread     = true
-    size         = 2
+    size         = 4
     ssd          = true
   }
 

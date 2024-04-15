@@ -1,0 +1,30 @@
+#============================
+# Template virtual machines
+#============================
+# vm_templates describes a map of virtual machine templates Terraform will
+# create from the disk images listed above in cloud_init_images. The keys for
+# the map are the names of the template virtual machines and the objects they
+# refer to contain the name of the cloud-init image to use and the Proxmox VM
+# id to use.
+vm_templates = {
+  debian11-genericcloud-20240211 = {
+    vm_id            = 999,
+    url       = "https://cloud.debian.org/images/cloud/bullseye/20240211-1654/debian-11-genericcloud-amd64-20240211-1654.qcow2",
+    file_name = "debian-11-genericcloud-amd64-20240211.qcow2.img",
+  },
+  debian12-genericcloud-20240211 = {
+    vm_id            = 998,
+    url       = "https://cloud.debian.org/images/cloud/bookworm/20240211-1654/debian-12-genericcloud-amd64-20240211-1654.qcow2",
+    file_name = "debian-12-genericcloud-amd64-20240211.qcow2.img",
+  },
+  jammy-server-cloudimg-amd64-20240403 = {
+    vm_id            = 997,
+    url       = "https://cloud-images.ubuntu.com/jammy/20240403/jammy-server-cloudimg-amd64.img",
+    file_name = "jammy-server-cloudimg-amd64-20240403.img",
+  },
+  noble-server-cloudimg-amd64-20240413 = {
+    vm_id            = 996,
+    url       = "https://cloud-images.ubuntu.com/noble/20240413/noble-server-cloudimg-amd64.img",
+    file_name = "noble-server-cloudimg-amd64-20240413.img",
+  },
+}
