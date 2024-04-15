@@ -35,7 +35,7 @@
         keyring: /etc/apt/trusted.gpg.d/docker.gpg
     - name: Ensure the GPG key for the kubernetes apt repo is installed
       ansible.builtin.apt_key:
-        url: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
+        url: https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key
         keyring: /etc/apt/trusted.gpg.d/kubernetes.gpg
     - name: Ensure docker registry is configured
       ansible.builtin.apt_repository:
@@ -44,7 +44,7 @@
       register: docker_repo
     - name: Ensure kubernetes registry is configured
       ansible.builtin.apt_repository:
-        repo: deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/kubernetes.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /
+        repo: deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/kubernetes.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /
         filename: kubernetes
       register: kubernetes_repo
     - name: Wait until the lock file is removed
