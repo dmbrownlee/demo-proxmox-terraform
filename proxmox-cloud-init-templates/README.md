@@ -12,6 +12,8 @@ cp terraform.tfvars.example terraform.tfvars
 vim terraform.tfvars
 ```
 
+Since we would like to edit the above file once and forget it, and since you might want to change the cloud-init images for which you are creating VM templates more often, the VM template configs are in their own file, vm-template.auto.tfvars (again, remove the .example extension after editing to taste).
+
 Then, initialize Terraform.  This will download the Terraform plugins the demo project will use to communicated with Proxmox and run Ansible.
 
 ```shell
