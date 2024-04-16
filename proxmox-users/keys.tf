@@ -37,7 +37,7 @@ resource "local_file" "ci_ssh_public_key_file" {
 }
 
 output "ssh_copy_root_key" {
-  value = "ssh-copy-id -i ~/keys/pveroot.pub root@pve1"
+  value = "ssh-copy-id -i ~/keys/pveroot.pub root@${regex("https+://([^:]+):8006", var.endpoint)[0]}"
 }
 
 output "ssh_agent_add_root" {
