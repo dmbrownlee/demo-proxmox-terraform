@@ -77,7 +77,6 @@ want_ansible_output = true
 # Uncomment to enable optional kubernetes apps
 want_k3s_photos = true
 want_k3s_gitea = true
-want_k3s_googlephotossync = true
 
 
 ###############################################################################
