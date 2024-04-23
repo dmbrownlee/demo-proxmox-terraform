@@ -77,6 +77,7 @@ want_ansible_output = true
 # Uncomment to enable optional kubernetes apps
 want_k3s_photos = true
 want_k3s_gitea = true
+want_k3s_googlephotossync = true
 
 
 ###############################################################################
@@ -178,7 +179,18 @@ vms = [
     hardware = {
       cpu_cores = 2,
       memory    = 8192,
-      disk      = 20
+      disks     = [
+        {
+          datastore_id = "local-lvm",
+          interface = "scsi0",
+          size      = 20
+        },
+        {
+          datastore_id = "truenas1",
+          interface = "scsi1",
+          size      = 200
+        },
+      ]
     }
     mac_address  = "ca:fe:01:82:01:01",
     vlan_id      = 82,
@@ -193,7 +205,18 @@ vms = [
     hardware = {
       cpu_cores = 2,
       memory    = 8192,
-      disk      = 20
+      disks     = [
+        {
+          datastore_id = "local-lvm",
+          interface = "scsi0",
+          size      = 20
+        },
+        {
+          datastore_id = "truenas1",
+          interface = "scsi1",
+          size      = 200
+        },
+      ]
     }
     mac_address  = "ca:fe:01:82:02:01",
     vlan_id      = 82,
@@ -208,7 +231,18 @@ vms = [
     hardware = {
       cpu_cores = 2,
       memory    = 8192,
-      disk      = 20
+      disks     = [
+        {
+          datastore_id = "local-lvm",
+          interface = "scsi0",
+          size      = 20
+        },
+        {
+          datastore_id = "truenas1",
+          interface = "scsi1",
+          size      = 200
+        },
+      ]
     }
     mac_address  = "ca:fe:01:82:03:01",
     vlan_id      = 82,
@@ -223,7 +257,18 @@ vms = [
     hardware = {
       cpu_cores = 2,
       memory    = 8192,
-      disk      = 200
+      disks     = [
+        {
+          datastore_id = "local-lvm",
+          interface = "scsi0",
+          size      = 20
+        },
+        {
+          datastore_id = "truenas1",
+          interface = "scsi1",
+          size      = 200
+        },
+      ]
     }
     mac_address  = "ca:fe:01:82:04:01",
     vlan_id      = 82,
@@ -238,7 +283,18 @@ vms = [
     hardware = {
       cpu_cores = 2,
       memory    = 8192,
-      disk      = 200
+      disks     = [
+        {
+          datastore_id = "local-lvm",
+          interface = "scsi0",
+          size      = 20
+        },
+        {
+          datastore_id = "truenas1",
+          interface = "scsi1",
+          size      = 200
+        },
+      ]
     }
     mac_address  = "ca:fe:01:82:05:01",
     vlan_id      = 82,
@@ -253,7 +309,18 @@ vms = [
     hardware = {
       cpu_cores = 2,
       memory    = 8192,
-      disk      = 60
+      disks     = [
+        {
+          datastore_id = "local-lvm",
+          interface = "scsi0",
+          size      = 20
+        },
+        {
+          datastore_id = "truenas1",
+          interface = "scsi1",
+          size      = 200
+        },
+      ]
     }
     mac_address  = "ca:fe:01:82:06:01",
     vlan_id      = 82,

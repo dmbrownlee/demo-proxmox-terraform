@@ -21,14 +21,17 @@ resource "proxmox_virtual_environment_vm" "k3s_master" {
     cores   = each.value.hardware.cpu_cores
     type    = "x86-64-v2-AES"
   }
-  disk {
-    #datastore_id = var.vm_storage
-    datastore_id = "local-lvm"
-    interface    = "scsi0"
-    size         = each.value.hardware.disk
-    discard      = "on"
-    iothread     = true
-    ssd          = true
+  dynamic "disk" {
+    for_each = each.value.hardware.disks
+    content {
+      datastore_id = disk.value.datastore_id
+      interface    = disk.value.interface
+      size         = disk.value.size
+      discard      = "on"
+      file_format  = "raw"
+      iothread     = true
+      ssd          = true
+    }
   }
   initialization {
     #datastore_id = var.vm_storage
@@ -100,14 +103,17 @@ resource "proxmox_virtual_environment_vm" "k3s_servers" {
     cores   = each.value.hardware.cpu_cores
     type    = "x86-64-v2-AES"
   }
-  disk {
-    #datastore_id = var.vm_storage
-    datastore_id = "local-lvm"
-    interface    = "scsi0"
-    size         = each.value.hardware.disk
-    discard      = "on"
-    iothread     = true
-    ssd          = true
+  dynamic "disk" {
+    for_each = each.value.hardware.disks
+    content {
+      datastore_id = disk.value.datastore_id
+      interface    = disk.value.interface
+      size         = disk.value.size
+      discard      = "on"
+      file_format  = "raw"
+      iothread     = true
+      ssd          = true
+    }
   }
   initialization {
     #datastore_id = var.vm_storage
@@ -179,14 +185,17 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
     cores   = each.value.hardware.cpu_cores
     type    = "x86-64-v2-AES"
   }
-  disk {
-    #datastore_id = var.vm_storage
-    datastore_id = "local-lvm"
-    interface    = "scsi0"
-    size         = each.value.hardware.disk
-    discard      = "on"
-    iothread     = true
-    ssd          = true
+  dynamic "disk" {
+    for_each = each.value.hardware.disks
+    content {
+      datastore_id = disk.value.datastore_id
+      interface    = disk.value.interface
+      size         = disk.value.size
+      discard      = "on"
+      file_format  = "raw"
+      iothread     = true
+      ssd          = true
+    }
   }
   initialization {
     #datastore_id = var.vm_storage

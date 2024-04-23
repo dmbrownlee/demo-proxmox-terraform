@@ -224,7 +224,11 @@ variable "vms" {
     hardware = object({
       cpu_cores = number,
       memory    = number,
-      disk      = number
+      disks     = list(object({
+        datastore_id = string,
+        interface    = string,
+        size         = number
+      }))
     })
     mac_address  = string,
     vlan_id      = number,
