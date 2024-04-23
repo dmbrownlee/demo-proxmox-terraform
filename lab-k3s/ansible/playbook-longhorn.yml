@@ -16,8 +16,12 @@
         chart_ref: longhorn/longhorn
         release_namespace: longhorn-system
         create_namespace: true
-    - name: Ensure the longhorn ingress configuration has been applied
-      kubernetes.core.k8s:
-        kubeconfig: "{{ k3s_local_kubeconfig_path }}"
-        state: present
-        template: longhorn-ingress.yaml
+        values:
+          defaultSettings:
+            defaultDataPath: /k3s_storage
+            backupTarget: nfs://truenas1.site1.thebrownleefamily.net:/mnt/pool1/longhorn-backups
+          ingress:
+            enabled: true
+            ingressClassName: traefik
+            host: "{{ cnames.longhorn }}"
+            path: /
