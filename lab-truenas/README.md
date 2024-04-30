@@ -1,6 +1,8 @@
 # TrueNAS Lab
 This Proxmox Terraform lab downloads the installation media for TrueNAS SCALE Dragonfish, VyOS, and Debian.  I then creates four virtual machines, connects them to an isolated switch (`vmbr10` in the example files), and inserts the installation media into the appropriate virtual machines so that you can install the operating systems.  This lab has two virtual machines (cores, 8GB RAM, two network cards, seven 20GB disks) for running TrueNAS SCALE, a VyOS firewall (2 cores, 1GB RAM, two network cards, one 20GB disk) to act as NAT gateway to the Internet and provide DNS/DHCP on the switch's subnet, and a Debian workstation (4 cores, 8GB RAM, one network card, one 20GB disk) for testing access to NAS shares.  Note, this Terraform project only downloads the media and creates the virtual machines.  It does not use Ansible to install the operating systems so you will have to do that yourself.
 
+![virual network](lab_truenas.png)
+
 ## Make Copies of the Example Files
 Site specific configuration is stored in variables within `*.auto.tfvars` files.  Example configuration files with a `.example` extension are included.  Make a copy of each of these files with the same filename, but without the `.example` extension and edit values as appropriate to your site.  At a minimum, you will need to change `endpoint` and `api_token` the in `terraform.tfvars`.
 
