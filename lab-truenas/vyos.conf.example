@@ -1,0 +1,83 @@
+configure
+
+# Timezone
+set system host-name fw1
+set system domain-name site1.example.com
+set system time-zone America/Los_Angeles
+commit
+
+# Interfaces
+set interfaces ethernet eth0 description 'WAN'
+set interfaces ethernet eth1 description 'LAN'
+set interfaces ethernet eth0 address dhcp
+set interfaces ethernet eth1 address '10.54.10.254/24'
+commit
+
+# Use DNS configuration in eth0 DHCP response
+set system name-server eth0
+commit
+
+# NAT
+set nat source rule 100 outbound-interface name eth0
+set nat source rule 100 source address 10.54.10.0/24
+set nat source rule 100 translation address masquerade
+commit
+
+# Firewall
+set firewall ipv4 name OUTSIDE-IN default-action drop
+set firewall ipv4 name OUTSIDE-IN rule 10 action accept
+set firewall ipv4 name OUTSIDE-IN rule 10 state established
+set firewall ipv4 name OUTSIDE-IN rule 10 state related
+
+set firewall ipv4 name OUTSIDE-LOCAL default-action drop
+set firewall ipv4 name OUTSIDE-LOCAL rule 10 action accept
+set firewall ipv4 name OUTSIDE-LOCAL rule 10 state established
+set firewall ipv4 name OUTSIDE-LOCAL rule 10 state related
+set firewall ipv4 name OUTSIDE-LOCAL rule 20 action accept
+set firewall ipv4 name OUTSIDE-LOCAL rule 20 icmp type-name echo-request
+set firewall ipv4 name OUTSIDE-LOCAL rule 20 protocol icmp
+set firewall ipv4 name OUTSIDE-LOCAL rule 20 state new
+commit
+
+# DHCP
+set service dhcp-server shared-network-name LAN authoritative
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 subnet-id 10
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 option default-router 10.54.10.254
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 option name-server 10.54.10.254
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 option domain-name site1.example.com
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 option domain-search site1.example.com
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 lease 86400
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 range 0 start 10.54.10.100
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 range 0 stop 10.54.10.200
+commit
+
+# DHCP Static Address Reservations
+# debian
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping debian-eth0 mac ca:fe:02:10:02:01
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping debian-eth0 ip-address 10.54.10.99
+# nas1
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas1-eth0 mac ca:fe:02:10:03:01
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas1-eth0 ip-address 10.54.10.3
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas1-eth1 mac ca:fe:02:10:03:02
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas1-eth1 ip-address 10.54.10.4
+# nas2
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas2-eth0 mac ca:fe:02:10:04:01
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas2-eth0 ip-address 10.54.10.5
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas2-eth1 mac ca:fe:02:10:04:02
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas2-eth1 ip-address 10.54.10.6
+
+# DNS Forwarding
+set service dns forwarding cache-size 0
+set service dns forwarding listen-address 10.54.10.254
+set service dns forwarding allow-from 10.54.10.0/24
+commit
+
+set system static-host-mapping host-name debian inet 10.54.10.99
+set system static-host-mapping host-name nas1-1 inet 10.54.10.3
+set system static-host-mapping host-name nas1-2 inet 10.54.10.4
+set system static-host-mapping host-name nas2-1 inet 10.54.10.5
+set system static-host-mapping host-name nas2-2 inet 10.54.10.6
+set system static-host-mapping host-name nas1-1 alias nas1
+set system static-host-mapping host-name nas2-1 alias nas2
+commit
+save

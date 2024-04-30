@@ -1,0 +1,37 @@
+###############################################################################
+###############################################################################
+##
+##  Bridges
+##
+###############################################################################
+###############################################################################
+# This is the list of network bridges for the lab.
+bridges = [
+  {
+    comment = "TrueNAS Lab (Switch)"
+    name = "vmbr10",
+    node_name  = "pve1"
+    vlan_aware = true,
+  },
+]
+
+
+###############################################################################
+###############################################################################
+##
+##  VLANs
+##
+###############################################################################
+###############################################################################
+# vlans is a map of project VLAN objects indexed by name.  Besides the VLAN ID,
+# each VLAN specifies networking configuration for the netblock the VLAN uses
+# in case the virtual machines connected to the VLAN do not use DHCP for
+# network configuration.
+vlans = [
+  {
+    comment    = "TrueNAS Lab - VLAN (10)"
+    interface  = "vmbr10"
+    node_name  = "pve1"
+    vlan_id    = 10,
+  },
+]

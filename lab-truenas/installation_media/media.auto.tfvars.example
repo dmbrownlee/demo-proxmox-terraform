@@ -1,0 +1,33 @@
+###############################################################################
+###############################################################################
+##
+##  Virtual Machines
+##
+###############################################################################
+###############################################################################
+
+proxmox_iso_datastore = {
+  node_name    = "pve1",
+  datastore_id = "local-lvm",
+}
+
+iso_images = [
+  {
+    checksum  = "9ab42b900894ecc2a0a46c598807bf6e493f53bee7d61ff321030fa4ff5f1a11",
+    checksum_algorithm = "sha256"
+    file_name = "TrueNAS-SCALE-24.04.0.iso",
+    url       = "https://download.sys.truenas.net/TrueNAS-SCALE-Dragonfish/24.04.0/TrueNAS-SCALE-24.04.0.iso",
+  },
+  {
+    checksum  = "92261a2a8a196f9b586f4e34e171d8551be3e91667945226024f10a07ca8e3b5",
+    checksum_algorithm = "sha256"
+    file_name = "vyos-1.5-rolling-202404270018-amd64.iso",
+    url       = "https://github.com/vyos/vyos-rolling-nightly-builds/releases/download/1.5-rolling-202404270018/vyos-1.5-rolling-202404270018-amd64.iso",
+  },
+  {
+    checksum  = "013f5b44670d81280b5b1bc02455842b250df2f0c6763398feb69af1a805a14f",
+    checksum_algorithm = "sha256"
+    file_name = "debian-12.5.0-amd64-netinst.iso",
+    url       = "https://debian.osuosl.org/debian-cdimage/12.5.0/amd64/iso-cd/debian-12.5.0-amd64-netinst.iso",
+  },
+]

@@ -1,0 +1,185 @@
+###############################################################################
+###############################################################################
+##
+##  Virtual Machines
+##
+###############################################################################
+###############################################################################
+
+vms = [
+  {
+    vm_id            = 710,
+    hostname         = "fw1",
+    role             = "firewall",
+    pve_node         = "pve1",
+    iso_image        = "local-lvm:iso/vyos-1.5-rolling-202404270018-amd64.iso",
+    hardware = {
+      cpu_cores = 2,
+      memory    = 1024,
+      disks     = [
+        {
+          datastore_id = "local-lvm",
+          interface = "virtio0",
+          size      = 20
+        },
+      ]
+      network_devices = [
+        {
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:02:10:01:01",
+          vlan_id      = 0,
+        },
+        {
+          interface    = "vmbr10",
+          mac_address  = "ca:fe:02:10:01:02",
+          vlan_id      = 10,
+        },
+      ]
+    }
+  },
+  {
+    vm_id            = 711,
+    hostname         = "debian",
+    role             = "workstation",
+    pve_node         = "pve1",
+    iso_image        = "local-lvm:iso/debian-12.5.0-amd64-netinst.iso",
+    hardware = {
+      cpu_cores = 2,
+      memory    = 4096,
+      disks     = [
+        {
+          datastore_id = "local-lvm",
+          interface = "virtio0",
+          size      = 20
+        },
+      ]
+      network_devices = [
+        {
+          interface    = "vmbr10",
+          mac_address  = "ca:fe:02:10:02:01",
+          vlan_id      = 10,
+        },
+      ]
+    }
+  },
+  {
+    vm_id            = 712,
+    hostname         = "nas1",
+    role             = "NAS",
+    pve_node         = "pve1",
+    iso_image        = "local-lvm:iso/TrueNAS-SCALE-24.04.0.iso",
+    hardware = {
+      cpu_cores = 2,
+      memory    = 8192,
+      disks     = [
+        {
+          datastore_id = "local-lvm",
+          interface = "virtio0",
+          size      = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface = "virtio1",
+          size      = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface = "virtio2",
+          size      = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface = "virtio3",
+          size      = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface = "virtio4",
+          size      = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface = "virtio5",
+          size      = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface = "virtio6",
+          size      = 20
+        },
+      ]
+      network_devices = [
+        {
+          interface    = "vmbr10",
+          mac_address  = "ca:fe:02:10:03:01",
+          vlan_id      = 10,
+        },
+        {
+          interface    = "vmbr10",
+          mac_address  = "ca:fe:02:10:03:02",
+          vlan_id      = 10,
+        },
+      ]
+    }
+  },
+  {
+    vm_id            = 713,
+    hostname         = "nas2",
+    role             = "NAS",
+    pve_node         = "pve1",
+    iso_image        = "local-lvm:iso/TrueNAS-SCALE-24.04.0.iso",
+    hardware = {
+      cpu_cores = 2,
+      memory    = 8192,
+      disks     = [
+        {
+          datastore_id = "local-lvm",
+          interface = "virtio0",
+          size      = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface = "virtio1",
+          size      = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface = "virtio2",
+          size      = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface = "virtio3",
+          size      = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface = "virtio4",
+          size      = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface = "virtio5",
+          size      = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface = "virtio6",
+          size      = 20
+        },
+      ]
+      network_devices = [
+        {
+          interface    = "vmbr10",
+          mac_address  = "ca:fe:02:10:04:01",
+          vlan_id      = 10,
+        },
+        {
+          interface    = "vmbr10",
+          mac_address  = "ca:fe:02:10:04:02",
+          vlan_id      = 10,
+        },
+      ]
+    }
+  },
+]
