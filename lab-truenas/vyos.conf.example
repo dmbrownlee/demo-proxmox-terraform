@@ -53,18 +53,18 @@ commit
 
 # DHCP Static Address Reservations
 # debian
-set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping debian-eth0 mac ca:fe:02:10:02:01
-set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping debian-eth0 ip-address 10.54.10.99
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping debian mac ca:fe:02:10:02:01
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping debian ip-address 10.54.10.99
 # nas1
-set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas1-eth0 mac ca:fe:02:10:03:01
-set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas1-eth0 ip-address 10.54.10.3
-set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas1-eth1 mac ca:fe:02:10:03:02
-set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas1-eth1 ip-address 10.54.10.4
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas1-1 mac ca:fe:02:10:03:01
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas1-1 ip-address 10.54.10.3
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas1-2 mac ca:fe:02:10:03:02
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas1-2 ip-address 10.54.10.4
 # nas2
-set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas2-eth0 mac ca:fe:02:10:04:01
-set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas2-eth0 ip-address 10.54.10.5
-set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas2-eth1 mac ca:fe:02:10:04:02
-set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas2-eth1 ip-address 10.54.10.6
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas2-1 mac ca:fe:02:10:04:01
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas2-1 ip-address 10.54.10.5
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas2-2 mac ca:fe:02:10:04:02
+set service dhcp-server shared-network-name LAN subnet 10.54.10.0/24 static-mapping nas2-2 ip-address 10.54.10.6
 
 # DNS Forwarding
 set service dns forwarding cache-size 0
