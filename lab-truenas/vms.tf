@@ -97,7 +97,6 @@ resource "proxmox_virtual_environment_vm" "lab_vms" {
   on_boot = true
   scsi_hardware = "virtio-scsi-single"
   serial_device {}
-  started = false
   vga {
     type = "qxl"
   }
