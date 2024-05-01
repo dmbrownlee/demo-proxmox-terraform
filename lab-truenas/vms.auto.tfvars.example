@@ -44,8 +44,8 @@ vms = [
     pve_node         = "pve1",
     iso_image        = "local-lvm:iso/debian-12.5.0-amd64-netinst.iso",
     hardware = {
-      cpu_cores = 2,
-      memory    = 4096,
+      cpu_cores = 4,
+      memory    = 8192,
       disks     = [
         {
           datastore_id = "local-lvm",
