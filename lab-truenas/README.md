@@ -3,6 +3,9 @@ This Proxmox Terraform lab downloads the installation media for TrueNAS SCALE Dr
 
 ![virual network](lab_truenas.png)
 
+## Watch it!
+I recorded a video walking through the steps below.  It includes some additional commentary and some unintended troubleshooting.  You can watch it [HERE](https://rumble.com/v4sq2sl-demo-project-update-2024-05-01.html).
+
 ## Make Copies of the Example Files
 Site specific configuration is stored in variables within `*.auto.tfvars` files.  Example configuration files with a `.example` extension are included.  Make a copy of each of these files with the same filename, but without the `.example` extension and edit values as appropriate to your site.  At a minimum, you will need to change `endpoint` and `api_token` the in `terraform.tfvars`.
 
