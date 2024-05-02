@@ -18,7 +18,10 @@ variable "vms" {
     pve_node         = string,
     iso_image        = string,
     hardware = object({
-      cpu_cores = number,
+      cpu       = object({
+        cores = number,
+        type  = string,
+      })
       memory    = number,
       disks     = list(object({
         datastore_id = string,
@@ -63,8 +66,8 @@ resource "proxmox_virtual_environment_vm" "lab_vms" {
   }
   cpu {
     sockets = 1
-    cores   = each.value.hardware.cpu_cores
-    type    = "x86-64-v2-AES"
+    cores   = each.value.hardware.cpu.cores
+    type    = each.value.hardware.cpu.type
   }
   dynamic "disk" {
     for_each = each.value.hardware.disks

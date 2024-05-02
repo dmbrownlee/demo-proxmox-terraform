@@ -14,7 +14,10 @@ vms = [
     pve_node         = "pve1",
     iso_image        = "local-lvm:iso/vyos-1.5-rolling-202404270018-amd64.iso",
     hardware = {
-      cpu_cores = 2,
+      cpu = {
+        cores = 2,
+        type  = "x86-64-v2-AES"
+      }
       memory    = 1024,
       disks     = [
         {
@@ -44,7 +47,10 @@ vms = [
     pve_node         = "pve1",
     iso_image        = "local-lvm:iso/debian-12.5.0-amd64-netinst.iso",
     hardware = {
-      cpu_cores = 4,
+      cpu = {
+        cores = 4,
+        type  = "x86-64-v2-AES"
+      }
       memory    = 8192,
       disks     = [
         {
@@ -69,7 +75,11 @@ vms = [
     pve_node         = "pve1",
     iso_image        = "local-lvm:iso/TrueNAS-SCALE-24.04.0.iso",
     hardware = {
-      cpu_cores = 2,
+      cpu = {
+        cores = 2,
+        #type  = "x86-64-v2-AES"
+        type  = "host"
+      }
       memory    = 8192,
       disks     = [
         {
@@ -129,7 +139,11 @@ vms = [
     pve_node         = "pve1",
     iso_image        = "local-lvm:iso/TrueNAS-SCALE-24.04.0.iso",
     hardware = {
-      cpu_cores = 2,
+      cpu = {
+        cores = 2,
+        #type  = "x86-64-v2-AES"
+        type  = "host"
+      }
       memory    = 8192,
       disks     = [
         {
