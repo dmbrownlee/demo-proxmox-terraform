@@ -85,6 +85,7 @@ resource "proxmox_virtual_environment_vm" "lab_vms" {
     datastore_id = "local-lvm"
     file_format  = "raw"
   }
+  machine = "q35"
   memory {
     dedicated = each.value.hardware.memory
     floating  = each.value.hardware.memory
