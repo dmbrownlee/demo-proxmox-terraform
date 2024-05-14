@@ -17,14 +17,14 @@ vm_templates = {
     url       = "https://cloud.debian.org/images/cloud/bookworm/20240211-1654/debian-12-genericcloud-amd64-20240211-1654.qcow2",
     file_name = "debian-12-genericcloud-amd64-20240211.qcow2.img",
   },
-  jammy-server-cloudimg-amd64-20240403 = {
+  jammy-server-cloudimg-amd64-20240514 = {
     vm_id            = 997,
-    url       = "https://cloud-images.ubuntu.com/jammy/20240403/jammy-server-cloudimg-amd64.img",
-    file_name = "jammy-server-cloudimg-amd64-20240403.img",
+    url       = "https://cloud-images.ubuntu.com/jammy/20240514/jammy-server-cloudimg-amd64.img",
+    file_name = "jammy-server-cloudimg-amd64-20240514.img",
   },
-  noble-server-cloudimg-amd64-20240413 = {
+  noble-server-cloudimg-amd64-20240505 = {
     vm_id            = 996,
-    url       = "https://cloud-images.ubuntu.com/noble/20240413/noble-server-cloudimg-amd64.img",
-    file_name = "noble-server-cloudimg-amd64-20240413.img",
+    url       = "https://cloud-images.ubuntu.com/noble/20240505/noble-server-cloudimg-amd64.img",
+    file_name = "noble-server-cloudimg-amd64-20240505.img",
   },
 }
