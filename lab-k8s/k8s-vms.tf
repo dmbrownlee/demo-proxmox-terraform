@@ -33,6 +33,7 @@ resource "proxmox_virtual_environment_vm" "k8s_servers" {
     datastore_id = var.vm_storage
     dns {
       servers = var.vlans[index(var.vlans.*.vlan_id, each.value.vlan_id)].ipv4_dns_servers
+      domain  = var.site_domain
     }
     ip_config {
       ipv4 {
@@ -61,7 +62,7 @@ resource "proxmox_virtual_environment_vm" "k8s_servers" {
     type  = "ssh"
     user  = var.ci_user
     agent = true
-    host  = self.name
+    host  = "${self.name}.${var.site_domain}"
   }
   provisioner "local-exec" {
     command = "sleep ${var.sleep_seconds_before_remote_provisioning}"
@@ -109,6 +110,7 @@ resource "proxmox_virtual_environment_vm" "k8s_agents" {
     datastore_id = var.vm_storage
     dns {
       servers = var.vlans[index(var.vlans.*.vlan_id, each.value.vlan_id)].ipv4_dns_servers
+      domain  = var.site_domain
     }
     ip_config {
       ipv4 {
@@ -137,7 +139,7 @@ resource "proxmox_virtual_environment_vm" "k8s_agents" {
     type  = "ssh"
     user  = var.ci_user
     agent = true
-    host  = self.name
+    host  = "${self.name}.${var.site_domain}"
   }
   provisioner "local-exec" {
     command = "sleep ${var.sleep_seconds_before_remote_provisioning}"
