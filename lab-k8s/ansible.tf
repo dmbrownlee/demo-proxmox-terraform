@@ -1,3 +1,9 @@
+variable kubernetes_version {
+  description = "Kubernetes version number including the 'v' prefix"
+  type        = string
+  default     = "v1.30"
+}
+
 resource "ansible_host" "k8s_servers" {
   for_each = { for vm in var.vms : vm.hostname => vm if vm.role == "k8s_server" }
   name     = each.key
@@ -16,6 +22,7 @@ resource "ansible_playbook" "k8s_servers" {
   extra_vars = {
     private_key      = var.ssh_private_key_files[var.ci_user]
     ansible_ssh_user = var.ci_user
+    kubernetes_version = var.kubernetes_version
   }
   depends_on = [
     resource.proxmox_virtual_environment_vm.k8s_servers,
@@ -45,6 +52,7 @@ resource "ansible_playbook" "k8s_agents" {
   extra_vars = {
     private_key      = var.ssh_private_key_files[var.ci_user]
     ansible_ssh_user = var.ci_user
+    kubernetes_version = var.kubernetes_version
   }
   depends_on = [
     resource.proxmox_virtual_environment_vm.k8s_agents,
