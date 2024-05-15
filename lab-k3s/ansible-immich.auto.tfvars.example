@@ -1,0 +1,6 @@
+# Uncomment this boolean variable if you want Terraform to run the Ansible
+# playbook that installs the immich helm chart to your K3S cluster.  The default
+# value is 'false'.  For the details, the Ansible playbook that gets run is in
+# ansible/playbook-immich.yml
+
+# want_k3s_photos = true

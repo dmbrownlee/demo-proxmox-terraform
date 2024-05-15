@@ -1,3 +1,8 @@
+variable "want_k3s_gitea" {
+  type    = bool
+  default = false
+}
+
 resource "ansible_playbook" "k3s_gitea" {
   count                   = var.want_k3s_gitea ? 1 : 0
   playbook                = "ansible/playbook-gitea.yml"

@@ -1,0 +1,18 @@
+###############################################################################
+###############################################################################
+##
+##  K3S
+##
+###############################################################################
+###############################################################################
+# These variables are passed to the Ansible playbook that installs the K3S
+# cluster.  For the details, the playbook is in ansible/playbook.yml.
+
+k3s_token                 = "any_string_you_like"
+k3s_version               = "v1.29.3+k3s1"
+k3s_api_url               = "https://10.48.82.90:6443"
+k3s_local_kubeconfig_path = "<your homedir on the control host>/.kube/config"
+k3s_vip_ip                = "10.48.82.90"
+k3s_vip_hostname          = "k3s-dev"
+k3s_vip_domain            = "example.com"
+

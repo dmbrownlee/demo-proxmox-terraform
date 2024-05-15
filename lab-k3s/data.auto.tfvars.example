@@ -1,0 +1,12 @@
+###############################################################################
+###############################################################################
+##
+##  Control host
+##
+###############################################################################
+###############################################################################
+# These variables are specific to your control host.  In particular, this
+# variable defines the location of the SSH keypair for the cloud-init user.
+# Terraform will search here for the cloud-init user's SSH public key and
+# install it via the cloud-init drive when it clones the VMs.
+ssh_keystore = "~/keys"

@@ -1,3 +1,46 @@
+###############################################################################
+###############################################################################
+##
+##  Variable Definitions
+##
+###############################################################################
+###############################################################################
+variable "k3s_token" {
+  description = "Join token for K3S (any string)"
+  type        = string
+}
+
+variable "k3s_version" {
+  description = "Version of K3S to install"
+  type        = string
+}
+
+variable "k3s_api_url" {
+  description = "Version of K3S to install"
+  type        = string
+}
+
+variable "k3s_local_kubeconfig_path" {
+  description = "Path to kubeconfig on the Ansible controller"
+  type        = string
+}
+
+variable "k3s_vip_ip" {
+  description = "Floating virtual IP of the external loadbalancer"
+  type        = string
+}
+
+variable "k3s_vip_hostname" {
+  description = "Hostname associated with the floating VIP"
+  type        = string
+}
+
+variable "k3s_vip_domain" {
+  description = "The site domain"
+  type        = string
+}
+
+
 resource "ansible_host" "k3s_master" {
   for_each = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_master" }
   name     = each.key
@@ -9,9 +52,11 @@ resource "ansible_host" "k3s_master" {
 
 
 ###############################################################################
+###############################################################################
 ##
-##  K3S Master node
+##  Resource Definitions
 ##
+###############################################################################
 ###############################################################################
 resource "ansible_group" "k3s_master" {
   name     = "k3s_master"

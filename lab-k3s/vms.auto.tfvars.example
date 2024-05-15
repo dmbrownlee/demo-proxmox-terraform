@@ -1,0 +1,270 @@
+###############################################################################
+###############################################################################
+##
+##  Ansible
+##
+###############################################################################
+###############################################################################
+# Uncomment if you don't want Ansible playbooks to be run after the first time.
+#ansible_replayable = false
+
+# This delay, in seconds, is to reduce output of failed connections attempts
+# while we're waiting for the SSH service to start.
+sleep_seconds_before_remote_provisioning = 40
+
+# ssh_private_key_files is a map of paths to SSH private key files indexed by
+# username.  Here, we specify the location of the "ansible" user's private
+# SSH key that needs to be known when Terraform runs ansible-playbook.
+ssh_private_key_files = {
+  ansible = "~/keys/ansible"
+}
+
+
+###############################################################################
+###############################################################################
+##
+##  Cloud-init
+##
+###############################################################################
+###############################################################################
+# This is where we specify the user credentials for the administrative user
+# cloud-init will create on each VM cloned from a cloud-init template image.
+# Since we will be using Ansible for configuration management, it makes sense
+# for this to be the "ansible" user.  If any other users need to be configured,
+# Ansible can do that.  After Terraform has created and booted the VM, it will
+# run Ansible to do further machine configuration.  The corresponding private
+# SSH key should be added to your SSH agent as SSH is usually configured to
+# disallow password logins.  Note, the public key does not include the comment
+# you see at the end of the line in the .pub file.
+ci_user     = "ansible"
+ci_password = "P455w0rd!"
+
+
+###############################################################################
+###############################################################################
+##
+##  Flags for development and testing
+##
+###############################################################################
+###############################################################################
+# Uncomment lines to override default values.
+want_ansible_output = true
+
+# These are for disbling k3s nodes during development
+#want_k3s_servers    = false
+#want_k3s_agents     = false
+
+
+###############################################################################
+###############################################################################
+##
+##  Proxmox
+##
+###############################################################################
+###############################################################################
+# This is the Proxmox storage location where you want VM disks to reside.  The
+# default is "local-lvm", but you can override it to specify a shared storage
+# location, such as NFS storage.
+vm_storage = "local-lvm"
+
+# This is the same as the above except this is for VM template images that will
+# get cloned rather then VMs.
+vm_template_storage = {
+  node = "pve3",
+  name = "local-lvm"
+}
+
+
+###############################################################################
+###############################################################################
+##
+##  Site-specific data
+##
+###############################################################################
+###############################################################################
+site_domain = "example.com"
+
+
+###############################################################################
+###############################################################################
+##
+##  Virtual Machines
+##
+###############################################################################
+###############################################################################
+vms = [
+  {
+    vm_id            = 610,
+    hostname         = "k3s-dev-s1",
+    role             = "k3s_master",
+    pve_node         = "pve1",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    ipv4_address = "10.48.82.91/24"
+    hardware = {
+      cpu = {
+        cores = 2,
+        type  = "x86-64-v2-AES"
+      }
+      memory    = 8192,
+      disks     = [
+        {
+          datastore_id = "local-lvm",
+          interface = "scsi0",
+          size      = 200
+        },
+      ]
+      network_devices = [
+        {
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:01:82:01:01",
+          vlan_id      = 82,
+        },
+      ]
+    }
+  },
+  {
+    vm_id            = 611,
+    hostname         = "k3s-dev-s2",
+    role             = "k3s_server",
+    pve_node         = "pve2",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    ipv4_address = "10.48.82.92/24"
+    hardware = {
+      cpu = {
+        cores = 2,
+        type  = "x86-64-v2-AES"
+      }
+      memory    = 8192,
+      disks     = [
+        {
+          datastore_id = "local-lvm",
+          interface = "scsi0",
+          size      = 200
+        },
+      ]
+      network_devices = [
+        {
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:01:82:02:01",
+          vlan_id      = 82,
+        },
+      ]
+    }
+  },
+  {
+    vm_id            = 612,
+    hostname         = "k3s-dev-s3",
+    role             = "k3s_server",
+    pve_node         = "pve3",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    ipv4_address = "10.48.82.93/24"
+    hardware = {
+      cpu = {
+        cores = 2,
+        type  = "x86-64-v2-AES"
+      }
+      memory    = 8192,
+      disks     = [
+        {
+          datastore_id = "local-lvm",
+          interface = "scsi0",
+          size      = 200
+        },
+      ]
+      network_devices = [
+        {
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:01:82:03:01",
+          vlan_id      = 82,
+        },
+      ]
+    }
+  },
+  {
+    vm_id            = 613,
+    hostname         = "k3s-dev-a1",
+    role             = "k3s_agent",
+    pve_node         = "pve1",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    ipv4_address = "10.48.82.94/24"
+    hardware = {
+      cpu = {
+        cores = 2,
+        type  = "x86-64-v2-AES"
+      }
+      memory    = 8192,
+      disks     = [
+        {
+          datastore_id = "local-lvm",
+          interface = "scsi0",
+          size      = 200
+        },
+      ]
+      network_devices = [
+        {
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:01:82:04:01",
+          vlan_id      = 82,
+        },
+      ]
+    }
+  },
+  {
+    vm_id            = 614,
+    hostname         = "k3s-dev-a2",
+    role             = "k3s_agent",
+    pve_node         = "pve2",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    ipv4_address = "10.48.82.95/24"
+    hardware = {
+      cpu = {
+        cores = 2,
+        type  = "x86-64-v2-AES"
+      }
+      memory    = 8192,
+      disks     = [
+        {
+          datastore_id = "local-lvm",
+          interface = "scsi0",
+          size      = 200
+        },
+      ]
+      network_devices = [
+        {
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:01:82:05:01",
+          vlan_id      = 82,
+        },
+      ]
+    }
+  },
+  {
+    vm_id            = 615,
+    hostname         = "k3s-dev-a3",
+    role             = "k3s_agent",
+    pve_node         = "pve3",
+    cloud_init_image = "debian12-genericcloud-20240211"
+    ipv4_address = "10.48.82.96/24"
+    hardware = {
+      cpu = {
+        cores = 2,
+        type  = "x86-64-v2-AES"
+      }
+      memory    = 8192,
+      disks     = [
+        {
+          datastore_id = "local-lvm",
+          interface = "scsi0",
+          size      = 200
+        },
+      ]
+      network_devices = [
+        {
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:01:82:06:01",
+          vlan_id      = 82,
+        },
+      ]
+    }
+  },
+]

@@ -1,3 +1,8 @@
+variable "want_k3s_photos" {
+  type    = bool
+  default = false
+}
+
 resource "ansible_playbook" "k3s_photos" {
   count                   = var.want_k3s_photos ? 1 : 0
   playbook                = "ansible/playbook-immich.yml"

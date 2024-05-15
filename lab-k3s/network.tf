@@ -1,31 +1,62 @@
-# For each node in our Proxmox cluster, we want to loop through all the VLANs.
-# However, we cannot do nested for_each loops in Terraform resources so we
-# need to create a flattened local list of objects that contains that contains
-# the same elements that would have been produced by the nested loops.  See
-# https://developer.hashicorp.com/terraform/language/functions/flatten#flattening-nested-structures-for-for_each
-# for an explanation and example.
+###############################################################################
+###############################################################################
+##
+##  Variable Definitions
+##
+###############################################################################
+###############################################################################
 
-locals {
-  node_vlans = flatten([
-    for node in data.proxmox_virtual_environment_nodes.available_nodes.names : [
-      for vlan in var.vlans : {
-        node_name = node
-        name      = "${var.node_vlan_interfaces[node]}.${vlan.vlan_id}"
-        interface = var.node_vlan_interfaces[node]
-        vlan      = vlan.vlan_id
-        comment   = vlan.comment
-      }
-    ]
-  ])
+# Note: This file only defines the variables available.  The values for these
+#       variables are assigned in the network.auto.tfvars file.
+
+variable "bridges" {
+  description = "A list of bridge names managed by this lab"
+  type        = list(object({
+    comment = string,
+    name = string,
+    node_name = string,
+    vlan_aware = bool,
+  }))
+  default     = []
+}
+
+variable "vlans" {
+  description = "Map of VLAN objects indexed on name"
+  type = list(object({
+    comment          = string,
+    interface        = string,
+    node_name        = string,
+    vlan_id          = number,
+    ipv4_gateway     = string,
+    ipv4_dns_servers = list(string)
+    netblock         = string
+  }))
+}
+
+###############################################################################
+###############################################################################
+##
+##  Resource Definitions
+##
+###############################################################################
+###############################################################################
+
+resource "proxmox_virtual_environment_network_linux_bridge" "bridges" {
+  for_each = tomap({ for bridge in var.bridges: "${bridge.node_name}-${bridge.name}" => bridge })
+  comment    = each.value.comment
+  name       = each.value.name
+  node_name  = each.value.node_name
+  vlan_aware = each.value.vlan_aware
 }
 
 resource "proxmox_virtual_environment_network_linux_vlan" "vlans" {
-  for_each = tomap({
-    for node_vlan in local.node_vlans : "${node_vlan.node_name}.${node_vlan.vlan}" => node_vlan
-  })
-  node_name = each.value.node_name
-  name      = each.value.name
-  interface = each.value.interface
-  vlan      = each.value.vlan
+  depends_on = [
+    proxmox_virtual_environment_network_linux_bridge.bridges
+  ]
+  for_each = tomap({ for vlan in var.vlans : "${vlan.node_name}-${vlan.interface}.${vlan.vlan_id}" => vlan })
   comment   = each.value.comment
+  interface = each.value.interface
+  name      = "${each.value.interface}.${each.value.vlan_id}"
+  node_name = each.value.node_name
+  vlan      = each.value.vlan_id
 }
