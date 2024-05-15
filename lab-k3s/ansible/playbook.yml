@@ -37,29 +37,29 @@
         group: root
         mode: '0755'
       become: true
-    - name: Ensure the second disk is partitioned
-      community.general.parted:
-        device: /dev/sdb
-        label: gpt
-        name: k3s_storage
-        number: 1
-        state: present
-        fs_type: ext4
-      become: true
-      register: partitions
-    - name: Ensure any new partition is formatted
-      community.general.filesystem:
-        fstype: ext4
-        dev: /dev/sdb1
-      become: true
-      when: partitions.changed
-    - name: Ensure storage disk is mounted
-      ansible.posix.mount:
-        path: /k3s_storage
-        src: /dev/sdb1
-        fstype: ext4
-        state: mounted
-      become: true
+    # - name: Ensure the second disk is partitioned
+    #   community.general.parted:
+    #     device: /dev/sdb
+    #     label: gpt
+    #     name: k3s_storage
+    #     number: 1
+    #     state: present
+    #     fs_type: ext4
+    #   become: true
+    #   register: partitions
+    # - name: Ensure any new partition is formatted
+    #   community.general.filesystem:
+    #     fstype: ext4
+    #     dev: /dev/sdb1
+    #   become: true
+    #   when: partitions.changed
+    # - name: Ensure storage disk is mounted
+    #   ansible.posix.mount:
+    #     path: /k3s_storage
+    #     src: /dev/sdb1
+    #     fstype: ext4
+    #     state: mounted
+    #   become: true
     - name: Include role-specific tasks
       ansible.builtin.include_tasks:
         file: tasks-{{ k3s_role }}.yml
