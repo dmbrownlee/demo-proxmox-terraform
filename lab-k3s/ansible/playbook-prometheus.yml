@@ -4,6 +4,13 @@
   vars_files:
     - cnames.yaml
   tasks:
+    - name: Ensure common packages are installed
+      ansible.builtin.apt:
+        name:
+          - python3-kubernetes
+        cache_valid_time: 300
+        lock_timeout: 180
+      become: true
     - name: Ensure the helm repo for prometheus is added
       kubernetes.core.helm_repository:
         kubeconfig: "{{ k3s_local_kubeconfig_path }}"
