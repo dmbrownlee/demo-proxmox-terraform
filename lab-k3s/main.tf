@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~> 1.7.5"
+  required_version = "~> 1.7.2"
   required_providers {
     ansible = {
       source  = "ansible/ansible"
