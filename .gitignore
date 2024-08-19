@@ -50,3 +50,5 @@ terraform-inventory.yml
 proxmox/ansible/dns/files/dns-zone-files/zones.local
 proxmox/ansible/dns/files/dns-zone-files/db.*
 
+# Ignore Kubernetes config files
+*/kubeconfig

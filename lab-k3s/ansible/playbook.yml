@@ -63,3 +63,22 @@
     - name: Include role-specific tasks
       ansible.builtin.include_tasks:
         file: tasks-{{ k3s_role }}.yml
+- name: Save Cluster Context
+  hosts: k3s-dev-s1
+  tasks:
+    - name: Save the kubernetes config locally
+      ansible.builtin.fetch:
+        dest: "./"
+        flat: true
+        src: /etc/rancher/k3s/k3s.yaml
+      become: true
+    - name: Ensure 127.0.0.1 is replaced with the hostname of the VIP
+      ansible.builtin.lineinfile:
+        path: k3s.yaml
+        regexp: '^(.*server: https://)127\.0\.0\.1(:6443)$'
+        line: '\1k3s-dev\2'
+        backrefs: true
+      delegate_to: localhost
+    - name: Move foo to bar
+      ansible.builtin.command: mv k3s.yaml ../kubeconfig
+      delegate_to: localhost
