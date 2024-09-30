@@ -1,27 +1,22 @@
-resource "proxmox_virtual_environment_download_file" "cloud_init_images" {
-  depends_on = [
-    proxmox_virtual_environment_network_linux_vlan.vlans
-  ]
-  for_each     = var.vm_templates
-  content_type = "iso"
-  overwrite    = true
-  datastore_id = var.iso_storage.name
-  file_name    = each.value.file_name
-  node_name    = var.iso_storage.node
-  url          = each.value.url
+variable "vm_templates" {
+  description = "Map of VM template objects keyed on template name"
+  type = map(object({
+    file_name = string,
+    node_name = string,
+    vm_id     = number,
+    datastore = string,
+    disk_size = number
+  }))
 }
 
 resource "proxmox_virtual_environment_vm" "vm_templates" {
-  depends_on = [
-    proxmox_virtual_environment_download_file.cloud_init_images,
-  ]
   for_each        = var.vm_templates
   acpi            = true
   bios            = "seabios"
   keyboard_layout = "en-us"
   migrate         = false
   name            = each.key
-  node_name       = var.vm_template_storage.node
+  node_name       = each.value.node_name
   on_boot         = false
   reboot          = false
   scsi_hardware   = "virtio-scsi-single"
@@ -36,7 +31,6 @@ resource "proxmox_virtual_environment_vm" "vm_templates" {
   timeout_clone       = 1800
   timeout_create      = 1800
   timeout_migrate     = 1800
-  timeout_move_disk   = 1800
   timeout_reboot      = 1800
   timeout_shutdown_vm = 1800
   timeout_start_vm    = 1800
@@ -60,12 +54,12 @@ resource "proxmox_virtual_environment_vm" "vm_templates" {
   }
 
   disk {
-    datastore_id = var.vm_template_storage.name
+    datastore_id = each.value.datastore
     discard      = "on"
-    file_id      = proxmox_virtual_environment_download_file.cloud_init_images[each.key].id
+    file_id      = each.value.file_name
     interface    = "scsi0"
     iothread     = true
-    size         = 4
+    size         = each.value.disk_size
     ssd          = true
   }
 
@@ -92,7 +86,6 @@ resource "proxmox_virtual_environment_vm" "vm_templates" {
     mtu        = 0
     queues     = 0
     rate_limit = 0
-    vlan_id    = var.vlans[index(var.vlans.*.comment, "PROVISIONING")].vlan_id
   }
 
   operating_system {
@@ -100,8 +93,7 @@ resource "proxmox_virtual_environment_vm" "vm_templates" {
   }
 
   vga {
-    enabled = true
-    memory  = 16
-    type    = "qxl"
+    memory = 16
+    type   = "qxl"
   }
 }

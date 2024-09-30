@@ -1,0 +1,17 @@
+#============================
+# Template virtual machines
+#============================
+# vm_templates describes a map of virtual machine templates Terraform will
+# create from the disk images listed above in cloud_init_images. The keys for
+# the map are the names of the template virtual machines and the objects they
+# refer to contain the name of the cloud-init image to use and the Proxmox VM
+# id to use.
+vm_templates = {
+  debian12-genericcloud-20240901 = {
+    file_name = "local-lvm:iso/debian-12-genericcloud-amd64-20240901.qcow2.img",
+    node_name = "pve1"
+    vm_id     = 996,
+    datastore = "local-lvm"
+    disk_size = 4,
+  },
+}
