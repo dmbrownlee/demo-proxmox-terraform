@@ -43,12 +43,14 @@ terraform.rc
 terraform-plugin-proxmox.log
 terraform.log
 
-# Terraform generated Ansible inventory
-terraform-inventory.yml
+# Terraform generated Ansible files
+**/ansible.cfg
+**/.terraform-dynamic-inventory.yml
 
+# Ansible generated
 # Local DNS zone files
 proxmox/ansible/dns/files/dns-zone-files/zones.local
 proxmox/ansible/dns/files/dns-zone-files/db.*
 
-# Ignore Kubernetes config files
-*/kubeconfig
+# Ansible generated Kubernetes config files
+**/.kube
