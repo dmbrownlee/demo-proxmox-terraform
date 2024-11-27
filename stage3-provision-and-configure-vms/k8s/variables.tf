@@ -1,30 +1,6 @@
 ###############################################################################
 ###############################################################################
 ##
-##  Ansible
-##
-###############################################################################
-###############################################################################
-variable "ansible_replayable" {
-  description = "Flag whether or not Ansible playbooks can be run again."
-  type        = bool
-  default     = true
-}
-
-variable "sleep_seconds_before_remote_provisioning" {
-  description = "The number of seconds to wait after booting before trying SSH"
-  type        = number
-}
-
-variable "ssh_private_key_files" {
-  description = "A map of SSH private key paths"
-  type        = map(string)
-}
-
-
-###############################################################################
-###############################################################################
-##
 ##  Cloud-init
 ##
 ###############################################################################
@@ -52,24 +28,6 @@ variable "ssh_keystore" {
   description = "Local path to directory of SSH keys"
   type        = string
 }
-
-
-###############################################################################
-###############################################################################
-##
-##  Flags for development and testing
-##
-###############################################################################
-###############################################################################
-variable "want_ansible_output" {
-  type    = bool
-  default = false
-}
-
-/* variable "want_k8s_agents" { */
-/*   type    = bool */
-/*   default = true */
-/* } */
 
 
 ###############################################################################
@@ -105,20 +63,6 @@ variable "vm_template_storage" {
     node = string,
     name = string
   })
-}
-
-
-###############################################################################
-###############################################################################
-##
-##  Site-specific data
-##
-###############################################################################
-###############################################################################
-variable "site_domain" {
-  description = "The DNS domain (used in cloud-init data when creating VMs)"
-  type        = string
-  default     = "example.com"
 }
 
 
