@@ -1,0 +1,12 @@
+# Uncomment this if you would like to change the default name of the
+# Promox role Terraform will use to determine API authorization (i.e. ACL
+# permissions granted to this role will be available to the Terrafrom account
+# below).
+#terraform_proxmox_role = "TERRAFORM"
+
+# This is the account we want Terraform to use when accessing the Proxmox web
+# API. You can change this if you want, just make sure your other Terraform
+# projects update the account name to match.  Since this is only used to
+# access the web API, no shell account on Proxmox is required and the @pve
+# authentication realm is appropriate.
+#terraform_proxmox_account = "terraform@pve"

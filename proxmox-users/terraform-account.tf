@@ -1,5 +1,27 @@
+##############################################################################
+##
+##  Variable definitions
+##
+##############################################################################
+variable "terraform_proxmox_role" {
+  description = "The name of the Proxmox role Terraform will use (determines ACLs)"
+  type        = string
+  default     = "TERRAFORM"
+}
+
+variable "terraform_proxmox_account" {
+  description = "Terraform administration account"
+  type        = string
+  default     = "terraform@pve"
+}
+
+##############################################################################
+##
+##  Resources
+##
+##############################################################################
 resource "proxmox_virtual_environment_role" "role_terraform" {
-  role_id = "TERRAFORM"
+  role_id = var.terraform_proxmox_role
 
   privileges = [
     "Datastore.Allocate",
