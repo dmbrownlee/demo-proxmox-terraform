@@ -1,0 +1,12 @@
+---
+- name: Configure CKA VMs
+  hosts: all
+  become: yes
+  vars_files:
+    cka-vars.yml
+  tasks:
+    - name: Configure clients to use local apt cache
+      ansible.builtin.include_tasks: tasks-apt-cacher-client.yml
+      when: use_apt_proxy
+    - name: Bring all k8s nodes to baseline
+      ansible.builtin.include_tasks: tasks-node-baseline.yml
