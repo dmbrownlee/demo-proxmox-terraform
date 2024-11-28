@@ -82,16 +82,16 @@
     sysctl_set: true
     state: present
     reload: true
-- name: Ensure net filtering is enabled on IPv6 bridge
+- name: Ensure IPv6 forwarding is enabled in kernel
   ansible.posix.sysctl:
-    name: net.bridge.bridge-nf-call-ip6tables
+    name: net.ipv6.conf.all.forwarding
     value: '1'
     sysctl_set: true
     state: present
     reload: true
-- name: Ensure IPv4 forwarding is enabled in kernel
+- name: Ensure net filtering is enabled on IPv6 bridge
   ansible.posix.sysctl:
-    name: net.ipv4.ip_forward
+    name: net.bridge.bridge-nf-call-ip6tables
     value: '1'
     sysctl_set: true
     state: present
