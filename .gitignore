@@ -47,6 +47,9 @@ terraform.log
 **/ansible.cfg
 **/.terraform-dynamic-inventory.yml
 
+# Ansible variable files containing site-specific data
+step5-provision-vms/*/ansible/*-vars.yml
+
 # Ansible generated
 # Local DNS zone files
 proxmox/ansible/dns/files/dns-zone-files/zones.local
