@@ -10,6 +10,10 @@ terraform {
       source  = "ansible/ansible"
       version = "~> 1.3.0"
     }
+    dns = {
+      source  = "hashicorp/dns"
+      version = "~> 3.4.2"
+    }
     local = {
       source  = "hashicorp/local"
       version = "~> 2.5.2"
@@ -49,3 +53,13 @@ provider "proxmox" {
     username = "root"
   }
 }
+
+provider "dns" {
+  update {
+    server        = var.dns_server
+    key_name      = var.dns_key_name
+    key_algorithm = var.dns_key_algorithm
+    key_secret    = var.dns_key_secret
+  }
+}
+
