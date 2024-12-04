@@ -13,11 +13,11 @@
 ##
 ###############################################################################
 ###############################################################################
+# The Ansible configuration file is required to find Terraform's dynamic
+# inventory file.  We only generate the Ansible configuration file dynamically,
+# as opposed to checking a static file into source control, because the
+# cloud-init user account may be different at your site.
 resource "local_file" "ansible_config" {
-  depends_on = [
-    resource.proxmox_virtual_environment_vm.k8s_control_plane_nodes,
-    resource.proxmox_virtual_environment_vm.k8s_worker_nodes
-  ]
   filename        = "${path.module}/ansible.cfg"
   file_permission = "0644"
   content         = <<EOF
@@ -39,7 +39,6 @@ EOF
 resource "ansible_group" "k8s_control_plane_nodes" {
   name = "k8s_control_plane_nodes"
   variables = {
-    #private_key         = var.ssh_private_key_files[var.ci_user]
     ansible_ssh_user    = var.ci_user
   }
   depends_on = [
@@ -51,7 +50,6 @@ resource "ansible_group" "k8s_control_plane_nodes" {
 resource "ansible_group" "k8s_worker_nodes" {
   name = "k8s_worker_nodes"
   variables = {
-    #private_key         = var.ssh_private_key_files[var.ci_user]
     ansible_ssh_user    = var.ci_user
   }
   depends_on = [
