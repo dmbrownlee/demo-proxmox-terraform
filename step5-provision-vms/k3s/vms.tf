@@ -1,6 +1,13 @@
 ###############################################################################
 ###############################################################################
 ##
+##  Variable Definitions
+##
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+##
 ##  Ansible
 ##
 ###############################################################################
@@ -40,6 +47,14 @@ variable "ci_password" {
   sensitive   = true
 }
 
+
+###############################################################################
+###############################################################################
+##
+##  Resource Definitions
+##
+###############################################################################
+###############################################################################
 
 ###############################################################################
 ###############################################################################
@@ -135,6 +150,7 @@ variable "site_domain" {
 
 resource "proxmox_virtual_environment_vm" "k3s_master" {
   depends_on = [
+    resource.dns_a_record_set.k3s_initial_cp,
     data.proxmox_virtual_environment_vms.cloud_init_template,
   ]
   for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_master" }
@@ -211,6 +227,9 @@ resource "proxmox_virtual_environment_vm" "k3s_master" {
   provisioner "remote-exec" {
     inline = ["hostnamectl"]
   }
+  startup {
+    order = 1
+  }
   vga {
     type = "qxl"
   }
@@ -218,6 +237,7 @@ resource "proxmox_virtual_environment_vm" "k3s_master" {
 
 resource "proxmox_virtual_environment_vm" "k3s_servers" {
   depends_on = [
+    resource.dns_a_record_set.k3s_servers,
     data.proxmox_virtual_environment_vms.cloud_init_template,
   ]
   for_each    = { for vm in var.vms : vm.hostname => vm if var.want_k3s_servers && vm.role == "k3s_server" }
@@ -294,6 +314,9 @@ resource "proxmox_virtual_environment_vm" "k3s_servers" {
   provisioner "remote-exec" {
     inline = ["hostnamectl"]
   }
+  startup {
+    order = 10
+  }
   vga {
     type = "qxl"
   }
@@ -301,6 +324,7 @@ resource "proxmox_virtual_environment_vm" "k3s_servers" {
 
 resource "proxmox_virtual_environment_vm" "k3s_agents" {
   depends_on = [
+    resource.dns_a_record_set.k3s_agents,
     data.proxmox_virtual_environment_vms.cloud_init_template,
   ]
   for_each    = { for vm in var.vms : vm.hostname => vm if var.want_k3s_agents && vm.role == "k3s_agent" }
@@ -376,6 +400,9 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
   }
   provisioner "remote-exec" {
     inline = ["hostnamectl"]
+  }
+  startup {
+    order = 20
   }
   vga {
     type = "qxl"
