@@ -135,8 +135,7 @@ variable "site_domain" {
 
 resource "proxmox_virtual_environment_vm" "k3s_master" {
   depends_on = [
-    proxmox_virtual_environment_network_linux_vlan.vlans,
-    data.proxmox_virtual_environment_vms.cloud_init_template
+    data.proxmox_virtual_environment_vms.cloud_init_template,
   ]
   for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_master" }
   name        = each.key
@@ -219,8 +218,7 @@ resource "proxmox_virtual_environment_vm" "k3s_master" {
 
 resource "proxmox_virtual_environment_vm" "k3s_servers" {
   depends_on = [
-    proxmox_virtual_environment_network_linux_vlan.vlans,
-    data.proxmox_virtual_environment_vms.cloud_init_template
+    data.proxmox_virtual_environment_vms.cloud_init_template,
   ]
   for_each    = { for vm in var.vms : vm.hostname => vm if var.want_k3s_servers && vm.role == "k3s_server" }
   name        = each.key
@@ -303,8 +301,7 @@ resource "proxmox_virtual_environment_vm" "k3s_servers" {
 
 resource "proxmox_virtual_environment_vm" "k3s_agents" {
   depends_on = [
-    proxmox_virtual_environment_network_linux_vlan.vlans,
-    data.proxmox_virtual_environment_vms.cloud_init_template
+    data.proxmox_virtual_environment_vms.cloud_init_template,
   ]
   for_each    = { for vm in var.vms : vm.hostname => vm if var.want_k3s_agents && vm.role == "k3s_agent" }
   name        = each.key
