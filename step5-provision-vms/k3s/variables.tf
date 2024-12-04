@@ -60,3 +60,21 @@ variable "api_token" {
   description = "Proxmox API token"
   type        = string
 }
+
+
+###############################################################################
+###############################################################################
+##
+##  VLANs
+##
+###############################################################################
+###############################################################################
+variable "vlans" {
+  description = "Map of VLAN objects indexed on name"
+  type = list(object({
+    vlan_id          = number,
+    comment          = string
+    ipv4_gateway     = string,
+    ipv4_dns_servers = list(string)
+  }))
+}
