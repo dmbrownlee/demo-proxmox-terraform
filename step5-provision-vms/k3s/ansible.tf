@@ -25,16 +25,6 @@ variable "k3s_local_kubeconfig_path" {
   type        = string
 }
 
-variable "k3s_vip" {
-  description = "Floating virtual IP of the external loadbalancer"
-  type        = string
-}
-
-variable "k3s_vip_hostname" {
-  description = "Hostname associated with the floating VIP"
-  type        = string
-}
-
 variable "k3s_vip_domain" {
   description = "The site domain"
   type        = string
