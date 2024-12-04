@@ -76,9 +76,6 @@ crash.*.log
 *.retry
 # Ansible generated Kubernetes config files
 **/.kube/*
-# Ansible generated DNS zone files
-proxmox/ansible/dns/files/dns-zone-files/zones.local
-proxmox/ansible/dns/files/dns-zone-files/db.*
 
 #############################################################
 #############################################################
