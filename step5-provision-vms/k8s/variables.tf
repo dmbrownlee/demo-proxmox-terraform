@@ -55,6 +55,7 @@ variable "node_vlan_interfaces" {
 variable "vm_storage" {
   description = "Name of Proxmox storage location where VM disks are stored"
   type        = string
+  default     = "local-lvm"
 }
 
 variable "vm_template_storage" {
