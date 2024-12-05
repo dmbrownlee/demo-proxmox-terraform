@@ -1,0 +1,8 @@
+# Source this file in your shell for some handy aliases for working with
+# OpenTofu and Ansible in these directories.  They are intended to help when
+# working with Terraform (OpenTofu) workspaces.
+alias ap='ansible-playbook -e tf_workspace=$(tofu workspace show) ansible/playbook.yml'
+alias ta='tofu apply -var-file $(tofu workspace show).tfvars -parallelism=1'
+alias td='tofu destroy -var-file $(tofu workspace show).tfvars'
+alias tsl='tofu state list'
+alias twl='tofu workspace list'
