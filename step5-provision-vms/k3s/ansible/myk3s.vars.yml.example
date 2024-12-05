@@ -1,5 +1,5 @@
 ---
-k3s_version: "v1.30.4+k3s1"
+k3s_version: "v1.31.2+k3s1"
 k3s_token: "secret_token"
 k3s_api_url: "https://192.168.10.80:6443"
 k3s_vip: "192.168.10.80"

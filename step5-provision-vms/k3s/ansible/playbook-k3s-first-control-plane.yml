@@ -107,3 +107,58 @@
       kubernetes.core.helm_plugin:
         plugin_path: https://github.com/databus23/helm-diff
         state: present
+    - name: Ensure the traefik dashboard service is exposed
+      #kubectl expose -n kube-system deployment traefik --name traefik-dashboard --port 9000 --target-port 9000
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            labels:
+              app.kubernetes.io/instance: traefik-kube-system
+              app.kubernetes.io/managed-by: Helm
+              app.kubernetes.io/name: traefik
+#              helm.sh/chart: traefik-25.0.3_up25.0.0
+            name: traefik-dashboard
+            namespace: kube-system
+          spec:
+            # clusterIP: 10.43.39.121
+            # clusterIPs:
+            # - 10.43.39.121
+            # internalTrafficPolicy: Cluster
+            # ipFamilies:
+            # - IPv4
+            # ipFamilyPolicy: SingleStack
+            ports:
+            - port: 9000
+              protocol: TCP
+              targetPort: 9000
+            selector:
+              app.kubernetes.io/instance: traefik-kube-system
+              app.kubernetes.io/name: traefik
+            sessionAffinity: None
+            type: ClusterIP
+    - name: Ensure there is an ingress for the traefik dashboard
+      #kubectl create ingress -n kube-system traefik-dashboard --rule 'dev-traefik.site1.thebrownleefamily.net/*=traefik-dashboard:9000'
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: networking.k8s.io/v1
+          kind: Ingress
+          metadata:
+            name: traefik-dashboard
+            namespace: kube-system
+          spec:
+            ingressClassName: traefik
+            rules:
+            - host: "{{ cnames.traefik }}"
+              http:
+                paths:
+                - backend:
+                    service:
+                      name: traefik-dashboard
+                      port:
+                        number: 9000
+                  path: /
+                  pathType: Prefix
