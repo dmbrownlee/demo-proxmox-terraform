@@ -1,0 +1,43 @@
+---
+- name: Common
+  hosts: all
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  environment:
+    INSTALL_K3S_SKIP_START: true
+    INSTALL_K3S_VERSION: "{{ k3s_version }}"
+    K3S_TOKEN: "{{ k3s_token }}"
+  tasks:
+    - name: Ensure common packages are installed
+      ansible.builtin.apt:
+        name:
+          - python3-kubernetes
+          - cryptsetup
+          - ipvsadm
+          - jq
+          - nfs-common
+          - open-iscsi
+          - parted
+        cache_valid_time: 300
+        lock_timeout: 180
+      become: true
+    - name: Ensure the iscsi_tcp module is loaded before iscsid is started
+      community.general.modprobe:
+        name: iscsi_tcp
+      become: true
+      register: iscsi_tcp_module
+    - name: Ensure the iscsid service is enabled and started for longhorn
+      ansible.builtin.systemd:
+        name: iscsid
+        state: restarted
+        enabled: true
+      become: true
+      when: iscsi_tcp_module.changed
+    - name: Ensure the K3S drop-in configuration directory exists
+      ansible.builtin.file:
+        path: /etc/rancher/k3s/config.yaml.d
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      become: true

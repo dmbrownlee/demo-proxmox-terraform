@@ -1,8 +1,9 @@
 ---
 - name: Install Prometheus into the cluster
-  hosts: localhost
+  hosts: k3s_first_control_plane
   vars_files:
-    - cnames.yaml
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
   tasks:
     - name: Ensure common packages are installed
       ansible.builtin.apt:
@@ -10,17 +11,14 @@
           - python3-kubernetes
         cache_valid_time: 300
         lock_timeout: 180
-      become: true
     - name: Ensure the helm repo for prometheus is added
       kubernetes.core.helm_repository:
-        kubeconfig: "{{ k3s_local_kubeconfig_path }}"
         name: prometheus-community
         repo_url: "https://prometheus-community.github.io/helm-charts"
     - name: Ensure the prometheus helm chart is installed
       kubernetes.core.helm:
-        kubeconfig: "{{ k3s_local_kubeconfig_path }}"
         name: prometheus
-        chart_ref: prometheus-community/prometheus
+        chart_ref: prometheus-community/kube-prometheus-stack
         release_namespace: monitoring
         create_namespace: true
         values:
@@ -30,8 +28,7 @@
               ingressClassName: traefik
               hosts:
                 - "{{ cnames.prometheus }}"
-    - name: Ensure the ingress configuration for the alertmanager has been applied
+    - name: Ensure the ingress configurations have been applied
       kubernetes.core.k8s:
-        kubeconfig: "{{ k3s_local_kubeconfig_path }}"
         state: present
-        template: prometheus-ingress.yaml
+        template: kube-prometheus-stack-ingress.yaml

@@ -1,84 +1,18 @@
 ---
-- name: Common
-  hosts: all
-  environment:
-    INSTALL_K3S_SKIP_START: true
-    INSTALL_K3S_VERSION: "{{ k3s_version }}"
-    K3S_TOKEN: "{{ k3s_token }}"
-  tasks:
-    - name: Ensure common packages are installed
-      ansible.builtin.apt:
-        name:
-          - python3-kubernetes
-          - cryptsetup
-          - ipvsadm
-          - jq
-          - nfs-common
-          - open-iscsi
-          - parted
-        cache_valid_time: 300
-        lock_timeout: 180
-      become: true
-    - name: Ensure the iscsi_tcp module is loaded before iscsid is started
-      community.general.modprobe:
-        name: iscsi_tcp
-      become: true
-    - name: Ensure the iscsid service is enabled and started for longhorn
-      ansible.builtin.systemd:
-        name: iscsid
-        state: restarted
-        enabled: true
-      become: true
-    - name: Ensure the K3S drop-in configuration directory exists
-      ansible.builtin.file:
-        path: /etc/rancher/k3s/config.yaml.d
-        state: directory
-        owner: root
-        group: root
-        mode: '0755'
-      become: true
-    # - name: Ensure the second disk is partitioned
-    #   community.general.parted:
-    #     device: /dev/sdb
-    #     label: gpt
-    #     name: k3s_storage
-    #     number: 1
-    #     state: present
-    #     fs_type: ext4
-    #   become: true
-    #   register: partitions
-    # - name: Ensure any new partition is formatted
-    #   community.general.filesystem:
-    #     fstype: ext4
-    #     dev: /dev/sdb1
-    #   become: true
-    #   when: partitions.changed
-    # - name: Ensure storage disk is mounted
-    #   ansible.posix.mount:
-    #     path: /k3s_storage
-    #     src: /dev/sdb1
-    #     fstype: ext4
-    #     state: mounted
-    #   become: true
-    - name: Include role-specific tasks
-      ansible.builtin.include_tasks:
-        file: tasks-{{ k3s_role }}.yml
-- name: Save Cluster Context
-  hosts: k3s-dev-s1
-  tasks:
-    - name: Save the kubernetes config locally
-      ansible.builtin.fetch:
-        dest: "./"
-        flat: true
-        src: /etc/rancher/k3s/k3s.yaml
-      become: true
-    - name: Ensure 127.0.0.1 is replaced with the hostname of the VIP
-      ansible.builtin.lineinfile:
-        path: k3s.yaml
-        regexp: '^(.*server: https://)127\.0\.0\.1(:6443)$'
-        line: '\1k3s-dev\2'
-        backrefs: true
-      delegate_to: localhost
-    - name: Move foo to bar
-      ansible.builtin.command: mv k3s.yaml ../kubeconfig
-      delegate_to: localhost
+# This top level playbook is only for including smaller playbooks which can be
+# developed and tested separately before adding them here.  The included
+# playbooks can (and do) use "${{ tf_workspace }}.vars.yml" as a vars-file so
+# that you can have different variable files for each workspace allowing you
+# to use the same playbooks for multiple projects.  When you run the
+# ansible-playbook command, be sure to use the -e option to pass a value for
+# tf_workspace.
+#
+# example:
+# ansible-playbook -e tf_workspace=$(tofu workspace show) ansible/playbook.yml
+#
+- import_playbook: playbook-k3s-node-baseline.yml
+- import_playbook: playbook-k3s-first-control-plane.yml
+- import_playbook: playbook-k3s-additional-control-planes.yml
+- import_playbook: playbook-k3s-workers.yml
+- import_playbook: playbook-nfs.yml
+- import_playbook: playbook-prometheus.yml

@@ -1,0 +1,15 @@
+---
+- name: Configure additional control planes
+  hosts: k3s_additional_control_planes
+  # vars:
+  #   k3s_role: k3s_server
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  environment:
+    INSTALL_K3S_SKIP_START: true
+    INSTALL_K3S_VERSION: "{{ k3s_version }}"
+    K3S_TOKEN: "{{ k3s_token }}"
+  tasks:
+    - name: Include role-specific tasks
+      ansible.builtin.include_tasks:
+        file: tasks-k3s_server.yml

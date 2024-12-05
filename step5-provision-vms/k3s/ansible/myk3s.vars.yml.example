@@ -1,0 +1,17 @@
+---
+k3s_version: "v1.30.4+k3s1"
+k3s_token: "secret_token"
+k3s_api_url: "https://192.168.10.80:6443"
+k3s_vip: "192.168.10.80"
+k3s_vip_hostname: "myk3s"
+# The following path is relative to the ansible directory
+#k3s_local_kubeconfig_path: "../.kube/myk3s.kubeconfig"
+
+persistent_nfs_server: nas1.example.com
+persistent_nfs_path: /mnt/pool1/myk3s-nfs
+
+cnames:
+  alertmanager: myk3s-alertmanager.example.com
+  grafana: myk3s-grafana.example.com
+  prometheus: myk3s-prometheus.example.com
+  traefik: myk3s-traefik.example.com
