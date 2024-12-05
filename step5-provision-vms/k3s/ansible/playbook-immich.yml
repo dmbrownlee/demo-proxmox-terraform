@@ -1,22 +1,39 @@
 ---
 - name: Install immich into the cluster
-  hosts: localhost
+  hosts: k3s_first_control_plane
   vars_files:
-    - cnames.yaml
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
   tasks:
     - name: Ensure the helm repo for immich is added
       kubernetes.core.helm_repository:
-        kubeconfig: "{{ k3s_local_kubeconfig_path }}"
         name: immich
         repo_url: "https://immich-app.github.io/immich-charts"
+    - name: Ensure the immich namespace exists
+      kubernetes.core.k8s:
+        name: immich
+        api_version: v1
+        kind: Namespace
+        state: present
     - name: Ensure the immich PVC configuration has been applied
       kubernetes.core.k8s:
-        kubeconfig: "{{ k3s_local_kubeconfig_path }}"
         state: present
-        src: immich-pvc.yaml
+        #src: immich-pvc.yaml
+        definition:
+          apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: immich-library-pvc
+            namespace: immich
+          spec:
+            accessModes:
+              - ReadWriteOnce
+            storageClassName: nfs-client
+            resources:
+              requests:
+                storage: 20Gi
     - name: Ensure the immich helm chart is installed
       kubernetes.core.helm:
-        kubeconfig: "{{ k3s_local_kubeconfig_path }}"
         name: immich
         chart_ref: immich/immich
         release_namespace: immich
@@ -25,7 +42,7 @@
           immich:
             persistence:
               library:
-                existingClaim: longhorn-immich-pvc
+                existingClaim: immich-library-pvc
           postgresql:
             enabled: true
           redis:
@@ -33,9 +50,27 @@
           machine-learning:
             persistence:
               cache:
-                storageClass: longhorn
+                storageClass: nfs-client
     - name: Ensure the photos ingress configuration has been applied
       kubernetes.core.k8s:
-        kubeconfig: "{{ k3s_local_kubeconfig_path }}"
         state: present
-        template: photos-ingress.yaml
+        #template: photos-ingress.yaml
+        definition:
+          apiVersion: networking.k8s.io/v1
+          kind: Ingress
+          metadata:
+            name: photos
+            namespace: immich
+          spec:
+            ingressClassName: traefik
+            rules:
+              - host: "{{ cnames.photos }}"
+                http:
+                  paths:
+                  - backend:
+                      service:
+                        name: immich-server
+                        port:
+                          number: 2283
+                    path: /
+                    pathType: Prefix

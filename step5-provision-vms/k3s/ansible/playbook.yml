@@ -16,3 +16,4 @@
 - import_playbook: playbook-k3s-workers.yml
 - import_playbook: playbook-nfs.yml
 - import_playbook: playbook-prometheus.yml
+- import_playbook: playbook-immich.yml
