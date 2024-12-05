@@ -5,26 +5,6 @@
 ##
 ###############################################################################
 ###############################################################################
-variable "k3s_token" {
-  description = "Join token for K3S (any string)"
-  type        = string
-}
-
-variable "k3s_version" {
-  description = "Version of K3S to install"
-  type        = string
-}
-
-variable "k3s_api_url" {
-  description = "Version of K3S to install"
-  type        = string
-}
-
-variable "k3s_local_kubeconfig_path" {
-  description = "Path to kubeconfig on the Ansible controller"
-  type        = string
-}
-
 
 ###############################################################################
 ###############################################################################
