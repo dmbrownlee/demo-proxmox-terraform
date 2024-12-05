@@ -62,7 +62,6 @@ crash.*.log
 
 # Terraform generated Ansible files
 **/ansible.cfg
-**/.terraform-dynamic-inventory.yml
 
 
 #############################################################
