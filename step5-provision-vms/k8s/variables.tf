@@ -1,6 +1,52 @@
 ###############################################################################
 ###############################################################################
 ##
+##  Variable Definitions
+##
+###############################################################################
+###############################################################################
+# Used in setting up both DNS and the control planes.
+variable "k8s_vip" {
+  description = "Floating virtual IP of the external loadbalancer"
+  type        = string
+}
+
+variable "k8s_vip_hostname" {
+  description = "Hostname associated with the floating VIP"
+  type        = string
+}
+
+###############################################################################
+###############################################################################
+##
+##  Dynamic DNS
+##
+###############################################################################
+###############################################################################
+# These variables allow Terraform to dynamically update DNS with resource
+# records for the VMs it creates (RFC 2845)
+variable "dns_server" {
+  description = "DNS server to receive updates"
+  type        = string
+}
+variable "dns_key_name" {
+  description = ""
+  type        = string
+}
+variable "dns_key_algorithm" {
+  description = ""
+  type        = string
+  default     = "hmac-md5"
+}
+variable "dns_key_secret" {
+  description = ""
+  type        = string
+}
+
+
+###############################################################################
+###############################################################################
+##
 ##  Cloud-init
 ##
 ###############################################################################
