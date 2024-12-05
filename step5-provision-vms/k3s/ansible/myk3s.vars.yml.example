@@ -12,7 +12,9 @@ persistent_nfs_path: /mnt/pool1/myk3s-nfs
 
 cnames:
   alertmanager: myk3s-alertmanager.example.com
+  gitea: myk3s-gitea.example.com
   grafana: myk3s-grafana.example.com
+  longhorn: myk3s-longhorn.example.com
   photos: myk3s-photos.example.com
   prometheus: myk3s-prometheus.example.com
   traefik: myk3s-traefik.example.com

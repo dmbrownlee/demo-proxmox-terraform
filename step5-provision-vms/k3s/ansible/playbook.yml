@@ -16,4 +16,10 @@
 - import_playbook: playbook-k3s-workers.yml
 - import_playbook: playbook-nfs.yml
 - import_playbook: playbook-prometheus.yml
+
+# Optional apps (uncomment the ones you want)
+
+#- import_playbook: playbook-certmanager.yml
+#- import_playbook: playbook-longhorn.yml
+#- import_playbook: playbook-gitea.yml
 - import_playbook: playbook-immich.yml

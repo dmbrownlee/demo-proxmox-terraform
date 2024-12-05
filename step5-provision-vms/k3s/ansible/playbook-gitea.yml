@@ -1,17 +1,16 @@
 ---
 - name: Install gitea into the cluster
-  hosts: localhost
+  hosts: k3s_first_control_plane
   vars_files:
-    - cnames.yaml
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
   tasks:
     - name: Ensure the helm repo for gitea is added
       kubernetes.core.helm_repository:
-        kubeconfig: "{{ k3s_local_kubeconfig_path }}"
         name: gitea-charts
         repo_url: "https://dl.gitea.com/charts/"
     - name: Ensure the gitea helm chart is installed
       kubernetes.core.helm:
-        kubeconfig: "{{ k3s_local_kubeconfig_path }}"
         name: gitea
         chart_ref: gitea-charts/gitea
         release_namespace: gitea
