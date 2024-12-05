@@ -51,25 +51,21 @@ EOF
 ##
 ###############################################################################
 ###############################################################################
-resource "ansible_group" "k3s_master" {
-  name     = "k3s_master"
-  children = [for vm in var.vms : vm.hostname if vm.role == "k3s_master"]
-  depends_on = [
-    resource.proxmox_virtual_environment_vm.k3s_master
-  ]
-}
-
-resource "ansible_group" "k3s_servers" {
-  name     = "k3s_servers"
-  children = [for vm in var.vms : vm.hostname if var.want_k3s_servers && vm.role == "k3s_server"]
+resource "ansible_group" "k3s_control_plane_nodes" {
+  name = "k3s_control_plane_nodes"
+  variables = {
+    ansible_ssh_user = var.ci_user
+  }
   depends_on = [
     resource.proxmox_virtual_environment_vm.k3s_servers
   ]
 }
 
-resource "ansible_group" "k3s_agents" {
-  name     = "k3s_agents"
-  children = [for vm in var.vms : vm.hostname if var.want_k3s_agents && vm.role == "k3s_agent"]
+resource "ansible_group" "k3s_worker_nodes" {
+  name = "k3s_worker_nodes"
+  variables = {
+    ansible_ssh_user = var.ci_user
+  }
   depends_on = [
     resource.proxmox_virtual_environment_vm.k3s_agents
   ]
@@ -82,28 +78,28 @@ resource "ansible_group" "k3s_agents" {
 ##
 ###############################################################################
 ###############################################################################
-resource "ansible_host" "k3s_master" {
-  for_each = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_master" }
+resource "ansible_host" "k3s_first_control_plane" {
+  for_each = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_initial_cp" }
   name     = each.key
-  groups   = ["k3s_master"]
+  groups   = ["k3s_control_plane_nodes", "k3s_first_control_plane"]
   depends_on = [
-    resource.proxmox_virtual_environment_vm.k3s_master
+    resource.proxmox_virtual_environment_vm.k3s_initial_cp
   ]
 }
 
-resource "ansible_host" "k3s_servers" {
-  for_each = { for vm in var.vms : vm.hostname => vm if var.want_k3s_servers && vm.role == "k3s_server" }
+resource "ansible_host" "k3s_additional_control_planes" {
+  for_each = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_server" }
   name     = each.key
-  groups   = ["k3s_servers"]
+  groups   = ["k3s_control_plane_nodes", "k3s_additional_control_planes"]
   depends_on = [
     resource.proxmox_virtual_environment_vm.k3s_servers
   ]
 }
 
-resource "ansible_host" "k3s_agents" {
-  for_each = { for vm in var.vms : vm.hostname => vm if var.want_k3s_agents && vm.role == "k3s_agent" }
+resource "ansible_host" "k3s_workers" {
+  for_each = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_agent" }
   name     = each.key
-  groups   = ["k3s_agent"]
+  groups   = ["k3s_worker_nodes"]
   depends_on = [
     resource.proxmox_virtual_environment_vm.k3s_agents
   ]

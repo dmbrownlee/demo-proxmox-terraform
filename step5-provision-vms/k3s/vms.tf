@@ -148,12 +148,12 @@ variable "site_domain" {
 }
 
 
-resource "proxmox_virtual_environment_vm" "k3s_master" {
+resource "proxmox_virtual_environment_vm" "k3s_initial_cp" {
   depends_on = [
     resource.dns_a_record_set.k3s_initial_cp,
     data.proxmox_virtual_environment_vms.cloud_init_template,
   ]
-  for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_master" }
+  for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_initial_cp" }
   name        = each.key
   description = "Managed by Terraform"
   tags        = ["${terraform.workspace}", each.value.cloud_init_image, each.value.role]

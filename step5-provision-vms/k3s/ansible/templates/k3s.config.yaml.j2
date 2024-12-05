@@ -1,11 +1,11 @@
 token: {{ k3s_token }}
-{% if k3s_role == "k3s_master" %}
+{% if k3s_role == "k3s_initial_cp" %}
 tls-san:
   - {{ k3s_vip }}
   - {{ k3s_vip_hostname }}
   - {{ k3s_vip_hostname }}.{{ ansible_domain }}
 {% endif %}
-{% if k3s_role == "k3s_master" or k3s_role == "k3s_server" %}
+{% if k3s_role == "k3s_initial_cp" or k3s_role == "k3s_server" %}
 disable:
   - servicelb
 {% endif %}
