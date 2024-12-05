@@ -1,15 +1,22 @@
 ---
 - name: Configure worker nodes
   hosts: k3s_worker_nodes
-  # vars:
-  #   k3s_role: k3s_agent
   vars_files:
     - "{{ tf_workspace }}.vars.yml"
   environment:
     INSTALL_K3S_SKIP_START: true
     INSTALL_K3S_VERSION: "{{ k3s_version }}"
     K3S_TOKEN: "{{ k3s_token }}"
+  become: true
   tasks:
-    - name: Include role-specific tasks
-      ansible.builtin.include_tasks:
-        file: tasks-k3s_agent.yml
+    - name: Ensure k3s agents are configured for the cluster
+      ansible.builtin.shell:
+        cmd: curl -sfL https://get.k3s.io | sh -s - agent --server={{ k3s_api_url }}
+      args:
+        creates: /etc/systemd/system/k3s-agent.service
+    - name: Ensure K3S service is started
+      ansible.builtin.systemd:
+        name: k3s-agent
+        state: started
+        enabled: true
+        daemon_reload: true

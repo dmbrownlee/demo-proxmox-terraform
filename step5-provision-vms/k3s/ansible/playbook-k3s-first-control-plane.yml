@@ -1,15 +1,105 @@
 ---
 - name: Configure the initial control plane
   hosts: k3s_first_control_plane
-  # vars:
-  #   k3s_role: k3s_initial_cp
   vars_files:
     - "{{ tf_workspace }}.vars.yml"
   environment:
     INSTALL_K3S_SKIP_START: true
     INSTALL_K3S_VERSION: "{{ k3s_version }}"
     K3S_TOKEN: "{{ k3s_token }}"
+  become: true
   tasks:
-    - name: Include role-specific tasks
-      ansible.builtin.include_tasks:
-        file: tasks-k3s_initial_cp.yml
+    - name: Ensure the K3S runtime directory exists
+      ansible.builtin.file:
+        path: /var/lib/rancher/k3s
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+    - name: Ensure the K3S server manifests directory (different mode) exists
+      ansible.builtin.file:
+        path: /var/lib/rancher/k3s/server/manifests
+        state: directory
+        owner: root
+        group: root
+        mode: '0700'
+    - name: Ensure the kube-vip RBAC manifest exists
+      ansible.builtin.get_url:
+        dest: /var/lib/rancher/k3s/server/manifests/kube-vip-rbac.yaml
+        url: https://kube-vip.io/manifests/rbac.yaml
+        owner: root
+        group: root
+        mode: '0600'
+    - name: Ensure the kube-vip DaemonSet manifest exists
+      ansible.builtin.template:
+        dest: /var/lib/rancher/k3s/server/manifests/kube-vip-daemonset.yaml
+        src: kube-vip-daemonset.yaml.j2
+        owner: root
+        group: root
+        mode: '0600'
+    - name: Ensure the K3S configuration file exists
+      ansible.builtin.template:
+        dest: /etc/rancher/k3s/config.yaml
+        src: k3s.config.yaml.j2
+        owner: root
+        group: root
+        mode: '0644'
+      vars:
+        k3s_role: k3s_initial_cp
+    - name: Ensure initial cluster server is installed
+      ansible.builtin.shell:
+        cmd: curl -sfL https://get.k3s.io | sh -s - server --cluster-init
+      args:
+        creates: /etc/systemd/system/k3s.service
+      register: k3s_installation
+    - name: Ensure K3S service is started
+      ansible.builtin.systemd:
+        name: k3s
+        state: started
+        enabled: true
+        daemon_reload: true
+    - name: Ensure K3S is up before continuing
+      kubernetes.core.k8s_info:
+        kind: Service
+        name: kubernetes
+        namespace: default
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        wait: yes
+        wait_sleep: 10
+        wait_timeout: 360
+    - name: Download kube-vip-cloud-provider manifest to the cluster.
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
+        dest: "/root/kube-vip-cloud-provider.yaml"
+        mode: '0664'
+    - name: Apply kube-vip-cloud-provider manifest to the cluster.
+      kubernetes.core.k8s:
+        state: present
+        src: "/root/kube-vip-cloud-provider.yaml"
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+    - name: Ensure root user has a ~/.kube directory
+      ansible.builtin.file:
+        path: /root/.kube
+        state: directory
+        owner: root
+        group: root
+        mode: '0700'
+    - name: Ensure root user has kubectl setup
+      ansible.builtin.copy:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: /root/.kube/config
+        remote_src: true
+        owner: root
+        group: root
+        mode: '0600'
+      when: k3s_installation.changed
+    - name: Ensure git is installed for helm plugins
+      ansible.builtin.apt:
+        name:
+          - git
+        lock_timeout: 180
+    - name: Ensure helm is installed
+      ansible.builtin.shell:
+        cmd: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+      args:
+        creates: /usr/local/bin/helm
