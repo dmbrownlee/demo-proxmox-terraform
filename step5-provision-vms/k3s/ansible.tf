@@ -21,6 +21,7 @@ resource "local_file" "ansible_config" {
 inventory=.terraform-dynamic-inventory.yml
 remote_user=${var.ci_user}
 host_key_checking=false
+stdout_callback=debug
 EOF
 }
 
