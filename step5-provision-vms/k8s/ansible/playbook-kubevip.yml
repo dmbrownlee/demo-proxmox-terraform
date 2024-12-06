@@ -1,0 +1,21 @@
+---
+- name: Configure kube-vip as static pods on on control plane nodes
+  hosts: k8s_control_plane_nodes
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
+  tasks:
+    - name: Ensure the /etc/kubernetes/manifests exists for static configuration
+      ansible.builtin.file:
+        path: /etc/kubernetes/manifests
+        state: directory
+        owner: root
+        group: root
+        mode: '0775'
+    - name: Ensure the kube-vip static pod manifests are installed
+      ansible.builtin.template:
+        dest: /etc/kubernetes/manifests/kube-vip.yaml
+        owner: root
+        group: root
+        mode: '0644'
+        src: kube-vip.yaml.j2

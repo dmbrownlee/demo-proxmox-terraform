@@ -1,0 +1,29 @@
+---
+# This top level playbook is only for including smaller playbooks which can be
+# developed and tested separately before adding them here.  The included
+# playbooks can (and do) use "${{ tf_workspace }}.vars.yml" as a vars-file so
+# that you can have different variable files for each workspace allowing you
+# to use the same playbooks for multiple projects.  When you run the
+# ansible-playbook command, be sure to use the -e option to pass a value for
+# tf_workspace.
+#
+# example:
+# ansible-playbook -e tf_workspace=$(tofu workspace show) ansible/playbook.yml
+#
+- import_playbook: playbook-k8s-node-baseline.yml
+- import_playbook: playbook-vip.yml
+  when: use_keepalived_vip
+- import_playbook: playbook-kubevip.yml
+  when: use_kubevip 
+
+# The rest of the playbooks are skipped for CKA
+- import_playbook: playbook-k8s-first-control-plane.yml
+  when: tf_workspace != 'cka'
+- import_playbook: playbook-k8s-additional-control-planes.yml
+  when: tf_workspace != 'cka'
+- import_playbook: playbook-k8s-workers.yml
+  when: tf_workspace != 'cka'
+#- import_playbook: playbook-nfs.yml
+#  when: tf_workspace is not 'cka'
+#- import_playbook: playbook-prometheus.yml
+#  when: tf_workspace is not 'cka'

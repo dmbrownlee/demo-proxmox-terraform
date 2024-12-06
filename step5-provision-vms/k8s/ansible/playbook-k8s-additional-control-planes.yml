@@ -1,0 +1,28 @@
+---
+- name: Join additional control plane nodes
+  hosts: k8s_additional_control_planes
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
+  tasks:
+    - name: Join control plane node to cluster
+      throttle: 1
+      block:
+        - name: Ensure control plane node is joined (up to 4 minutes)
+          ansible.builtin.shell: kubeadm join {{ vip_hostname }}:6443 --token {{ k8s_token }} --certificate-key {{ k8s_certificate_key }} --discovery-token-unsafe-skip-ca-verification --control-plane
+          args:
+            creates: /etc/kubernetes/kubelet.conf
+          register: kubeadm_join
+        - debug:
+            var: kubeadm_join.stdout_lines
+        - name: Wait for this control node to be ready
+          ansible.builtin.shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl wait --for=condition=Ready nodes {{ ansible_hostname }} --timeout=600s
+          changed_when: false
+          register: nodes_ready
+          delegate_to: "{{ groups['k8s_first_control_plane'][0] }}"
+          # it's possible for "kubectl wait" to fail with a disconnect when the VIP migrates so these lines attempt to handle that.
+          until: nodes_ready is success
+          retries: 3
+          delay: 10
+        - debug:
+            var: nodes_ready.stdout_lines

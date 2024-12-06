@@ -1,6 +1,0 @@
----
-- name: Ensure apt is configured to use local caching server
-  ansible.builtin.lineinfile:
-    path: /etc/apt/apt.conf.d/00aptproxy
-    line: Acquire::http::Proxy "{{ apt_proxy_url }}";
-    create: true

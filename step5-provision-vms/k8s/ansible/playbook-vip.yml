@@ -1,0 +1,29 @@
+---
+- name: Configure control plane VIP using keepalived
+  hosts: k8s_control_plane_nodes
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
+  tasks:
+    - name: Ensure keepalived is installed
+      ansible.builtin.apt:
+        name:
+          - keepalived
+    - name: Ensure keepalived is configured correctly
+      ansible.builtin.template:
+        dest: /etc/keepalived/keepalived.conf
+        owner: root
+        group: root
+        mode: '0644'
+        src: keepalived.conf.j2
+      register: keepalived_config
+    - name: Ensure keepalived is restarted if its configuration changed
+      ansible.builtin.systemd:
+        name: keepalived
+        state: restarted
+      when: keepalived_config.changed
+    # - name: Ensure VIP responds to ping before continuing
+    #   ansible.builtin.wait_for:
+    #     host: "{{ vip }}"
+    #     port: 0
+    #   delegate_to: localhost

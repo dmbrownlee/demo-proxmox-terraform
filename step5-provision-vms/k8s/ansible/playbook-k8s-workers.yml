@@ -1,0 +1,26 @@
+---
+- name: Join worker nodes
+  hosts: k8s_worker_nodes
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
+  tasks:
+    - name: Join worker node to cluster
+      throttle: 1
+      block:
+        - name: Ensure worker node is joined (up to 4 minutes)
+          ansible.builtin.shell: kubeadm join {{ vip_hostname }}:6443 --token {{ k8s_token }} --discovery-token-unsafe-skip-ca-verification
+          args:
+            creates: /etc/kubernetes/kubelet.conf
+          register: kubeadm_join
+        - debug:
+            var: kubeadm_join.stdout_lines
+        - name: Wait for this worker node to be ready
+          ansible.builtin.shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl wait --for=condition=Ready nodes {{ ansible_hostname }} --timeout=600s
+          changed_when: false
+          register: nodes_ready
+          retries: 3
+          delay: 10
+          delegate_to: "{{ groups['k8s_first_control_plane'][0] }}"
+        - debug:
+            var: nodes_ready.stdout_lines

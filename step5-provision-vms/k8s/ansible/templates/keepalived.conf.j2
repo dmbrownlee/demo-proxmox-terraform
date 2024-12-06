@@ -1,0 +1,33 @@
+# global_defs {
+#   router_id {{ ansible_hostname }}
+#   vrrp_skip_check_adv_addr
+#   vrrp_strict
+#   vrrp_garp_interval 0
+#   vrrp_gna_interval 0
+# }
+
+vrrp_instance VI_1 {
+  state {% if ansible_hostname in groups["k8s_first_control_plane"] %}MASTER
+{% else %}SLAVE
+{% endif %}
+  interface {{ vip_interface }}
+  virtual_router_id 51
+{% if ansible_hostname in groups["k8s_first_control_plane"] %}  priority 100
+{% else %}{% for node in groups["k8s_additional_control_planes"] | sort %}{% if ansible_hostname == node %}  priority {{ 99 - loop.index }}
+{% endif %}{% endfor %}{% endif %}
+  advert_int 1
+  unicast_src_ip {{ ansible_default_ipv4.address }}
+  unicast_peer {
+{% for node in groups["k8s_control_plane_nodes"] %}{% if node != ansible_hostname %}
+    {{ hostvars[node]['ansible_default_ipv4']['address'] }}
+{% endif %}{% endfor %}
+  }
+  authentication {
+    auth_type PASS
+    auth_pass {{ keepalived_vrrp_password }}
+  }
+  virtual_ipaddress {
+    #{{ vip }}
+    {{ vip }}{{ vip_cidr }}
+  }
+}

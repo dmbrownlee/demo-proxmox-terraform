@@ -1,0 +1,47 @@
+---
+#############################################################################
+##  Baseline system variables
+#############################################################################
+# With frequent standups and teardowns, you may find a local APT caching proxy
+# (e.g. apt-cacher-ng on Debian) will speed things up.
+use_apt_proxy: false
+#apt_proxy_url: "http://apt.site1.example.com:3142"
+
+# The version of kubernetes CLI tools to install.  Available versions are
+# listed on:
+#   https://github.com/kubernetes/kubernetes/releases
+#
+# Note, the version number is a string and must appear in quotes to prevent
+# version numbers like 1.30 from being interpreted as a float and rounded down
+# to 1.3.
+
+# You will likely want to install one minor version older than the current
+# release so that you can practice in-place upgrades of kubernetes nodes for
+# the CKA exam objectives.
+kubernetes_version: "1.30"
+containerd_sandbox_image: "registry.k8s.io/pause:3.10"
+#############################################################################
+##  VIP variables
+#############################################################################
+# Variables common to all VIP implementations
+vip: "192.168.10.90"
+vip_cidr: "/24"
+vip_hostname: cka-k8s
+vip_interface: eth0
+
+# Variables for keepalived/haproxy VIP
+use_keepalived_vip: true
+keepalived_router_id: CKA_K8S
+keepalived_vrrp_password: supersecret
+
+# Variables for kube-vip VIP
+use_kubevip: false
+kubevip_image: "ghcr.io/kube-vip/kube-vip:v0.8.7"
+
+#vip_peers:
+#  - ip: "192.168.10.91"
+#    priority: 100
+#  - ip: "192.168.10.92"
+#    priority: 90
+#  - ip: "192.168.10.93"
+#    priority: 80
