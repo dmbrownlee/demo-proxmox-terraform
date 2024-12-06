@@ -1,0 +1,241 @@
+###############################################################################
+###############################################################################
+##
+##  DNS
+##
+###############################################################################
+###############################################################################
+dns_server        = "192.168.10.1"
+dns_key_name      = "update-key."
+dns_key_secret    = "SuperSecretKey+SuperSecretKey+SuperSecretKey="
+dns_key_algorithm = "hmac-sha256"
+
+
+###############################################################################
+###############################################################################
+##
+##  K8S
+##
+###############################################################################
+###############################################################################
+# These variables are passed to the Ansible playbook that installs the K3S
+# cluster.  For the details, the playbook is in ansible/playbook.yml.
+k8s_vip                   = "192.168.10.70"
+k8s_vip_hostname          = "ckad-k8s"
+k8s_vip_cnames            = [
+  "ckad-alertmanager",
+  "ckad-grafana",
+  "ckad-prometheus",
+  "ckad-traefik",
+]
+
+
+###############################################################################
+###############################################################################
+##
+##  Ansible
+##
+###############################################################################
+###############################################################################
+# This delay, in seconds, is to reduce output of failed connections attempts
+# while we're waiting for the SSH service to start.
+sleep_seconds_before_testing_connectivity = 20
+
+
+###############################################################################
+###############################################################################
+##
+##  Cloud-init
+##
+###############################################################################
+###############################################################################
+# This is where we specify the user credentials for the administrative user
+# cloud-init will create on each VM cloned from a cloud-init template image.
+# Since we will be using Ansible for configuration management, it makes sense
+# for this to be the "ansible" user.  If any other users need to be configured,
+# Ansible can do that.  After Terraform has created and booted the VM, it will
+# run Ansible to do further machine configuration.  The corresponding private
+# SSH key should be added to your SSH agent as SSH is usually configured to
+# disallow password logins.  Note, the public key does not include the comment
+# you see at the end of the line in the .pub file.
+ci_user     = "groot"
+ci_password = "change_me!"
+
+
+###############################################################################
+###############################################################################
+##
+##  Control host
+##
+###############################################################################
+###############################################################################
+# These variables are specific to your control host.  In particular, this
+# variable defines the location of the SSH keypair for the cloud-init user.
+# Terraform will search here for the cloud-init user's SSH public key and
+# install it via the cloud-init drive when it clones the VMs.
+ssh_keystore = "~/keys"
+
+
+###############################################################################
+###############################################################################
+##
+##  Proxmox
+##
+###############################################################################
+###############################################################################
+# Here is where we specify the URL for the web API for the Proxmox cluster.
+endpoint = "https://pve1.example.com:8006/"
+
+# The API Token is the combination of the ID and secret:
+api_token = "terraform@pve!mytoken=12345678-90ab-cdef-1234-567890abcdef"
+
+# Here is where we specify the node interface to which we add the VLANs. The
+# switch port patched to this interface should be configured as a VLAN trunk.
+node_vlan_interfaces = {
+  pve1 = "vmbr0"
+  pve2 = "vmbr0"
+  pve3 = "vmbr0"
+}
+
+# This is the Proxmox storage location where you want VM disks to reside.  The
+# default is "local-lvm", but you can override it to specify a shared storage
+# location, such as NFS storage.
+vm_storage = "nas1"
+
+# This is the Proxmox storage location for VM template images that will
+# get cloned rather then VMs.
+vm_template_storage = {
+  node = "pve1",
+  name = "local-lvm"
+}
+
+
+###############################################################################
+###############################################################################
+##
+##  Site-specific data
+##
+###############################################################################
+###############################################################################
+dns_domainname      = "site1.example.com"
+
+###############################################################################
+###############################################################################
+##
+##  VLANs
+##
+###############################################################################
+###############################################################################
+# vlans is a map of project VLAN objects indexed by name.  Besides the VLAN ID,
+# each VLAN specifies networking configuration for the netblock the VLAN uses
+# in case the virtual machines connected to the VLAN do not use DHCP for
+# network configuration.
+vlans = [
+  {
+    comment          = "VLAN_10",
+    vlan_id          = 10,
+    ipv4_gateway     = "192.168.10.254",
+    ipv4_dns_servers = ["192.168.10.1"]
+  },
+]
+
+
+###############################################################################
+###############################################################################
+##
+##  Virtual Machines
+##
+###############################################################################
+###############################################################################
+vms = [
+  {
+    vm_id            = 471,
+    hostname         = "ckad-k8s-cp1",
+    role             = "k8s_first_control_plane_node",
+    pve_node         = "pve1",
+    cloud_init_image = "noble-server-cloudimg-amd64-20241106"
+    hardware = {
+      cpu_cores = 4,
+      memory    = 8192,
+      disk      = 20
+    }
+    mac_address  = "ca:fe:01:10:71:01",
+    vlan_id      = 10,
+    ipv4_address = "192.168.10.71/24"
+  },
+  {
+    vm_id            = 472,
+    hostname         = "ckad-k8s-cp2",
+    role             = "k8s_control_plane_node",
+    pve_node         = "pve2",
+    cloud_init_image = "noble-server-cloudimg-amd64-20241106"
+    hardware = {
+      cpu_cores = 4,
+      memory    = 8192,
+      disk      = 20
+    }
+    mac_address  = "ca:fe:01:10:72:01",
+    vlan_id      = 10,
+    ipv4_address = "192.168.10.72/24"
+  },
+  {
+    vm_id            = 473,
+    hostname         = "ckad-k8s-cp3",
+    role             = "k8s_control_plane_node",
+    pve_node         = "pve3",
+    cloud_init_image = "noble-server-cloudimg-amd64-20241106"
+    hardware = {
+      cpu_cores = 4,
+      memory    = 8192,
+      disk      = 20
+    }
+    mac_address  = "ca:fe:01:10:73:01",
+    vlan_id      = 10,
+    ipv4_address = "192.168.10.73/24"
+  },
+  {
+    vm_id            = 474,
+    hostname         = "ckad-k8s-w1",
+    role             = "k8s_worker_node",
+    pve_node         = "pve1",
+    cloud_init_image = "noble-server-cloudimg-amd64-20241106"
+    hardware = {
+      cpu_cores = 4,
+      memory    = 16384,
+      disk      = 20
+    }
+    mac_address  = "ca:fe:01:10:74:01",
+    vlan_id      = 10,
+    ipv4_address = "192.168.10.74/24"
+  },
+  {
+    vm_id            = 475,
+    hostname         = "ckad-k8s-w2",
+    role             = "k8s_worker_node",
+    pve_node         = "pve2",
+    cloud_init_image = "noble-server-cloudimg-amd64-20241106"
+    hardware = {
+      cpu_cores = 4,
+      memory    = 16384,
+      disk      = 20
+    }
+    mac_address  = "ca:fe:01:10:75:01",
+    vlan_id      = 10,
+    ipv4_address = "192.168.10.75/24"
+  },
+  {
+    vm_id            = 476,
+    hostname         = "ckad-k8s-w3",
+    role             = "k8s_worker_node",
+    pve_node         = "pve3",
+    cloud_init_image = "noble-server-cloudimg-amd64-20241106"
+    hardware = {
+      cpu_cores = 4,
+      memory    = 16384,
+      disk      = 20
+    }
+    mac_address  = "ca:fe:01:10:76:01",
+    vlan_id      = 10,
+    ipv4_address = "192.168.10.76/24"
+  },
+]
