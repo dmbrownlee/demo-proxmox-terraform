@@ -45,7 +45,6 @@ resource "proxmox_virtual_environment_vm" "vm_templates" {
   }
 
   cpu {
-    architecture = "x86_64"
     cores        = 2
     flags        = []
     hotplugged   = 0
