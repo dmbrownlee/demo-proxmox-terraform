@@ -45,11 +45,11 @@ resource "proxmox_virtual_environment_vm" "vm_templates" {
   }
 
   cpu {
-    cores        = 2
-    flags        = []
-    hotplugged   = 0
-    sockets      = 1
-    type         = "x86-64-v2-AES"
+    cores      = 2
+    flags      = []
+    hotplugged = 0
+    sockets    = 1
+    type       = "x86-64-v2-AES"
   }
 
   disk {
@@ -89,6 +89,10 @@ resource "proxmox_virtual_environment_vm" "vm_templates" {
 
   operating_system {
     type = "l26"
+  }
+
+  serial_device {
+    device = "socket"
   }
 
   vga {
