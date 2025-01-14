@@ -11,6 +11,30 @@ variable "k3s_vip_cnames" {
   default     = []
 }
 
+variable "enable_live_cnames" {
+  description = "Create additional CNAME resource records for live services?"
+  type        = bool
+  default     = false
+}
+
+variable "k3s_live_cnames" {
+  description = "List of additional CNAME resource records for live services"
+  type        = list(string)
+  default     = []
+}
+
+variable "enable_dev_cnames" {
+  description = "Create additional CNAME resource records for dev services?"
+  type        = bool
+  default     = false
+}
+
+variable "k3s_dev_cnames" {
+  description = "List of additional CNAME resource records for dev services"
+  type        = list(string)
+  default     = []
+}
+
 ###############################################################################
 ###############################################################################
 ##
@@ -32,6 +56,28 @@ resource "dns_cname_record" "k3s_vip_cnames" {
   count = length(var.k3s_vip_cnames)
   zone = "${var.site_domain}."
   name  = var.k3s_vip_cnames[count.index]
+  cname = "${var.k3s_vip_hostname}.${var.site_domain}."
+  ttl = 300
+}
+
+resource "dns_cname_record" "k3s_live_cnames" {
+  depends_on = [
+    resource.dns_a_record_set.k3s_vip
+  ]
+  count = var.enable_live_cnames ? length(var.k3s_live_cnames) : 0
+  zone = "${var.site_domain}."
+  name  = var.k3s_live_cnames[count.index]
+  cname = "${var.k3s_vip_hostname}.${var.site_domain}."
+  ttl = 300
+}
+
+resource "dns_cname_record" "k3s_dev_cnames" {
+  depends_on = [
+    resource.dns_a_record_set.k3s_vip
+  ]
+  count = var.enable_dev_cnames ? length(var.k3s_dev_cnames) : 0
+  zone = "${var.site_domain}."
+  name  = var.k3s_dev_cnames[count.index]
   cname = "${var.k3s_vip_hostname}.${var.site_domain}."
   ttl = 300
 }
