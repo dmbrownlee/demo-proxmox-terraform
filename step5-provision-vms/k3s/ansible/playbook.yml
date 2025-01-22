@@ -24,4 +24,5 @@
 #- import_playbook: playbook-certmanager.yml
 #- import_playbook: playbook-longhorn.yml
 #- import_playbook: playbook-gitea.yml
+- import_playbook: playbook-cnpg.yml
 - import_playbook: playbook-immich.yml
