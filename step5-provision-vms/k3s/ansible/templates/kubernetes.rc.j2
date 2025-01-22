@@ -1,0 +1,9 @@
+if [[ -x /usr/local/bin/kubectl ]]; then
+  source <(kubectl completion bash)
+  alias k="kubectl"
+  complete -o default -F __start_kubectl k
+fi
+if [[ -x /usr/local/bin/helm ]]; then
+  source <(helm completion bash)
+fi
+export KUBECONFIG=.kube/config

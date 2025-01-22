@@ -1,0 +1,36 @@
+---
+- name: Configure kubectl alias and completion for root
+  hosts: k3s_first_control_plane
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  become: true
+  tasks:
+    - name: Ensure the /root/.bashrc.d/ directory exists
+      ansible.builtin.file:
+        path: /root/.bashrc.d
+        state: directory
+        owner: root
+        group: root
+        mode: '0700'
+    - name: Ensure /root/.bashrc.d/kubectl exists
+      ansible.builtin.template:
+        dest: /root/.bashrc.d/kubernetes.rc
+        src: kubernetes.rc.j2
+        owner: root
+        group: root
+        mode: '0600'
+    - name: Ensure /root/.bashrc sources files in /root/.bashrc.d
+      ansible.builtin.blockinfile:
+        dest: /root/.bashrc
+        content: |
+          BASH_RC_DIR="$HOME/.bashrc.d"
+          if [ -d "$BASH_RC_DIR" ]; then
+            for f in $(ls "$BASH_RC_DIR"); do
+              source "$BASH_RC_DIR/$f"
+            done
+          fi
+        owner: root
+        group: root
+        mode: '0644'
