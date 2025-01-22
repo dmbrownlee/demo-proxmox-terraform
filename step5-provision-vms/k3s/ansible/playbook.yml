@@ -15,6 +15,7 @@
 - import_playbook: playbook-k3s-additional-control-planes.yml
 - import_playbook: playbook-k3s-workers.yml
 - import_playbook: playbook-k3s-completion.yml
+- import_playbook: playbook-update-local-kubeconfig.yml
 - import_playbook: playbook-nfs.yml
 - import_playbook: playbook-prometheus.yml
 
