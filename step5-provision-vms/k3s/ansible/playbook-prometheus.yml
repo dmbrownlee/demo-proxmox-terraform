@@ -31,4 +31,4 @@
     - name: Ensure the ingress configurations have been applied
       kubernetes.core.k8s:
         state: present
-        template: kube-prometheus-stack-ingress.yaml
+        template: traefik-ingress-prometheus.yml.j2
