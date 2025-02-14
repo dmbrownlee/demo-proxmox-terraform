@@ -19,7 +19,7 @@ items:
   spec:
     ingressClassName: traefik
     rules:
-    - host: {{ cnames.prometheus }}
+    - host: "{{ k3s_vip_hostname }}-{{ cnames.prometheus }}"
       http:
         paths:
         - backend:
@@ -29,7 +29,8 @@ items:
                 number: 9090
           path: /
           pathType: Prefix
-    - host: prometheus.{{ ansible_domain }}
+{% if add_ingress_for_dev_cnames %}
+    - host: "dev-{{ cnames.prometheus }}"
       http:
         paths:
         - backend:
@@ -39,7 +40,9 @@ items:
                 number: 9090
           path: /
           pathType: Prefix
-    - host: dev-prometheus.{{ ansible_domain }}
+{% endif %}
+{% if add_ingress_for_live_cnames %}
+    - host: "{{ cnames.prometheus }}"
       http:
         paths:
         - backend:
@@ -49,7 +52,8 @@ items:
                 number: 9090
           path: /
           pathType: Prefix
-    - host: {{ cnames.alertmanager }}
+{% endif %}
+    - host: "{{ k3s_vip_hostname }}-{{ cnames.alertmanager }}"
       http:
         paths:
         - backend:
@@ -59,7 +63,8 @@ items:
                 number: 9093
           path: /
           pathType: Prefix
-    - host: alertmanager.{{ ansible_domain }}
+{% if add_ingress_for_dev_cnames %}
+    - host: "dev-{{ cnames.alertmanager }}"
       http:
         paths:
         - backend:
@@ -69,7 +74,9 @@ items:
                 number: 9093
           path: /
           pathType: Prefix
-    - host: dev-alertmanager.{{ ansible_domain }}
+{% endif %}
+{% if add_ingress_for_live_cnames %}
+    - host: "{{ cnames.alertmanager }}"
       http:
         paths:
         - backend:
@@ -79,6 +86,7 @@ items:
                 number: 9093
           path: /
           pathType: Prefix
+{% endif %}
 - apiVersion: networking.k8s.io/v1
   kind: Ingress
   metadata:
@@ -87,6 +95,29 @@ items:
   spec:
     ingressClassName: traefik
     rules:
+    - host: "{{ k3s_vip_hostname }}-{{ cnames.grafana }}"
+      http:
+        paths:
+        - backend:
+            service:
+              name: prometheus-grafana
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+{% if add_ingress_for_dev_cnames %}
+    - host: "dev-{{ cnames.grafana }}"
+      http:
+        paths:
+        - backend:
+            service:
+              name: prometheus-grafana
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+{% endif %}
+{% if add_ingress_for_live_cnames %}
     - host: {{ cnames.grafana }}
       http:
         paths:
@@ -97,26 +128,7 @@ items:
                 number: 80
           path: /
           pathType: Prefix
-    - host: grafana.{{ ansible_domain }}
-      http:
-        paths:
-        - backend:
-            service:
-              name: prometheus-grafana
-              port:
-                number: 80
-          path: /
-          pathType: Prefix
-    - host: dev-grafana.{{ ansible_domain }}
-      http:
-        paths:
-        - backend:
-            service:
-              name: prometheus-grafana
-              port:
-                number: 80
-          path: /
-          pathType: Prefix
+{% endif %}
 kind: List
 metadata:
   resourceVersion: ""
