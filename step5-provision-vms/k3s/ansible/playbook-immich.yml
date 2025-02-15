@@ -5,33 +5,31 @@
     - "{{ tf_workspace }}.vars.yml"
   become: true
   tasks:
-    - name: Ensure the helm repo for immich is added
-      kubernetes.core.helm_repository:
-        name: immich
-        repo_url: "https://immich-app.github.io/immich-charts"
     - name: Ensure the immich namespace exists
       kubernetes.core.k8s:
         name: immich
         api_version: v1
         kind: Namespace
         state: present
+    - name: Ensure credentials for the immich database exist
+      kubernetes.core.k8s:
+        state: present
+        template: secret-immich-postgres-credentials.yml.j2
+      loop:
+        - cnpg
+        - immich
+    - name: Ensure a cnpg database exists for immich
+      kubernetes.core.k8s:
+        state: present
+        template: cnpg-cluster.yml.j2
+    - name: Ensure the helm repo for immich is added
+      kubernetes.core.helm_repository:
+        name: immich
+        repo_url: "https://immich-app.github.io/immich-charts"
     - name: Ensure the immich PVC configuration has been applied
       kubernetes.core.k8s:
         state: present
-        #src: immich-pvc.yaml
-        definition:
-          apiVersion: v1
-          kind: PersistentVolumeClaim
-          metadata:
-            name: immich-library-pvc
-            namespace: immich
-          spec:
-            accessModes:
-              - ReadWriteOnce
-            storageClassName: nfs-client
-            resources:
-              requests:
-                storage: 20Gi
+        template: immich-library-pvc.yml.j2
     - name: Ensure the immich helm chart is installed
       kubernetes.core.helm:
         name: immich
@@ -39,12 +37,23 @@
         release_namespace: immich
         create_namespace: true
         values:
+          image:
+            tag: "{{ immich_version }}"
           immich:
             persistence:
               library:
                 existingClaim: immich-library-pvc
+          env:
+            DB_HOSTNAME: immich-rw.cnpg.svc.cluster.local
+            DB_PASSWORD:
+              valueFrom:
+                secretKeyRef:
+                  name: immich-postgres-user
+                  key: password
+            DB_USERNAME: "{{ immich_db_username }}"
+            DB_DATABASE_NAME: immich
           postgresql:
-            enabled: true
+            enabled: false
           redis:
             enabled: true
           machine-learning:
@@ -54,23 +63,4 @@
     - name: Ensure the photos ingress configuration has been applied
       kubernetes.core.k8s:
         state: present
-        #template: photos-ingress.yaml
-        definition:
-          apiVersion: networking.k8s.io/v1
-          kind: Ingress
-          metadata:
-            name: photos
-            namespace: immich
-          spec:
-            ingressClassName: traefik
-            rules:
-              - host: "{{ cnames.photos }}"
-                http:
-                  paths:
-                  - backend:
-                      service:
-                        name: immich-server
-                        port:
-                          number: 2283
-                    path: /
-                    pathType: Prefix
+        template: traefik-ingress-immich.yml.j2

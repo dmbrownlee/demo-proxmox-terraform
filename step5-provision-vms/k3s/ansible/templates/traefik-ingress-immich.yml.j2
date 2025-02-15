@@ -1,0 +1,43 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: photos
+  namespace: immich
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: "{{ k3s_vip_hostname }}-{{ cnames.photos }}"
+      http:
+        paths:
+        - backend:
+            service:
+              name: immich-server
+              port:
+                number: 2283
+          path: /
+          pathType: Prefix
+{% if add_ingress_for_dev_cnames %}
+    - host: "dev-{{ cnames.photos }}"
+      http:
+        paths:
+        - backend:
+            service:
+              name: immich-server
+              port:
+                number: 2283
+          path: /
+          pathType: Prefix
+{% endif %}
+{% if add_ingress_for_live_cnames %}
+    - host: "{{ cnames.photos }}"
+      http:
+        paths:
+        - backend:
+            service:
+              name: immich-server
+              port:
+                number: 2283
+          path: /
+          pathType: Prefix
+{% endif %}
