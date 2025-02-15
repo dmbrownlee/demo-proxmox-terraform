@@ -140,25 +140,6 @@
             sessionAffinity: None
             type: ClusterIP
     - name: Ensure there is an ingress for the traefik dashboard
-      #kubectl create ingress -n kube-system traefik-dashboard --rule 'dev-traefik.site1.thebrownleefamily.net/*=traefik-dashboard:9000'
       kubernetes.core.k8s:
         state: present
-        definition:
-          apiVersion: networking.k8s.io/v1
-          kind: Ingress
-          metadata:
-            name: traefik-dashboard
-            namespace: kube-system
-          spec:
-            ingressClassName: traefik
-            rules:
-            - host: "{{ cnames.traefik }}"
-              http:
-                paths:
-                - backend:
-                    service:
-                      name: traefik-dashboard
-                      port:
-                        number: 9000
-                  path: /
-                  pathType: Prefix
+        template: traefik-ingress-dashboard.yml.j2
