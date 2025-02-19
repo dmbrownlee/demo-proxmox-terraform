@@ -38,7 +38,7 @@ resource "proxmox_virtual_environment_vm" "k8s_control_plane_nodes" {
   for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "k8s_first_control_plane_node" || vm.role == "k8s_control_plane_node" }
   name        = each.key
   description = "Managed by Terraform"
-  tags        = ["${terraform.workspace}", each.value.cloud_init_image, each.value.role]
+  tags        = ["${terraform.workspace}", each.value.cloud_init_image]
   node_name   = each.value.pve_node
   vm_id       = each.value.vm_id
 
@@ -117,7 +117,7 @@ resource "proxmox_virtual_environment_vm" "k8s_worker_nodes" {
   for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "k8s_worker_node" }
   name        = each.key
   description = "Managed by Terraform"
-  tags        = ["${terraform.workspace}", each.value.cloud_init_image, each.value.role]
+  tags        = ["${terraform.workspace}", each.value.cloud_init_image]
   node_name   = each.value.pve_node
   vm_id       = each.value.vm_id
 
