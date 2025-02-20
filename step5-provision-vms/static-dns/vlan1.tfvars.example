@@ -1,0 +1,45 @@
+###############################################################################
+###############################################################################
+##
+##  DNS
+##
+###############################################################################
+###############################################################################
+# These variables are used in main.tf to authenticate with the DNS server.
+# Note: The DNS server must be configured to allow updates for the zone
+# being managed here.
+dns_server        = "192.168.0.1"
+dns_key_name      = "update-key."
+dns_key_secret    = "123456789abcdef+Your_Key_Here+123456789abcd="
+dns_key_algorithm = "hmac-sha256"
+
+
+###############################################################################
+###############################################################################
+##
+##  Managed DNS resource record data
+##
+###############################################################################
+###############################################################################
+# These variables are used to create the managed DNS records
+
+site_domain = "site1.example.com"
+
+static_a_records = [
+  {
+    name = "fw1"
+    addresses = ["192.168.0.254"]
+  },
+  {
+    name = "pve1"
+    addresses = ["192.168.0.10"]
+  },
+  {
+    name = "pve2"
+    addresses = ["192.168.0.20"]
+  },
+  {
+    name = "pve3"
+    addresses = ["192.168.0.30"]
+  },
+]
