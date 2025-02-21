@@ -62,7 +62,7 @@ resource "proxmox_virtual_environment_vm" "k3s_initial_cp" {
   for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_initial_cp" }
   name        = each.key
   description = "Managed by Terraform"
-  tags        = ["${terraform.workspace}", each.value.cloud_init_image, each.value.role]
+  tags        = ["${terraform.workspace}", each.value.cloud_init_image]
   node_name   = each.value.pve_node
   vm_id       = each.value.vm_id
 
@@ -149,7 +149,7 @@ resource "proxmox_virtual_environment_vm" "k3s_servers" {
   for_each    = { for vm in var.vms : vm.hostname => vm if var.want_k3s_servers && vm.role == "k3s_server" }
   name        = each.key
   description = "Managed by Terraform"
-  tags        = ["${terraform.workspace}", each.value.cloud_init_image, each.value.role]
+  tags        = ["${terraform.workspace}", each.value.cloud_init_image]
   node_name   = each.value.pve_node
   vm_id       = each.value.vm_id
 
@@ -236,7 +236,7 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
   for_each    = { for vm in var.vms : vm.hostname => vm if var.want_k3s_agents && vm.role == "k3s_agent" }
   name        = each.key
   description = "Managed by Terraform"
-  tags        = ["${terraform.workspace}", each.value.cloud_init_image, each.value.role]
+  tags        = ["${terraform.workspace}", each.value.cloud_init_image]
   node_name   = each.value.pve_node
   vm_id       = each.value.vm_id
 
@@ -324,7 +324,7 @@ resource "proxmox_virtual_environment_vm" "k3s_db_workers" {
   for_each    = { for vm in var.vms : vm.hostname => vm if var.want_k3s_db_workers && vm.role == "k3s_db_worker" }
   name        = each.key
   description = "Managed by Terraform"
-  tags        = ["${terraform.workspace}", each.value.cloud_init_image, each.value.role]
+  tags        = ["${terraform.workspace}", each.value.cloud_init_image]
   node_name   = each.value.pve_node
   vm_id       = each.value.vm_id
 
