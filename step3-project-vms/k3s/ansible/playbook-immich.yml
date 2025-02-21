@@ -18,10 +18,16 @@
       loop:
         - cnpg
         - immich
-    - name: Ensure a cnpg database exists for immich
+    - name: Ensure a cnpg database exists for immich (takes a while - waiting up to 10 min.)
       kubernetes.core.k8s:
         state: present
-        template: cnpg-cluster.yml.j2
+        template: cnpg-immich-cluster.yml.j2
+        wait: yes
+        wait_timeout: 600
+        wait_condition:
+          type: Ready
+          status: "True"
+          reason: ClusterIsReady
     - name: Ensure the helm repo for immich is added
       kubernetes.core.helm_repository:
         name: immich
@@ -36,6 +42,7 @@
         chart_ref: immich/immich
         release_namespace: immich
         create_namespace: true
+        wait: true
         values:
           image:
             tag: "{{ immich_version }}"
