@@ -1,0 +1,6 @@
+if [[ -x /usr/local/bin/kubectl-cnpg ]]; then
+  source <(kubectl-cnpg completion bash)
+  alias kc="kubectl-cnpg"
+  complete -o default -F __start_kubectl-cnpg kc
+fi
+

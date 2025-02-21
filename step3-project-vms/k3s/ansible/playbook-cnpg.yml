@@ -3,6 +3,8 @@
   hosts: k3s_first_control_plane
   vars_files:
     - "{{ tf_workspace }}.vars.yml"
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
   become: true
   tasks:
     - name: Ensure the helm repo for cnpg is added
@@ -28,3 +30,13 @@
       ansible.builtin.command:
         cmd: "kubectl wait -n cnpg --for=condition=Available deployment --selector app.kubernetes.io/name=cloudnative-pg"
       changed_when: false
+    - name: Ensure the cnpg plugin for kubectl is installed
+      ansible.builtin.apt:
+        deb: "{{ cnpg_kubectl_plugin_url }}"
+    - name: Ensure /root/.bashrc.d/cnpg-kubectl.rc exists
+      ansible.builtin.template:
+        dest: /root/.bashrc.d/cnpg-kubectl.rc
+        src: cnpg-kubectl.rc.j2
+        owner: root
+        group: root
+        mode: '0600'
