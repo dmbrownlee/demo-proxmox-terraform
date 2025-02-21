@@ -1,12 +1,13 @@
-# demo-proxmox-terraform Summary
-This project provides example files demonstrating how to automate the creating and configuration of virtual machines in Proxmox using Terraform and Ansible.  There is a lot learn when setting this up and, rather than being an exhaustive explanation, this project aims to provide a working example to tinker with while you explore the pieces you find interesting.
+# demo-proxmox-terraform
+This repo contains example files which demonstrate how to automate the creation and configuration of virtual machines in Proxmox using Terraform and Ansible.  There is a lot learn when setting this up and, rather than being an exhaustive explanation, this project aims to provide a working example to tinker with while you explore the pieces you find interesting.
 
 ## Prerequisites
-TL;DR: You will need:
+You will need:
 - a Proxmox cluster (a single node is fine, a three node cluster is better) for which you have admin rights.
 - Terraform and Ansible installed
 
-If you can't or don't want to install Terraform and Ansible, I have a container with the neccessary tools pre-installed in its own repo: https://github.com/dmbrownlee/demo-containers/tree/main/devcontainer.  Of course, that requires a podman/docker installation to use.
+> [!TIP]
+> If you can't or don't want to install Terraform and Ansible, I have a container with the neccessary tools pre-installed in its own repo: https://github.com/dmbrownlee/demo-containers/tree/main/devcontainer.  Of course, that requires podman or docker to use.
 
 > [!NOTE]
 > I'm actually using Open Tofu, a fork of Terraform and that is what is installed in my container image.  Just substitute `tofu` wherever you see `terraform` in the commands.
