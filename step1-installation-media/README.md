@@ -1,7 +1,8 @@
 # Manage installation media in Proxmox's ISO storage
 This Terraform project directory is used to manage the ISO installation media images in the Proxmox cluster's ISO storage.  Specifically, I'm using it to manage the cloud-init images for both Debian and Ubuntu which I use to create virtual machine templates in the next step.
 
-> [!NOTE] As always, make sure you `git pull` to get the latest content.
+> [!NOTE]
+> As always, make sure you `git pull` to get the latest content.
 
 First, run `terraform init` if this is your first time using this project.  If this is not your first time and Terraform is complaining the version numbers referenced in the files you just pulled are newer that the versions you have already downloaded, run `terraform init -update`.  Finally, if you are using a version of Terraform newer than what I'm using, you make need to update the version number for Terraform in `main.tf` and hope the new version is backwards compatible (or debug the issues that arrise).
 
@@ -41,7 +42,8 @@ iso_storage = {
 
 Each entry in the `cloud_init_images` map is a cloud-init image to download to Proxmox ISO storage.  The map keys (e.g. `debian12-genericcloud-20250210`) are the strings you will use to identify which media to use when creating the virtual machine templates in the next step.
 
-> [!NOTE] Proxmox is finicky about the filename extentions it lets you upload to the Proxmox ISO storage and does not like the `.qcow2` extension on the original file names in this example.  Appending `.img` to the filename used to store the file works around this limitation.
+> [!NOTE]
+> Proxmox is finicky about the filename extentions it lets you upload to the Proxmox ISO storage and does not like the `.qcow2` extension on the original file names in this example.  Appending `.img` to the filename used to store the file works around this limitation.
 
 ```hcl
 cloud_init_images = {

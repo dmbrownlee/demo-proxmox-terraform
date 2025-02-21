@@ -8,7 +8,8 @@ TL;DR: You will need:
 
 If you can't or don't want to install Terraform and Ansible, I have a container with the neccessary tools pre-installed in its own repo: https://github.com/dmbrownlee/demo-containers/tree/main/devcontainer.  Of course, that requires a podman/docker installation to use.
 
-> [!NOTE] I'm actually using Open Tofu, a fork of Terraform and that is what is installed in my container image.  Just substitute `tofu` wherever you see `terraform` in the commands.
+> [!NOTE]
+> I'm actually using Open Tofu, a fork of Terraform and that is what is installed in my container image.  Just substitute `tofu` wherever you see `terraform` in the commands.
 
 It is assumed you are familiar with Linux and, obviously, the more you already know about terraform, ansible, containers, etc. the easier it will be for you.
 
@@ -20,11 +21,13 @@ Generally, each directory is its own Terraform project which automates an isolat
 
 Terraform stores the state of the resources it manages in a "workspace" and you have one workspace by default named "default".  With only one workspace, if you run `terraform apply -var-file debian.tfvars` to download the Debian installation media to your Proxmox ISO storage and then run `terraform apply -var-file ubuntu.tfvars`, Terraform will delete the Debian installation media from your Proxmox cluster before downloading the Ubuntu installation media because the details of the Debian installation media do not exist in the `ubuntu.tfvars` file and Terraform assumes you no longer want those resources.  Likely, this is not what you will want most of the time.  If you want to use multiple variable files simultaneously within a single project directory, you will need to create a workspace for each.  You can create a new workspace called "debian" and switch to it with `terraform workspace new debian`.  Use `terraform workspace list` to list the workspaces which already exist and identify which workspace you are currently using (as denoted with an asterisk).  Use `terraform workspace select ubuntu` to switch to the "ubuntu" workspace (if you have already created one).  For other workspace related commands, there is `terraform workspace help`.
 
-> [!NOTE] You cannot delete the "default" workspace.  Creating a workspace creates a new directory for storing state files and the "default" workspace uses the current directory as the state directory when no other workspace has been selected.
+> [!NOTE]
+> You cannot delete the "default" workspace.  Creating a workspace creates a new directory for storing state files and the "default" workspace uses the current directory as the state directory when no other workspace has been selected.
 
 Switching between workspaces is a common occurence so it is helpful to adopt some conventions to make this easier.  First, name your variable files using the workspace name with a `.tfvars` extension (i.e. the `debian.tfvars` will be used with the "debian" workspace and the `ubuntu.tfvars` file will be used with the "ubuntu" workspace).  Next, create shell aliases that use these workspace names.  Besides saving yourself some typing, using aliases will save you from forgetting to pass the variable file as an option or, worse, using the wrong variable file as an argument.  Here are the aliases I'm using:
 
-> [!NOTE] As mentioned above, I'm using the Open Tofu fork of Terraform so my aliases use `tofu` instead of `terraform`.  Adjust for your environment as needed.
+> [!NOTE]
+> As mentioned above, I'm using the Open Tofu fork of Terraform so my aliases use `tofu` instead of `terraform`.  Adjust for your environment as needed.
 
 ```shell
 # List all workspaces and note which is current
@@ -56,7 +59,8 @@ alias ap='ansible-playbook -e tf_workspace=$(tofu workspace show) ansible/playbo
 alias pb='ansible-playbook -e tf_workspace=$(tofu workspace show)'
 ```
 
-> [!NOTE] The Terraform and Ansible variable files are where you configure information specific to your site.  These files contain sensitive information so the included `.gitignore` file tells git to ignore them so you don't accidentally commit them to a public git repo.  You will want to backup these files using some other means.
+> [!CAUTION]
+> The Terraform and Ansible variable files are where you configure information specific to your site.  These files contain sensitive information so the included `.gitignore` file tells git to ignore them so you don't accidentally commit them to a public git repo.  You will want to backup these files using some other means.
 
 The end result of all the above is that I can create lots of different environments to experiment in.  For example, when I want to spin up a six node Kubernetes cluster with an external loadbalancer in front of three control plane nodes in order to practice for the CKAD exam, I can just run this and wait:
 
@@ -78,7 +82,8 @@ git clone https://github.com/dmbrownlee/demo-proxmox-terraform.git
 ```
 Better still, fork it and clone your own repo via SSH so you can commit your own projects.
 
-> [!NOTE] Don't forget to `git pull` repo updates periodically to make sure you're getting the latest contents.
+> [!TIP]
+> Don't forget to `git pull` repo updates periodically to make sure you're getting the latest contents.
 
 There are a couple of things you need to do before you can use Terrafrom with Proxmox.  You will only have to do this once (unless you completely reinstall your Proxmox cluster in which case you're starting from square one).
 
