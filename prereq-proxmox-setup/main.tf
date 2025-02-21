@@ -31,8 +31,8 @@ provider "proxmox" {
   # These variables define the URL and authentication credentials to use with
   # Proxmox API.
   endpoint = var.endpoint
-  username = var.rootaccount
-  password = var.rootpassword
+  username = var.pverootaccount
+  password = var.pverootpassword
 
   # "insecure" is set to true because I assume your Proxmox cluster is using
   # self-signed certs for TLS.

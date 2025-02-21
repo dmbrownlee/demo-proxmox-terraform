@@ -1,32 +1,10 @@
-# "endpoint" is the URL for the Proxmox web UI.
+# Here is where we specify the URL for the web API for the Proxmox cluster.
 endpoint = "https://pve1.example.com:8006/"
 
-# This directory specifies where SSH key pairs for the Proxmox
-# root user and the cloud
-ssh_keystore = "~/keys"
-# Some Proxmox configuration cannot be done through the API.  In these cases,
-# the Proxmox plugin for Terraform will use SSH to log into the cluster and
-# make the changes via the command line.  You need to load this key into your
-# ssh-agent and make sure you can login to the Proxmox nodes as root using this
-# key (i.e., without a password). The name of the key file is pveroot so as not
-# to get confused with other root keys.
-#pveroot_ssh_private_key_file = "~/keys/pveroot"
-#pveroot_ssh_public_key_file  = "~/keys/pveroot.pub"
+# Only uncomment this if you want to override the default.
+#pverootaccount = "root@pam"
 
-# This is the account we will use for authentication when using the web API.
-terraform_proxmox_account = "terraform@pve"
-
-#=============
-# Cloud-init
-#=============
-# This is where we specify the user credentials for the administrative user
-# cloud-init will create on each VM cloned from a cloud-init template image.
-# Since we will be using Ansible for configuration management, it makes sense
-# for this to be the "ansible" user.  If any other users need to be configured,
-# Ansible can do that.  After Terraform has created and booted the VM, it will
-# run Ansible to do further machine configuration.  The corresponding private
-# SSH key should be added to your SSH agent as SSH is usually configured to
-# disallow password logins.
-ci_user = "ansible"
-#ci_ssh_private_key_file = "~/keys/ansible"
-#ci_ssh_public_key_file  = "~/keys/ansible.pub"
+# Only uncomment this if you hate being prompted for your root password so
+# much that your are willing to put the root password of your entire Proxmox
+# cluster in a cleartext file and suffer the security consequences.
+#pverootpassword = "password123"
