@@ -81,11 +81,14 @@ Better still, fork it and clone your own repo via SSH so you can commit your own
 > [!note:] Don't forget to `git pull` repo updates periodically to make sure you're getting the latest contents.
 
 There are a couple of things you need to do before you can use Terrafrom with Proxmox.  You will only have to do this once (unless you completely reinstall your Proxmox cluster in which case you're starting from square one).
-[Configure Proxmox for use with Terraform](prereq-proxmox-setup/)
+
+- [Configure Proxmox for use with Terraform](prereq-proxmox-setup/)
 
 Once Proxmox is setup, we can have Terraform manage installation media downloads and build virtual machine templates we can use as starting points for our projects.
-[Use Terraform to manage installation media in Proxmox's ISO storage](step1-installation-media/)
-[Use Terraform to create virtual machine templates](step2-virtual-machine-templates/)
+
+- [Use Terraform to manage installation media in Proxmox's ISO storage](step1-installation-media/)
+- [Use Terraform to create virtual machine templates](step2-virtual-machine-templates/)
 
 Lastly, I have some sample projects (each with their own README.md) you can use as a starting point for your own.
-[Use Terraform (and Ansible) to provision and configure virtual machines for projects](step3-project-vms/)
+
+- [Use Terraform (and Ansible) to provision and configure virtual machines for projects](step3-project-vms/)
