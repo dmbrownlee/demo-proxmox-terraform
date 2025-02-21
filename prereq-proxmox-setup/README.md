@@ -39,14 +39,16 @@ vim terraform-account.auto.tfvars
 terraform apply
 ```
 
-> [!note:] You probably won't be managing multiple Proxmox users from this project, but if you still want to use the `ta` alias for `terraform apply`, you can can create a "terraform" workspace with `terraform workspace new terraform` or create an empty file named `default.yaml`.  Either will allow the alias to work.
+> [!NOTE]
+> You probably won't be managing multiple Proxmox users from this project, but if you still want to use the `ta` alias for `terraform apply`, you can can create a "terraform" workspace with `terraform workspace new terraform` or create an empty file named `default.yaml`.  Either will allow the alias to work.
 
 Terraform will prompt you for your Proxmox root@pam password.  This is the only time the demo will ask for your root password.  Terraform will inform you of the changes it plans to make and, if you agree, enter "yes" when prompted.
 
 # Create an API token for the terraform account within Proxmox
 Here are the steps for creating an API token for the `terraform@pve` account:
 
-> [!note:] If you changed the default account name, adjust these steps as appropriate.
+> [!NOTE]
+> If you changed the default account name, adjust these steps as appropriate.
 
 1. Select your cluster in the Server view on the left side of the Proxmox web interface.
 1. In the menu to the right of the Server view, navigate to `Permissions > API Tokens`.  You can add and remove API Tokens from this pane.
