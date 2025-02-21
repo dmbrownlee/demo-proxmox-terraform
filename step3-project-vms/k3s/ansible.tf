@@ -54,6 +54,16 @@ resource "ansible_group" "k3s_worker_nodes" {
   ]
 }
 
+resource "ansible_group" "k3s_db_worker_nodes" {
+  name = "k3s_db_worker_nodes"
+  variables = {
+    ansible_ssh_user = var.ci_user
+  }
+  depends_on = [
+    resource.proxmox_virtual_environment_vm.k3s_db_workers
+  ]
+}
+
 ###############################################################################
 ###############################################################################
 ##
@@ -83,6 +93,15 @@ resource "ansible_host" "k3s_workers" {
   for_each = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_agent" }
   name     = each.key
   groups   = ["k3s_worker_nodes"]
+  depends_on = [
+    resource.proxmox_virtual_environment_vm.k3s_agents
+  ]
+}
+
+resource "ansible_host" "k3s_db_workers" {
+  for_each = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_db_worker" }
+  name     = each.key
+  groups   = ["k3s_worker_nodes","k3s_db_worker_nodes"]
   depends_on = [
     resource.proxmox_virtual_environment_vm.k3s_agents
   ]

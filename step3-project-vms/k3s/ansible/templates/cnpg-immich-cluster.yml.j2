@@ -11,6 +11,16 @@ spec:
   # https://github.com/immich-app/immich-charts/issues/149#issuecomment-2559012759
   instances: 1
 
+  # affinity:
+  #   nodeSelector:
+  #     label: node.kubernetes.io/cnpg=cnpg
+  #   podAntiAffinityType: preferred
+  #   tolerations:
+  #     - effect: NoSchedule
+  #       key: reservation
+  #       operator: Equal
+  #       value: database
+
   postgresql:
     shared_preload_libraries:
       - "vectors.so"

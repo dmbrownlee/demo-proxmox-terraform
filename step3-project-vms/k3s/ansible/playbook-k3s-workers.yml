@@ -11,7 +11,8 @@
   tasks:
     - name: Ensure k3s agents are configured for the cluster
       ansible.builtin.shell:
-        cmd: curl -sfL https://get.k3s.io | sh -s - agent --server={{ k3s_api_url }}
+        #cmd: curl -sfL https://get.k3s.io | sh -s - agent {% if 'k3s_db_worker_nodes' in group_names %}--node-taint="reservation=database:NoSchedule" --node-label "node.kubernetes.io/cnpg=cnpg"{% endif %} --server={{ k3s_api_url }}
+        cmd: curl -sfL https://get.k3s.io | sh -s - agent {% if 'k3s_db_worker_nodes' in group_names %}--node-label "node.kubernetes.io/cnpg=cnpg"{% endif %} --server={{ k3s_api_url }}
       args:
         creates: /etc/systemd/system/k3s-agent.service
     - name: Ensure K3S service is started

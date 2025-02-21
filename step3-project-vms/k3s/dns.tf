@@ -105,3 +105,11 @@ resource "dns_a_record_set" "k3s_agents" {
   addresses = [ split("/", each.value.ipv4_address)[0] ]
   ttl = 300
 }
+
+resource "dns_a_record_set" "k3s_db_workers" {
+  for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_db_worker" }
+  zone = "${var.site_domain}."
+  name = each.key
+  addresses = [ split("/", each.value.ipv4_address)[0] ]
+  ttl = 300
+}
