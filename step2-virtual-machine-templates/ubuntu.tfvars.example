@@ -6,17 +6,11 @@
 # the map are the names of the template virtual machines and the objects they
 # refer to contain the name of the cloud-init image to use and the Proxmox VM
 # id to use.
+
 vm_templates = {
-  jammy-server-cloudimg-amd64-20240912 = {
-    vm_id     = 987,
-    file_name = "local-lvm:iso/jammy-server-cloudimg-amd64-20240912.img",
-    node_name = "pve1"
-    datastore = "local-lvm"
-    disk_size = 4,
-  },
-  noble-server-cloudimg-amd64-20240912 = {
-    vm_id     = 986,
-    file_name = "local-lvm:iso/noble-server-cloudimg-amd64-20240912.img",
+  noble-server-cloudimg-amd64-20250211 = {
+    vm_id     = 989,
+    file_name = "local-lvm:iso/noble-server-cloudimg-amd64-20250211.img",
     node_name = "pve1"
     datastore = "local-lvm"
     disk_size = 4,
