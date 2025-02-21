@@ -20,14 +20,19 @@ dns_key_algorithm = "hmac-sha256"
 ###############################################################################
 # These variables are passed to the Ansible playbook that installs the K3S
 # cluster.  For the details, the playbook is in ansible/playbook.yml.
+
 k3s_vip                   = "192.168.1.80"
 k3s_vip_hostname          = "myk3s"
-k3s_vip_cnames            = [
-  "dev-alertmanager",
-  "dev-grafana",
-  "dev-prometheus",
-  "dev-traefik",
+
+k3s_cnames            = [
+  "alertmanager",
+  "grafana",
+  "prometheus",
+  "traefik",
 ]
+
+enable_live_cnames = true
+enable_dev_cnames = false
 
 
 ###############################################################################
