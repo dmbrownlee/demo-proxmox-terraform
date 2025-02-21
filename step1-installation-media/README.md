@@ -30,7 +30,7 @@ ta
 
 You should now have the downloaded installation media in your Proxmox ISO storage.  From time to time, you will want to revisit your `.tfvars` files and update the images and virtual machine templates you have on hand to minimize how much time the cloned cloud-init virtual machines spend updating packages on first boot.  If you remove a reference to an ISO file that Terraform previously installed, Terraform will remove it from the Proxmox ISO storage the next time you run `terraform apply`.
 
-## A notes about variables in the `.tfvars` files
+## Notes about variables in the `.tfvars` files
 The `iso_storage` variable specifies a Proxmox node name and the name of the Proxmox storage.  If the storage name used is shared storage such as an NFS share used by all nodes, then it doesn't matter which node name you use for the upload.  All nodes with access to the shared storage will have access to anything uploaded there.
 
 ```hcl
