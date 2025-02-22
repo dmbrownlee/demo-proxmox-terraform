@@ -1,0 +1,225 @@
+---
+- name: Install firefly into the cluster
+  hosts: k3s_first_control_plane
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
+  tasks:
+    - name: Ensure the firefly namespace exists
+      kubernetes.core.k8s:
+        name: firefly
+        api_version: v1
+        kind: Namespace
+        state: present
+    - name: Ensure credentials for the firefly database exist
+      kubernetes.core.k8s:
+        state: present
+        template: secret-firefly-postgres-credentials.yml.j2
+      loop:
+        - cnpg
+        - firefly
+    - name: Ensure a cnpg database exists for firefly (takes a while - waiting up to 10 min.)
+      kubernetes.core.k8s:
+        state: present
+        template: cnpg-firefly-cluster.yml.j2
+        wait: yes
+        wait_timeout: 600
+        wait_condition:
+          type: Ready
+          status: "True"
+          reason: ClusterIsReady
+    - name: Ensure the helm repo for firefly is added
+      kubernetes.core.helm_repository:
+        name: firefly-iii
+        repo_url: "https://firefly-iii.github.io/kubernetes/"
+    - name: Ensure the firefly helm chart is installed
+      kubernetes.core.helm:
+        name: firefly-iii
+        chart_ref: firefly-iii/firefly-iii
+        release_namespace: firefly
+        create_namespace: true
+        wait: true
+        values:
+          global:
+            image:
+              # -- if set it will overwrite all registry entries
+              registry:
+              # -- if set it will overwrite all pullPolicy
+              pullPolicy:
+
+          replicaCount: 1
+          deploymentStrategyType: RollingUpdate
+
+          image:
+            registry: "docker.io"
+            repository: "fireflyiii/core"
+            pullPolicy: IfNotPresent
+            # -- Overrides the image tag whose default is the chart appVersion.
+            tag: ""
+
+          imagePullSecrets: []
+          nameOverride: ""
+          fullnameOverride: ""
+
+          persistence:
+            # -- If you set this to false, uploaded attachments are not stored persistently and will be lost with every restart of the pod
+            enabled: true
+            storageClassName: ""
+            accessModes: ReadWriteOnce
+            storage: "{{ firefly_attachment_storage_size }}"
+            # -- If you want to use an existing claim, set it here
+            existingClaim: ""
+
+          # -- Environment variables for Firefly III. See docs at: https://github.com/firefly-iii/firefly-iii/blob/main/.env.example
+          config:
+            # -- Set this to the name of a secret to load environment variables from. If defined, values in the secret will override values in config.env
+            existingSecret: ""
+
+            # -- Set environment variables from configMaps or Secrets
+            envValueFrom: {}
+
+            # -- Directly defined environment variables. Use this for non-secret configuration values.
+            env:
+              DB_HOST: "{{ firefly_db_hostname }}.cnpg"
+              DB_CONNECTION: pgsql
+              DB_PORT: "5432"
+              DB_DATABASE: "{{ firefly_db_name }}"
+              DB_USERNAME: "{{ firefly_db_username }}"
+              DEFAULT_LANGUAGE: "en_US"
+              DEFAULT_LOCALE: "equal"
+              TZ: "America/Vancouver"
+              TRUSTED_PROXIES: "**"
+
+          # -- Create a new Secret from values file to store sensitive environment variables. Make sure to keep your secrets encrypted in the repository! For example, you can use the 'helm secrets' plugin (https://github.com/jkroepke/helm-secrets) to encrypt and manage secrets. If the 'config.existingSecret' value is set, a new Secret will not be created.
+          secrets:
+            env:
+              APP_PASSWORD: "{{ firefly_db_password }}"
+              DB_PASSWORD: "{{ firefly_db_password }}"
+            # -- Statically set the APP_KEY in case this is desired over the autogeneration. Should be a random 32-character string.
+            # -- Can be generated using: `cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
+            # appKey: "CHANGE_ME"
+
+          # -- A cronjob for [recurring Firefly III tasks](https://docs.firefly-iii.org/firefly-iii/advanced-installation/cron/).
+          cronjob:
+            # -- Set to true to enable the CronJob. Note that you need to specify either cronjob.auth.existingSecret or cronjob.auth.token for it to actually be deployed.
+            enabled: false
+
+            # -- Authorization for the CronJob. See https://docs.firefly-iii.org/firefly-iii/advanced-installation/cron/#request-a-page-over-the-web
+            auth:
+              # -- The name of a secret containing a data.token field with the cronjob token
+              existingSecret: ""
+
+              # -- The name of the key in the existing secret to get the cronjob token from
+              secretKey: "token"
+
+              # -- The token in plain text
+              token: ""
+
+            # -- Annotations for the CronJob
+            annotations: {}
+
+            # -- When to run the CronJob. Defaults to 03:00 as this is when Firefly III executes regular tasks.
+            schedule: "0 3 * * *"
+
+            # -- How many pods to keep around for successful jobs
+            successfulJobsHistoryLimit: 3
+
+            # -- How many pods to keep around for failed jobs
+            failedJobsHistoryLimit: 1
+
+            # -- How to treat failed jobs
+            restartPolicy: OnFailure
+
+            image:
+              registry: docker.io
+              repository: curlimages/curl
+              pullPolicy: IfNotPresent
+              tag: 8.12.0
+
+            imagePullSecrets: []
+
+            podAnnotations: {}
+
+            securityContext: {}
+
+            podSecurityContext: {}
+
+            resources: {}
+
+            nodeSelector: {}
+
+            tolerations: []
+
+            affinity: {}
+
+          podAnnotations: {}
+
+          podSecurityContext: {}
+            # fsGroup: 2000
+
+          securityContext: {}
+            # capabilities:
+            #   drop:
+            #   - ALL
+            # readOnlyRootFilesystem: true
+            # runAsNonRoot: true
+            # runAsUser: 1000
+
+          service:
+            type: ClusterIP
+            port: 80
+
+          ingress:
+            enabled: false
+            className: ""
+            annotations: {}
+              # kubernetes.io/ingress.class: nginx
+              # kubernetes.io/tls-acme: "true"
+            hosts:
+              - chart-example.local
+            tls: []
+            #  - secretName: chart-example-tls
+            #    hosts:
+            #      - chart-example.local
+
+          resources: {}
+            # We usually recommend not to specify default resources and to leave this as a conscious
+            # choice for the user. This also increases chances charts run on environments with little
+            # resources, such as Minikube. If you do want to specify resources, uncomment the following
+            # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+            # limits:
+            #   cpu: 100m
+            #   memory: 128Mi
+            # requests:
+            #   cpu: 100m
+            #   memory: 128Mi
+
+          autoscaling:
+            enabled: false
+            minReplicas: 1
+            maxReplicas: 100
+            targetCPUUtilizationPercentage: 80
+            # targetMemoryUtilizationPercentage: 80
+
+          nodeSelector: {}
+
+          tolerations: []
+
+          affinity: {}
+
+          # Here, you can specify custom volumes to use.
+          extraVolumes: []
+            # - name: db-tls-firefly
+            #   secret:
+            #     secretName: db-tls-firefly
+            #     defaultMode: 0440
+
+          # And here, your custom volume mounts.
+          extraVolumeMounts: []
+            # - name: db-tls-firefly
+            #   mountPath: /db-cert
+            #   readOnly: true
+    - name: Ensure the firefly ingress configuration has been applied
+      kubernetes.core.k8s:
+        state: present
+        template: traefik-ingress-firefly.yml.j2

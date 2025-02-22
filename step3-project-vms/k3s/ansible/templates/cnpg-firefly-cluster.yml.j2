@@ -1,0 +1,43 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: firefly
+  namespace: cnpg
+spec:
+  imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.5-v0.3.0@sha256:be3f025d79aa1b747817f478e07e71be43236e14d00d8a9eb3914146245035ba
+  instances: 1
+
+  # affinity:
+  #   nodeSelector:
+  #     label: node.kubernetes.io/cnpg=cnpg
+  #   podAntiAffinityType: preferred
+  #   tolerations:
+  #     - effect: NoSchedule
+  #       key: reservation
+  #       operator: Equal
+  #       value: database
+
+  postgresql:
+    shared_preload_libraries:
+      - "vectors.so"
+
+  # The "postgres" superuser is needed only for import and it can be deactivated after migration.
+  enableSuperuserAccess: true
+  # superuserSecret: firefly-superuser
+
+  managed:
+    roles:
+      - name: firefly
+        superuser: true
+        login: true
+        passwordSecret:
+          name: firefly-postgres-user
+  bootstrap:
+    initdb:
+      database: "{{ firefly_db_name }}"
+      owner: "{{ firefly_db_username }}"
+      secret:
+        name: firefly-postgres-user
+  storage:
+    size: "{{ firefly_db_size }}"
