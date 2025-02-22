@@ -1,0 +1,255 @@
+---
+- name: Install wger into the cluster
+  hosts: k3s_first_control_plane
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
+  tasks:
+    - name: Ensure the wger namespace exists
+      kubernetes.core.k8s:
+        name: wger
+        api_version: v1
+        kind: Namespace
+        state: present
+    - name: Ensure credentials for the wger database exist
+      kubernetes.core.k8s:
+        state: present
+        template: secret-wger-postgres-credentials.yml.j2
+      loop:
+        - cnpg
+        - wger
+    - name: Ensure a cnpg database exists for wger (takes a while - waiting up to 10 min.)
+      kubernetes.core.k8s:
+        state: present
+        template: cnpg-wger-cluster.yml.j2
+        wait: yes
+        wait_timeout: 600
+        wait_condition:
+          type: Ready
+          status: "True"
+          reason: ClusterIsReady
+    - name: Ensure the helm repo for wger is added
+      kubernetes.core.helm_repository:
+        name: wger
+        repo_url: "https://wger-project.github.io/helm-charts"
+    - name: Ensure the wger helm chart is installed
+      kubernetes.core.helm:
+        name: wger
+        chart_ref: wger/wger
+        release_namespace: wger
+        create_namespace: true
+        # Don't wait for the deployment to finish until the bug is fixed.
+        # You need to edit the database name in the nc test in init-container
+        # for the deployment to succeed.
+        #wait: true
+        values:
+          app:
+            # The server's timezone, for a list of possible names:
+            # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+            timezone: "America/Vancouver"
+            global:
+              image:
+                registry: docker.io
+                repository: wger/server
+                # when tag left emtpy the Chart appversion will be taken
+                # wger is developed as a rolling release
+                tag: latest
+                PullPolicy: Always
+              annotations: {}
+              replicas: 1
+              securityContext:
+                fsGroup: 1000
+            persistence:
+              # this will be overriden to `true` when nginx is enabled
+              enabled: true
+              storageClass: nfs-client
+              accessModes:
+                - ReadWriteMany
+              sizeMedia: 8Gi
+              sizeStatic: 8Gi
+              sizeCeleryBeat: 1Gi
+              annotations: {}
+              existingClaim:
+                enabled: false
+                media: null
+                static: null
+                code: null
+                celeryBeat: null
+            resources:
+              requests:
+                memory: 512Mi
+                cpu: 100m
+              limits:
+                memory: 1Gi
+                cpu: 500m
+            # when nginx is enabled persistent volumes are required
+            # and therefore automatically enabled
+            nginx:
+              enabled: false
+              image: nginx:stable
+              imagePullPolicy: IfNotPresent
+            django:
+              secret:
+                name: null
+                key: null
+              cache:
+                # in seconds - 60*60*24*15, 15 Days
+                timeout: 1296000
+            #
+            # JWT auth
+            jwt:
+              secret:
+                name: null
+                key: null
+              # The lifetime duration of the access token, in minutes
+              accessTokenLifetime: 10
+              # The lifetime duration of the refresh token, in hours
+              refreshTokenLifetime: 24
+            #
+            # Brute force login attacks
+            # https://django-axes.readthedocs.io/en/latest/index.html
+            axes:
+              enabled: false
+              lockoutParameters: "ip_address"
+              failureLimit: 10
+              # in minutes
+              cooloffTime: 30
+              # number of reverse proxies involved
+              ipwareProxyCount: 0
+              # order of magnitude from last proxy for the real ip
+              ipwareMetaPrecedenceOrder: "HTTP_X_FORWARDED_FOR,REMOTE_ADDR"
+            mail:
+              enabled: false
+              server: null
+              port: null
+              user: null
+              from_email: null
+              # Set your name and email to be notified if an internal server error occurs.
+              # don't set django_admins when not needed
+              django_admins: null
+              secret:
+                name: mail
+                key: mail-password
+                password: null
+                update: false
+
+          # celery tasks
+          # https://wger.readthedocs.io/en/latest/celery.html
+          celery:
+            enabled: true
+            annotations: {}
+            replicas: 1
+            replicasWorker: 1
+            securityContext:
+              fsGroup: 1000
+            syncExercises: true
+            syncImages: true
+            syncVideos: true
+            # Where to download ingredient and their images if they are not known locally.
+            # Possible values OFF, WGER. Note that it is recommended to keep this as WGER
+            # so that we don't overwhelm the Open Food Facts servers. Needs to have USE_CELERY
+            # set to true
+            ingredientsFrom: WGER
+            # flower the webinterface for celery
+            flower:
+              enabled: false
+              secret:
+                name: null
+                password: null
+
+          ingress:
+            enabled: false
+            ingressClassName:
+            url: fit.example.com
+            tls: true
+            annotations: {}
+
+          service:
+            annotations: {}
+            type: ClusterIP
+            port: 8000
+
+          # PostgreSQL Settings for groundhog2k chart. Only a minimum has been specified below.
+          # For more options, see https://github.com/groundhog2k/helm-charts/tree/master/charts/postgres
+          postgres:
+            # Note: keep these variables present as the wger chart uses them for the deployment
+            # the superuser and user settings will be saved into a secret
+            enabled: false
+            # changes to the superuser and userDatabase passwords will update
+            # the secret where they are save in
+            settings:
+              superuser:
+                value: postgres
+              superuserPassword:
+                value: postgres
+            userDatabase:
+              name:
+                value: wger
+              user:
+                value: wger
+              password:
+                value: wger
+            # the user from the user database will be turned into a superuser
+            # some database migration in django requires this
+            # otherwise it was not able to create the database
+            extraScripts: wger-pg-init
+            service:
+              port: 5432
+            resources:
+              limits:
+                cpu: 500m
+                memory: 512Mi
+              requests:
+                cpu: 100m
+                memory: 128Mi
+            ## Storage parameters
+            storage:
+              ##  Set persistentVolumenClaimName to reference an existing PVC
+              #persistentVolumeClaimName:
+              ## Alternative set requestedSize to define a size for a dynmaically created PVC
+              requestedSize: 8Gi
+              ## the storage class name
+              className: ""
+
+          # Redis Settings for groundhog2k chart. Only a minimum has been specified below.
+          # For more options, see https://github.com/groundhog2k/helm-charts/tree/master/charts/redis
+          redis:
+            # Note: keep these variables present as the chart uses them for the Deployment
+            enabled: true
+            # auth: is used in wger-helm-charts to auto-create a secret for redis
+            #
+            # if you enable auth it will create new secret from auth.password
+            # if auth.password is missing it will randomly generate one.
+            #
+            # to enable authentication in the redis container, you need
+            # to enable the env and args mentioned below
+            auth:
+              enabled: false
+              # default no password set, this will randomly create
+              # one upon first installation
+              # password: XXXXXXXXXXXXXXXXXX
+            # Uncomment the following to enable password authentication:
+            # # Additional environment variables (Redis server and Sentinel)
+            # env:
+            #   - name: REDIS_PASSWORD
+            #     valueFrom:
+            #       secretKeyRef:
+            #         name: redis
+            #         key: redis-password
+            # # Arguments for the container entrypoint process (Redis server)
+            # args:
+            #   - "--requirepass $(REDIS_PASSWORD)"
+            storage:
+              ##  Set persistentVolumenClaimName to reference an existing PVC
+              #persistentVolumeClaimName:
+              ## Alternative set requestedSize to define a size for a dynmaically created PVC
+              ## five times (5x) the amount of memory (RAM)
+              requestedSize: 10Gi
+              ## the storage class name
+              className: ""
+            service:
+              serverPort: 6379
+    - name: Ensure the wger ingress configuration has been applied
+      kubernetes.core.k8s:
+        state: present
+        template: traefik-ingress-wger.yml.j2

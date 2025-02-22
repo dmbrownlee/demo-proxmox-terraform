@@ -27,3 +27,4 @@
 - import_playbook: playbook-cnpg.yml
 - import_playbook: playbook-immich.yml
 - import_playbook: playbook-firefly-iii.yml
+- import_playbook: playbook-wger.yml
