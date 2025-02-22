@@ -1,0 +1,21 @@
+---
+- name: Install jellyfin into the cluster
+  hosts: k3s_first_control_plane
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
+  tasks:
+    - name: Ensure the jellyfin namespace exists
+      kubernetes.core.k8s:
+        name: jellyfin
+        api_version: v1
+        kind: Namespace
+        state: present
+    - name: Ensure the helm repo for jellyfin is added
+      kubernetes.core.helm_repository:
+        name: jellyfin
+        repo_url: "https://jellyfin.github.io/jellyfin-helm"
+    - name: Ensure the jellyfin ingress configuration has been applied
+      kubernetes.core.k8s:
+        state: present
+        template: traefik-ingress-jellyfin.yml.j2
