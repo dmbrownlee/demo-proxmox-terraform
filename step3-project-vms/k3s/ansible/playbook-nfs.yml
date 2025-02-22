@@ -15,6 +15,7 @@
         chart_ref: nfs-subdir-external-provisioner/nfs-subdir-external-provisioner
         release_namespace: nfs-system
         create_namespace: true
+        wait: true
         values:
           nfs:
             server: "{{ persistent_nfs_server }}"

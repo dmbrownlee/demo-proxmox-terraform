@@ -23,6 +23,7 @@
         chart_ref: cnpg/cloudnative-pg
         release_namespace: cnpg
         create_namespace: true
+        wait: true
         values:
           config:
             clusterWide: false
