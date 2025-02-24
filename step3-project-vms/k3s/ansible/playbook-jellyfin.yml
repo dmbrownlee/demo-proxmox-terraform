@@ -15,6 +15,13 @@
       kubernetes.core.helm_repository:
         name: jellyfin
         repo_url: "https://jellyfin.github.io/jellyfin-helm"
+    - name: Ensure the jellyfin helm chart is installed
+      kubernetes.core.helm:
+        name: jellyfin
+        chart_ref: jellyfin/jellyfin
+        release_namespace: jellyfin
+        create_namespace: true
+        wait: true
     - name: Ensure the jellyfin ingress configuration has been applied
       kubernetes.core.k8s:
         state: present
