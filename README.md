@@ -5,6 +5,10 @@ This repo contains example files which demonstrate how to automate the creation 
 You will need:
 - a Proxmox cluster (a single node is fine, a three node cluster is better) for which you have admin rights.
 - Terraform and Ansible installed
+- The `cloud.terraform` Ansible collection (for dynamic inventory)
+
+> [!NOTE]
+> You can install the Ansible collection for Terraform with `ansible-galaxy collection install cloud.terraform`.
 
 > [!TIP]
 > If you can't or don't want to install Terraform and Ansible, I have a container with the neccessary tools pre-installed in its own repo: https://github.com/dmbrownlee/demo-containers/tree/main/devcontainer.  Of course, that requires podman or docker to use.
