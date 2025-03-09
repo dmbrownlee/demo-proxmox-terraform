@@ -4,7 +4,7 @@
 # numbers are updated).  The '~>' notation is like >= except that the actual
 # version must have the same major number.
 terraform {
-  required_version = "~> 1.9.0"
+  required_version = "~> 1.8.8"
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
