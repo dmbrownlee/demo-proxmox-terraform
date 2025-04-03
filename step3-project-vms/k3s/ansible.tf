@@ -18,6 +18,7 @@ resource "local_file" "ansible_config" {
   file_permission = "0644"
   content         = <<EOF
 [defaults]
+interpreter_python=auto_silent
 inventory=.terraform-dynamic-inventory.yml
 remote_user=${var.ci_user}
 host_key_checking=false
