@@ -24,8 +24,6 @@ resource "proxmox_virtual_environment_vm" "vm_templates" {
   tablet_device   = true
   tags = [
     each.key,
-    "terraform",
-    "cloud_init_template",
   ]
   template            = true
   timeout_clone       = 1800
