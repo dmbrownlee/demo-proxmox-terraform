@@ -23,6 +23,7 @@ resource "proxmox_virtual_environment_vm" "vm_templates" {
   started         = false
   tablet_device   = true
   tags = [
+    "cloud_init_template",
     each.key,
   ]
   template            = true
