@@ -18,13 +18,16 @@
 - import_playbook: playbook-update-local-kubeconfig.yml
 - import_playbook: playbook-nfs.yml
 - import_playbook: playbook-prometheus.yml
-
-# Optional apps (uncomment the ones you want)
-
-#- import_playbook: playbook-certmanager.yml
+- import_playbook: playbook-certmanager.yml
 #- import_playbook: playbook-longhorn.yml
 - import_playbook: playbook-cnpg.yml
-- import_playbook: playbook-immich.yml
-- import_playbook: playbook-jellyfin.yml
+
+# Optional apps
 - import_playbook: playbook-firefly-iii.yml
+  when: install_firefly
+- import_playbook: playbook-immich.yml
+  when: install_immich
+- import_playbook: playbook-jellyfin.yml
+  when: install_jellyfin
 - import_playbook: playbook-wger.yml
+  when: install_wger
