@@ -20,7 +20,7 @@
         wait: true
         values:
           config:
-            clusterWide: false
+            clusterWide: true
     - name: Ensure the cnpg deployment is ready before continuing
       ansible.builtin.command:
         cmd: "kubectl wait -n cnpg --for=condition=Available deployment --selector app.kubernetes.io/name=cloudnative-pg"
