@@ -15,6 +15,10 @@
       kubernetes.core.k8s:
         state: present
         template: secret-immich-postgres-credentials.yml.j2
+    - name: Ensure immich credentials for minio exist
+      kubernetes.core.k8s:
+        state: present
+        template: secret-immich-minio-credentials.yml.j2
     - name: Ensure a cnpg database exists for immich (takes a while - waiting up to 10 min.)
       kubernetes.core.k8s:
         state: present
@@ -45,3 +49,13 @@
       kubernetes.core.k8s:
         state: present
         template: traefik-ingress-immich.yml.j2
+    - name: Ensure scheduled backups for the database are configured and initial backup performed
+      kubernetes.core.k8s:
+        state: present
+        template: cnpg-immich-cluster-backup.yml.j2
+        wait: yes
+        wait_timeout: 600
+        # wait_condition:
+        #   type: LastBackupSucceeded
+        #   status: "True"
+        #   reason: LastBackupSucceeded

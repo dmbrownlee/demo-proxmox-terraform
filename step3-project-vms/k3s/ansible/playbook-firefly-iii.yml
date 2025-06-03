@@ -15,6 +15,11 @@
       kubernetes.core.k8s:
         state: present
         template: secret-firefly-postgres-credentials.yml.j2
+    - name: Ensure firefly credentials for minio exist
+      kubernetes.core.k8s:
+        state: present
+        namespace: firefly
+        template: secret-firefly-minio-credentials.yml.j2
     - name: Ensure a cnpg database exists for firefly (takes a while - waiting up to 10 min.)
       kubernetes.core.k8s:
         state: present
@@ -57,3 +62,13 @@
       kubernetes.core.k8s:
         state: present
         template: traefik-ingress-importer.yml.j2
+    - name: Ensure scheduled backups for the database are configured and initial backup performed
+      kubernetes.core.k8s:
+        state: present
+        template: cnpg-firefly-cluster-backup.yml.j2
+        wait: yes
+        wait_timeout: 600
+        # wait_condition:
+        #   type: LastBackupSucceeded
+        #   status: "True"
+        #   reason: LastBackupSucceeded
