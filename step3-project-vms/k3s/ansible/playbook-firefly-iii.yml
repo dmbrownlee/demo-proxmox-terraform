@@ -15,9 +15,6 @@
       kubernetes.core.k8s:
         state: present
         template: secret-firefly-postgres-credentials.yml.j2
-      loop:
-        - cnpg
-        - firefly
     - name: Ensure a cnpg database exists for firefly (takes a while - waiting up to 10 min.)
       kubernetes.core.k8s:
         state: present

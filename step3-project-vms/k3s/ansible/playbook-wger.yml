@@ -11,35 +11,10 @@
         api_version: v1
         kind: Namespace
         state: present
-    - name: Ensure credentials for the wger database exist in the cnpg namespace
+    - name: Ensure credentials for the wger database exist
       kubernetes.core.k8s:
         state: present
-        definition:
-          apiVersion: v1
-          kind: Secret
-          metadata:
-            name: wger-postgres-user
-            namespace: cnpg
-          type: kubernetes.io/basic-auth
-          stringData:
-            username: "{{ wger_db_username }}"
-            password: "{{ wger_db_password }}"
-    - name: Ensure credentials for the wger database exist in the wger namespace
-      # As of chart version 0.2.4-rc.1, USERDB_NAME is required to be included
-      # in the secret.
-      kubernetes.core.k8s:
-        state: present
-        definition:
-          apiVersion: v1
-          kind: Secret
-          metadata:
-            name: wger-credentials
-            namespace: wger
-          type: kubernetes.io/basic-auth
-          stringData:
-            USERDB_NAME: "{{ wger_db_name }}"
-            username: "{{ wger_db_username }}"
-            password: "{{ wger_db_password }}"
+        template: secret-wger-postgres-credentials.yml.j2
     - name: Ensure a cnpg database exists for wger (takes a while - waiting up to 10 min.)
       kubernetes.core.k8s:
         state: present

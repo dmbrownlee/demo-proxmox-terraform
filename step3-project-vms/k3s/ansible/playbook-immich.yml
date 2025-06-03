@@ -11,13 +11,10 @@
         api_version: v1
         kind: Namespace
         state: present
-    - name: Ensure credentials for the immich database exist
+    - name: Ensure immich credentials for cnpg exist
       kubernetes.core.k8s:
         state: present
         template: secret-immich-postgres-credentials.yml.j2
-      loop:
-        - cnpg
-        - immich
     - name: Ensure a cnpg database exists for immich (takes a while - waiting up to 10 min.)
       kubernetes.core.k8s:
         state: present
