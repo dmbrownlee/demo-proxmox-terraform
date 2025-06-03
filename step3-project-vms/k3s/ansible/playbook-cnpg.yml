@@ -11,12 +11,6 @@
       kubernetes.core.helm_repository:
         name: cnpg
         repo_url: "https://cloudnative-pg.github.io/charts"
-    - name: Ensure the cnpg namespace exists
-      kubernetes.core.k8s:
-        name: cnpg
-        api_version: v1
-        kind: Namespace
-        state: present
     - name: Ensure the cnpg helm chart is installed
       kubernetes.core.helm:
         name: cnpg
