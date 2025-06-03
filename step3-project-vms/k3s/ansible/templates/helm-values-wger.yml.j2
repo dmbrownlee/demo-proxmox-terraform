@@ -1,0 +1,115 @@
+# App settings
+app:
+  timezone: "UTC"
+  global:
+    image:
+      #registry: docker.io
+      repository: wger/server
+      # when tag left emtpy the Chart appversion will be taken
+      # wger is developed as a rolling release
+      tag: latest
+      PullPolicy: Always
+    annotations: {}
+    replicas: 1
+    securityContext:
+      fsGroup: 1000
+  persistence:
+    enabled: true
+    storageClass: nfs-client
+    accessModes:
+      - ReadWriteMany
+    sizeMedia: 8Gi
+    sizeStatic: 8Gi
+    sizeCeleryBeat: 1Gi
+    annotations: {}
+    existingClaim:
+      enabled: false
+      media: null
+      static: null
+      code: null
+      celeryBeat: null
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 100m
+    limits:
+      memory: 1Gi
+      cpu: 500m
+  nginx:
+    enabled: false
+    image: nginx:stable
+    imagePullPolicy: IfNotPresent
+  django:
+    secret:
+      name: null
+      key: null
+    cache:
+      timeout: 1296000
+    existingDatabase:
+      enabled: true
+      engine: null
+      host: {% wger_db_hostname %}
+      port: null
+      dbname: {% wger_db_name %}
+      dbuser: {% wger_db_username %}
+      dbpw: null
+      existingSecret:
+        name: wger-postgres-user
+        dbnameKey: DB_DATABASE_NAME
+        dbuserKey: username
+        dbpwKey: password
+
+  jwt:
+    secret:
+      name: null
+      key: null
+    accessTokenLifetime: 10
+    refreshTokenLifetime: 24
+  axes:
+    enabled: false
+    lockoutParameters: "ip_address"
+    failureLimit: 10
+    cooloffTime: 30
+    ipwareProxyCount: 0
+    ipwareMetaPrecedenceOrder: "HTTP_X_FORWARDED_FOR,REMOTE_ADDR"
+  mail:
+    enabled: false
+    server: null
+    port: null
+    user: null
+    from_email: null
+    django_admins: null
+    secret:
+      name: mail
+      key: mail-password
+      password: null
+      update: false
+
+celery:
+  enabled: false
+
+ingress:
+  enabled: false
+
+service:
+  annotations: {}
+  type: ClusterIP
+  port: 8000
+
+postgres:
+  enabled: false
+
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  storage:
+    ##  Set persistentVolumenClaimName to reference an existing PVC
+    persistentVolumeClaimName:
+    ## Alternative set requestedSize to define a size for a dynmaically created PVC
+    ## five times (5x) the amount of memory (RAM)
+    requestedSize: 10Gi
+    ## the storage class name
+    className: nfs-client
+  service:
+    serverPort: 6379
