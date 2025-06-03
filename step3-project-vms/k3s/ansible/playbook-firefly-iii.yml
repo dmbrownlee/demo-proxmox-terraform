@@ -29,6 +29,10 @@
       kubernetes.core.helm_repository:
         name: firefly-iii
         repo_url: "https://firefly-iii.github.io/kubernetes/"
+    - name: Ensure the firefly PVC configuration has been applied
+      kubernetes.core.k8s:
+        state: present
+        template: pvc-firefly-attachments.yml.j2
     - name: Ensure the firefly helm chart is installed
       kubernetes.core.helm:
         name: firefly-iii
@@ -37,7 +41,19 @@
         create_namespace: true
         wait: true
         values: "{{ lookup('template', 'helm-values-firefly.yml.j2') | from_yaml }}"
+    - name: Ensure the firefly importer helm chart is installed
+      kubernetes.core.helm:
+        name: firefly-iii-importer
+        chart_ref: firefly-iii/importer
+        release_namespace: firefly
+        create_namespace: false
+        wait: true
+        values: "{{ lookup('template', 'helm-values-firefly-importer.yml.j2') | from_yaml }}"
     - name: Ensure the firefly ingress configuration has been applied
       kubernetes.core.k8s:
         state: present
         template: traefik-ingress-firefly.yml.j2
+    - name: Ensure the firefly importer ingress configuration has been applied
+      kubernetes.core.k8s:
+        state: present
+        template: traefik-ingress-importer.yml.j2
