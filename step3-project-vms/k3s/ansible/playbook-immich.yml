@@ -40,31 +40,8 @@
         release_namespace: immich
         create_namespace: true
         wait: true
-        values:
-          image:
-            tag: "{{ immich_version }}"
-          immich:
-            persistence:
-              library:
-                existingClaim: immich-library-pvc
-          env:
-            DB_HOSTNAME: immich-rw.cnpg.svc.cluster.local
-            DB_PASSWORD:
-              valueFrom:
-                secretKeyRef:
-                  name: immich-postgres-user
-                  key: password
-            DB_USERNAME: "{{ immich_db_username }}"
-            DB_DATABASE_NAME: immich
-          postgresql:
-            enabled: false
-          redis:
-            enabled: true
-          machine-learning:
-            persistence:
-              cache:
-                storageClass: nfs-client
-    - name: Ensure the photos ingress configuration has been applied
+        values: "{{ lookup('template', 'helm-values-immich.yml.j2') | from_yaml }}"
+    - name: Ensure the immich ingress configuration has been applied
       kubernetes.core.k8s:
         state: present
         template: traefik-ingress-immich.yml.j2

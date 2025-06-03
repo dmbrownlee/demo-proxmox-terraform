@@ -37,18 +37,7 @@
         release_namespace: wger
         create_namespace: true
         wait: true
-        set_values:
-          - value: app.django.existingDatabase.enabled=true
-          - value: app.django.existingDatabase.host=wger-rw.cnpg
-            value_type: string
-          - value: app.django.existingDatabase.existingSecret.name=wger-credentials
-            value_type: string
-          - value: app.django.existingDatabase.existingSecret.dbuserKey=username
-            value_type: string
-          - value: app.django.existingDatabase.existingSecret.dbpwKey=password
-            value_type: string
-          - value: persistence.enabled=true
-          - value: postgres.enabled=false
+        values: "{{ lookup('template', 'helm-values-wger.yml.j2') | from_yaml }}"
     - name: Ensure the wger ingress configuration has been applied
       kubernetes.core.k8s:
         state: present
