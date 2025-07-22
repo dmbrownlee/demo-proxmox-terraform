@@ -48,10 +48,10 @@ app:
     existingDatabase:
       enabled: true
       engine: null
-      host: {% wger_db_hostname %}
+      host: {{{ wger_db_hostname }}}
       port: null
-      dbname: {% wger_db_name %}
-      dbuser: {% wger_db_username %}
+      dbname: {{{ wger_db_name }}}
+      dbuser: {{{ wger_db_username }}}
       dbpw: null
       existingSecret:
         name: wger-postgres-user

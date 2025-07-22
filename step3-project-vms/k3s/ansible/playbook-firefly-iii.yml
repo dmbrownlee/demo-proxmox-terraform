@@ -45,7 +45,7 @@
         release_namespace: firefly
         create_namespace: true
         wait: true
-        values: "{{ lookup('template', 'helm-values-firefly.yml.j2') | from_yaml }}"
+        values: "{{ lookup('template', 'helm-values-firefly.yml.j2', variable_start_string='{{{', variable_end_string='}}}') | from_yaml }}"
     - name: Ensure the firefly importer helm chart is installed
       kubernetes.core.helm:
         name: firefly-iii-importer
@@ -53,7 +53,7 @@
         release_namespace: firefly
         create_namespace: false
         wait: true
-        values: "{{ lookup('template', 'helm-values-firefly-importer.yml.j2') | from_yaml }}"
+        values: "{{ lookup('template', 'helm-values-firefly-importer.yml.j2', variable_start_string='{{{', variable_end_string='}}}') | from_yaml }}"
     - name: Ensure the firefly ingress configuration has been applied
       kubernetes.core.k8s:
         state: present

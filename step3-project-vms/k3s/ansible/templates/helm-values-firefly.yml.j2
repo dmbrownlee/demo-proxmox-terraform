@@ -25,8 +25,8 @@ config:
     DB_HOST: "firefly-rw"
     DB_CONNECTION: pgsql
     DB_PORT: "5432"
-    DB_DATABASE: {% firefly_db_name %}
-    DB_USERNAME: {% firefly_db_username %}
+    DB_DATABASE: {{{ firefly_db_name }}}
+    DB_USERNAME: {{{ firefly_db_username }}}
     DEFAULT_LANGUAGE: "en_US"
     DEFAULT_LOCALE: "equal"
     TZ: "America/Vancouver"
@@ -35,8 +35,8 @@ config:
 # -- Create a new Secret from values file to store sensitive environment variables. Make sure to keep your secrets encrypted in the repository! For example, you can use the 'helm secrets' plugin (https://github.com/jkroepke/helm-secrets) to encrypt and manage secrets. If the 'config.existingSecret' value is set, a new Secret will not be created.
 secrets:
   env:
-    APP_PASSWORD: "{% firefly_db_password %}"
-    DB_PASSWORD: "{% firefly_db_password %}"
+    APP_PASSWORD: "{{{ firefly_db_password }}}"
+    DB_PASSWORD: "{{{ firefly_db_password }}}"
 
 cronjob:
   enabled: false

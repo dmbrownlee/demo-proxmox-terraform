@@ -42,7 +42,7 @@
         release_namespace: wger
         create_namespace: true
         wait: true
-        values: "{{ lookup('template', 'helm-values-wger.yml.j2') | from_yaml }}"
+        values: "{{ lookup('template', 'helm-values-wger.yml.j2', variable_start_string='{{{', variable_end_string='}}}') | from_yaml }}"
     - name: Ensure the wger ingress configuration has been applied
       kubernetes.core.k8s:
         state: present

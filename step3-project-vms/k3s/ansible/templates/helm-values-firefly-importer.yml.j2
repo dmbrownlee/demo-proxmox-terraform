@@ -6,7 +6,7 @@ fireflyiii:
   url: "http://firefly-iii:80"
 
   # -- The URL at which you access Firefly III. Check https://docs.firefly-iii.org/data-importer/install/configure/#configure-fidi to find out if you should set this.
-  vanityUrl: "http://{{ k3s_vip_hostname }}-firefly.site1.thebrownleefamily.net"
+  vanityUrl: "http://{{{ k3s_vip_hostname }}}-firefly.site1.thebrownleefamily.net"
 
   auth:
     # -- If you specify an existingSecret, it has to have the accessToken in a .spec.data.accessToken
