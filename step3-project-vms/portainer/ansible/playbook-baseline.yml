@@ -1,0 +1,75 @@
+---
+- name: Establish baseline
+  hosts: all
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
+  tasks:
+    - name: Ensure the /root/.bashrc.d/ directory exists
+      ansible.builtin.file:
+        path: /root/.bashrc.d
+        state: directory
+        owner: root
+        group: root
+        mode: '0700'
+    - name: Ensure /root/.bashrc sources files in /root/.bashrc.d
+      ansible.builtin.blockinfile:
+        dest: /root/.bashrc
+        content: |
+          BASH_RC_DIR="$HOME/.bashrc.d"
+          if [ -d "$BASH_RC_DIR" ]; then
+            for f in $(ls "$BASH_RC_DIR"); do
+              source "$BASH_RC_DIR/$f"
+            done
+          fi
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Ensure apt is configured to use local caching server
+      ansible.builtin.lineinfile:
+        path: /etc/apt/apt.conf.d/00aptproxy
+        line: Acquire::http::Proxy "{{ apt_proxy_url }}";
+        create: true
+      when: use_apt_proxy
+    - name: Ensure common packages are installed
+      ansible.builtin.apt:
+        name:
+          - docker.io
+          - docker-compose
+        cache_valid_time: 300
+        lock_timeout: 180
+    - name: Ensure Portainer has a volume
+      community.docker.docker_volume:
+        name: portainer_data
+    - name: Ensure Portainer has a network
+      community.docker.docker_network:
+        name: portainer
+    - name: Ensure an ipvlan network exists
+      docker_network:
+        name: SERVER_VLAN
+        attachable: false
+        driver: ipvlan
+        driver_options:
+          parent: eth0
+        enable_ipv6: false
+        internal: false
+        ipam_config:
+          - subnet: 10.48.16.0/24
+            gateway: 10.48.16.254
+        scope: local
+    - name: Ensure Portainer is deployed
+      community.docker.docker_container:
+        name: portainer
+        image: portainer/portainer-ce:lts
+        state: started
+        detach: true
+        restart_policy: unless-stopped
+        networks:
+          - name: portainer
+        ports:
+          - "8000:8000"
+          - "9000:9000"
+          - "9443:9443"
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - portainer_data:/data
