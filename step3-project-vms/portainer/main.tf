@@ -12,11 +12,11 @@ terraform {
     }
     dns = {
       source  = "hashicorp/dns"
-      version = "~> 3.4.2"
+      version = "~> 3.4.3"
     }
     local = {
       source  = "hashicorp/local"
-      version = "~> 2.5.2"
+      version = "~> 2.5.3"
     }
     proxmox = {
       source  = "bpg/proxmox"
