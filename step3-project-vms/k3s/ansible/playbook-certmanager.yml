@@ -20,3 +20,21 @@
         release_namespace: cert-manager
         create_namespace: true
         wait: true
+- name: Install cert-manager CLI on the first control plane node
+  hosts: k3s_first_control_plane
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
+  tasks:
+    - name: Ensure Go is installed
+      ansible.builtin.apt:
+        name: golang
+    - name: Ensure the certmanager CLI is installed
+      ansible.builtin.uri:
+        url: https://github.com/cert-manager/cmctl/releases/latest/download/cmctl_linux_amd64
+        dest: /usr/local/bin/cmctl
+        creates: /usr/local/bin/cmctl
+        owner: root
+        group: root
+        mode: '0755'
+
