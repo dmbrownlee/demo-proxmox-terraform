@@ -37,3 +37,23 @@
         owner: root
         group: root
         mode: '0600'
+- name: Install Barman Cloud Plugin into the cluster (for Minio backups)
+  hosts: k3s_first_control_plane
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  become: true
+  tasks:
+    - name: Ensure the Barman Cloud Plugin manifest is downloaded locally
+      ansible.builtin.uri:
+        url: https://github.com/cloudnative-pg/plugin-barman-cloud/releases/download/v0.6.0/manifest.yaml
+        dest: /root/barman.yaml
+        creates: /root/barman.yaml
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Ensure the Barman Cloud Plugin is installed
+      kubernetes.core.k8s:
+        state: present
+        src: /root/barman.yaml
