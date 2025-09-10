@@ -1,0 +1,24 @@
+---
+# This top level playbook is only for including smaller playbooks which can be
+# developed and tested separately before adding them here.  The included
+# playbooks can (and do) use "${{ tf_workspace }}.vars.yml" as a vars-file so
+# that you can have different variable files for each workspace allowing you
+# to use the same playbooks for multiple projects.  When you run the
+# ansible-playbook command, be sure to use the -e option to pass a value for
+# tf_workspace.
+#
+# example:
+# ansible-playbook -e tf_workspace=$(tofu workspace show) ansible/playbook.yml
+#
+
+# These playbooks also include an "install" boolean variable which can be set
+# to "false" in your workspace specific ansible variables so there is no need
+# to comment out these lines to disable an application.
+- import_playbook: playbook-firefly-iii.yml
+  when: install_firefly
+- import_playbook: playbook-immich.yml
+  when: install_immich
+- import_playbook: playbook-jellyfin.yml
+  when: install_jellyfin
+- import_playbook: playbook-wger.yml
+  when: install_wger
