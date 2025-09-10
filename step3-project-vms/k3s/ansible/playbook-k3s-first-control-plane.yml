@@ -107,38 +107,30 @@
       kubernetes.core.helm_plugin:
         plugin_path: https://github.com/databus23/helm-diff
         state: present
-    - name: Ensure the traefik dashboard service is exposed
-      #kubectl expose -n kube-system deployment traefik --name traefik-dashboard --port 9000 --target-port 9000
+    - name: Ensure the traefik helm chart config exists to override defaults
       kubernetes.core.k8s:
         state: present
         definition:
-          apiVersion: v1
-          kind: Service
+          kind: HelmChartConfig
           metadata:
-            labels:
-              app.kubernetes.io/instance: traefik-kube-system
-              app.kubernetes.io/managed-by: Helm
-              app.kubernetes.io/name: traefik
-#              helm.sh/chart: traefik-25.0.3_up25.0.0
-            name: traefik-dashboard
+            name: traefik
             namespace: kube-system
           spec:
-            # clusterIP: 10.43.39.121
-            # clusterIPs:
-            # - 10.43.39.121
-            # internalTrafficPolicy: Cluster
-            # ipFamilies:
-            # - IPv4
-            # ipFamilyPolicy: SingleStack
-            ports:
-            - port: 9000
-              protocol: TCP
-              targetPort: 9000
-            selector:
-              app.kubernetes.io/instance: traefik-kube-system
-              app.kubernetes.io/name: traefik
-            sessionAffinity: None
-            type: ClusterIP
+            valuesContent: |-
+              additionalArguments:
+                - "--api.dashboard=true"
+                - "--api.insecure=true"
+              ports:
+                metrics:
+                  port: 9100
+                  expose: {"default":true}
+                  exposedPort: 9100
+                  protocol: TCP
+                traefik:
+                  port: 8080
+                  expose: {"default":true}
+                  exposedPort: 9000
+                  protocol: TCP
     - name: Ensure there is an ingress for the traefik dashboard
       kubernetes.core.k8s:
         state: present
