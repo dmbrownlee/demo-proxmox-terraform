@@ -18,7 +18,7 @@
 - import_playbook: playbook-update-local-kubeconfig.yml
 - import_playbook: playbook-nfs.yml
 - import_playbook: playbook-certmanager.yml
-#- import_playbook: playbook-longhorn.yml
+- import_playbook: playbook-longhorn.yml
 - import_playbook: playbook-cnpg.yml
 - import_playbook: playbook-prometheus.yml
 

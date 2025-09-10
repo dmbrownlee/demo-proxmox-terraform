@@ -1,0 +1,7 @@
+defaultSettings:
+  defaultDataPath: /k3s_storage
+  backupTarget: nfs://truenas1.site1.thebrownleefamily.net:/mnt/pool1/{{{ k3s_vip_hostname }}}-longhorn-backups
+persistence:
+  defaultClass: false
+ingress:
+  enabled: false

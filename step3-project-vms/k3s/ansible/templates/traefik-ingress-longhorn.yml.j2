@@ -1,0 +1,44 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: longhorn
+  namespace: longhorn-system
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: "{{ k3s_vip_hostname }}-{{ cnames.longhorn }}"
+    http:
+      paths:
+      - backend:
+          service:
+            name: longhorn-frontend
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+{% if add_ingress_for_dev_cnames %}
+  - host: "dev-{{ cnames.longhorn }}"
+    http:
+      paths:
+      - backend:
+          service:
+            name: longhorn-frontend
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+{% endif %}
+{% if add_ingress_for_live_cnames %}
+  - host: "{{ cnames.longhorn }}"
+    http:
+      paths:
+      - backend:
+          service:
+            name: longhorn-frontend
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+{% endif %}
+
