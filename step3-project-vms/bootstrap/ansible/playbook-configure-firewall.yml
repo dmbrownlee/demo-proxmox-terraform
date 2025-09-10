@@ -1,0 +1,44 @@
+
+---
+- name: Configure the firewall
+  hosts: all
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
+  tasks:
+    - name: Ensure the firewalld service is installed
+      ansible.builtin.apt:
+        name: firewalld
+        update_cache: yes
+        cache_valid_time: 300
+    - name: Ensure the firewalld service is enabled and started
+      ansible.builtin.systemd:
+        name: firewalld
+        enabled: yes
+        state: started
+    - name: Ensure the external zone is the default zone
+      ansible.builtin.command: firewall-cmd --set-default-zone=external
+      changed_when: '"ZONE_ALREADY_SET" not in default_zone_set.stderr'
+      register: default_zone_set
+    - name: Ensure the SSH service is allowed from the outside
+      ansible.posix.firewalld:
+        zone: external
+        service: ssh
+        permanent: yes
+        immediate: yes
+        state: enabled
+      when: ansible_controller_is_external
+    - name: Ensure the WAN interface is in the external zone
+      ansible.posix.firewalld:
+        zone: external
+        interface: "{{ wan_interface }}"
+        permanent: yes
+        immediate: yes
+        state: enabled
+    - name: Ensure the LAN interface is in the trusted zone
+      ansible.posix.firewalld:
+        zone: trusted
+        interface: "{{ lan_interface }}"
+        permanent: yes
+        immediate: yes
+        state: enabled

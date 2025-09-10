@@ -1,0 +1,36 @@
+---
+- name: Configure DNS
+  hosts: all
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
+  tasks:
+    - name: Ensure the DNS service is installed
+      ansible.builtin.apt:
+        name:
+          - bind9
+          - bind9-dnsutils
+        update_cache: yes
+        cache_valid_time: 300
+    - name: Ensure the DNS service is configured
+      ansible.builtin.template:
+        dest: /etc/bind/{{ item }}
+        src: "{{ item }}.j2"
+        owner: root
+        group: bind
+        mode: '0644'
+      loop:
+        - named.conf.options
+        - named.conf.local
+    - name: Ensure the DNS service is enabled and started
+      ansible.builtin.systemd:
+        name: named
+        enabled: yes
+        state: started
+    # - name: Ensure the firewall allows traffic to the DNS service
+    #   ansible.posix.firewalld:
+    #     zone: internal
+    #     service: dns
+    #     permanent: yes
+    #     immediate: yes
+    #     state: enabled

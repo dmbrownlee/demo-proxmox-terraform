@@ -1,0 +1,76 @@
+---
+- name: Configure netbootxyz
+  hosts: all
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
+  tasks:
+    - name: Ensure GPG and some other handy items are installed
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - bash-completion
+          - ca-certificates
+          - curl
+          - git
+          - gnupg
+          - socat
+          - vim
+        update_cache: yes
+        cache_valid_time: 300
+    - name: Ensure the GPG key for the docker apt repo is installed
+      shell: |
+        curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+      args:
+        creates: /etc/apt/keyrings/docker.gpg
+    - name: Ensure docker registry is configured
+      ansible.builtin.apt_repository:
+        repo: deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian trixie stable
+        state: present
+      register: docker_repo
+    # - name: Ensure docker registry is configured
+    #   ansible.builtin.apt_repository:
+    #     repo: deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker.gpg] https://download.docker.com/linux/debian trixie stable
+    #     filename: docker
+    - name: Ensure package cache is updated if new repos have been added
+      ansible.builtin.apt:
+        update_cache: yes
+      when: docker_repo.changed
+      register: apt_update
+      until: apt_update is success
+      retries: 10
+      delay: 30
+    - name: Ensure containerd is installed
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+    - name: Ensure a directory for persistent netbootxyz exists
+      ansible.builtin.file:
+        path: "{{netboot_data_dir}}/{{ item }}"
+        state: directory
+      loop:
+        - "config"
+        - "assets"
+    - name: Ensure a netbootxyz container is started
+      community.docker.docker_container:
+        name: netbootxyz
+        image: ghcr.io/netbootxyz/netbootxyz
+        state: started
+        restart: true
+        restart_policy: "unless-stopped"
+        ports:
+          - "3000:3000"
+          - "69:69/udp"
+          - "8080:80"
+        env:
+          #MENU_VERSION: "2.0.84"
+          NGINX_PORT: "80"
+          WEB_APP_PORT: "3000"
+        volumes:
+          - "{{netboot_data_dir}}/config:/config"
+          - "{{netboot_data_dir}}/assets:/assets"
+

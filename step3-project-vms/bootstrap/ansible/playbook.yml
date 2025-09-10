@@ -1,0 +1,20 @@
+---
+# This top level playbook is only for including smaller playbooks which can be
+# developed and tested separately before adding them here.  The included
+# playbooks can (and do) use "${{ tf_workspace }}.vars.yml" as a vars-file so
+# that you can have different variable files for each workspace allowing you
+# to use the same playbooks for multiple projects.  When you run the
+# ansible-playbook command, be sure to use the -e option to pass a value for
+# tf_workspace.
+#
+# example:
+# ansible-playbook -e tf_workspace=$(tofu workspace show) ansible/playbook.yml
+#
+- import_playbook: playbook-host-baseline.yml
+- import_playbook: playbook-configure-firewall.yml
+- import_playbook: playbook-configure-networking.yml
+- import_playbook: playbook-dns.yml
+- import_playbook: playbook-dhcp.yml
+- import_playbook: playbook-netbootxyz.yml
+
+# Optional apps have been moved to playbook-apps.yml

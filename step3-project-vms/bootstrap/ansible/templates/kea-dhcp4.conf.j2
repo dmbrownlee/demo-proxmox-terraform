@@ -1,0 +1,86 @@
+{
+  "Dhcp4": {
+    "interfaces-config": {
+      "interfaces": [ "{{ lan_interface }}" ]
+    },
+    "control-socket": {
+      "socket-type": "unix",
+      "socket-name": "kea4-ctrl-socket"
+    },
+    "valid-lifetime": 4000,
+    "renew-timer": 1000,
+    "rebind-timer": 2000,
+    "option-data": [
+      {
+        "name": "domain-name-servers",
+        "data": "{{ dhcp_opt_domain_name_servers }}"
+      },
+      {
+        "name": "domain-name",
+        "data": "{{ dhcp_opt_domain_name }}"
+      },
+      {
+        "name": "domain-search",
+        "data": "{{ dhcp_opt_domain_search }}"
+      }
+    ],
+    "client-classes": [
+      {
+        "name": "iPXE",
+        "next-server": "{{ dhcp_opt_tftp_server_name }}",
+        "test": "option[175].exists",
+        "option-data": [
+          {
+            "name": "boot-file-name",
+            //"data": "http://boot.netboot.xyz"
+            "data": "netboot.xyz.kpxe"
+          }
+        ]
+      },
+      {
+        "name": "UEFI clients",
+        "test": "option[93].hex == 0x0007 and not option[175].exists",
+        "option-data": [
+          {
+            "name": "boot-file-name",
+            "data": "netboot.xyz.efi"
+          }
+        ]
+      },
+      {
+        "name": "BIOS clients",
+        "test": "option[93].hex == 0x0000 and not option[175].exists",
+        "option-data": [
+          {
+            "name": "boot-file-name",
+            "data": "netboot.xyz.kpxe"
+            //"data": "undionly.kpxe"
+          }
+        ]
+      }
+    ],
+    "subnet4": [
+      {
+        "id": 1,
+        "subnet": "{{ dhcp_network }}/{{ dhcp_prefix }}",
+        "pools": [
+          {
+            "pool": "{{ dhcp_pool_start }} - {{ dhcp_pool_end }}"
+          },
+        ],
+        "option-data": [
+          {
+            "name": "routers",
+            "data": "{{ dhcp_opt_routers }}"
+          }
+  //    ],
+  //    "reservations": [
+  //      {
+  //        "hw-address": "<mac>",
+  //        "ip-address": "<ip>"
+  //      },
+        ]
+      }
+    ]
+  }
+}

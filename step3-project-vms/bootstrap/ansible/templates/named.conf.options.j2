@@ -1,0 +1,15 @@
+options {
+  directory "/var/cache/bind";
+  forwarders { 9.9.9.9; };
+  allow-query {
+    localhost;
+    localnets;
+  };
+  allow-recursion {
+    localhost;
+    localnets;
+  };
+//  controls {
+//    inet 127.0.0.1 port 953 allow { 127.0.0.1; } keys { "rndc-key"; };
+//  };
+};
