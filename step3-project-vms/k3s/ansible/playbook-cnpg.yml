@@ -15,15 +15,17 @@
       kubernetes.core.helm:
         name: cnpg
         chart_ref: cnpg/cloudnative-pg
-        release_namespace: cnpg
+        release_namespace: cnpg-system
         create_namespace: true
         wait: true
         values:
+          image:
+            tag: latest
           config:
             clusterWide: true
     - name: Ensure the cnpg deployment is ready before continuing
       ansible.builtin.command:
-        cmd: "kubectl wait -n cnpg --for=condition=Available deployment --selector app.kubernetes.io/name=cloudnative-pg"
+        cmd: "kubectl wait -n cnpg-system --for=condition=Available deployment --selector app.kubernetes.io/name=cloudnative-pg"
       changed_when: false
     - name: Ensure the cnpg plugin for kubectl is installed
       ansible.builtin.apt:
