@@ -5,8 +5,9 @@ metadata:
   name: wger
   namespace: wger
 spec:
-  imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.5-v0.3.0@sha256:be3f025d79aa1b747817f478e07e71be43236e14d00d8a9eb3914146245035ba
+  imageName: ghcr.io/cloudnative-pg/postgresql:17-standard-bookworm
   instances: 1
+  enableSuperuserAccess: true
 
   # affinity:
   #   nodeSelector:
@@ -17,14 +18,6 @@ spec:
   #       key: reservation
   #       operator: Equal
   #       value: database
-
-  # postgresql:
-  #   shared_preload_libraries:
-  #     - "vectors.so"
-
-  # The "postgres" superuser is needed only for import and it can be deactivated after migration.
-  enableSuperuserAccess: true
-  # superuserSecret: wger-superuser
 
   managed:
     roles:
