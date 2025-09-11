@@ -34,6 +34,20 @@ spec:
         passwordSecret:
           name: immich-postgres-user
   bootstrap:
+{% if immich_recover_db_from_backup %}
+    recovery:
+      database: "{{ immich_db_name }}"
+      owner: "{{ immich_db_username }}"
+      source: dbRecoverySource
+
+  externalClusters:
+    - name: dbRecoverySource
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: "{{ immich_objectstore_name }}"
+          serverName: "immich"
+{% else %}
     initdb:
       database: "{{ immich_db_name }}"
       owner: "{{ immich_db_username }}"
@@ -43,5 +57,12 @@ spec:
         - CREATE EXTENSION IF NOT EXISTS "vectors";
         - CREATE EXTENSION IF NOT EXISTS "cube" CASCADE;
         - CREATE EXTENSION IF NOT EXISTS "earthdistance" CASCADE;
+{% endif %}
+
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: "{{ immich_objectstore_name }}"
   storage:
     size: "{{ immich_db_size }}"

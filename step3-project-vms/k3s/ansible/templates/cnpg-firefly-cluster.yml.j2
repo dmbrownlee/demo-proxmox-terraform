@@ -31,10 +31,31 @@ spec:
         passwordSecret:
           name: firefly-postgres-user
   bootstrap:
+{% if firefly_recover_db_from_backup %}
+    recovery:
+      database: "{{ firefly_db_name }}"
+      owner: "{{ firefly_db_username }}"
+      source: dbRecoverySource
+
+  externalClusters:
+    - name: dbRecoverySource
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: "{{ firefly_objectstore_name }}"
+          serverName: "firefly"
+{% else %}
     initdb:
       database: "{{ firefly_db_name }}"
       owner: "{{ firefly_db_username }}"
       secret:
         name: firefly-postgres-user
+{% endif %}
+
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: "{{ firefly_objectstore_name }}"
   storage:
     size: "{{ firefly_db_size }}"

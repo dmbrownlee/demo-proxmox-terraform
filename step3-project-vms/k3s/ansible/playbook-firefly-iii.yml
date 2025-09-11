@@ -20,6 +20,28 @@
         state: present
         namespace: firefly
         template: secret-firefly-minio-credentials.yml.j2
+    - name: Ensure the Barman Objectstore exists for backups
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: barmancloud.cnpg.io/v1
+          kind: ObjectStore
+          metadata:
+            name: "{{ firefly_objectstore_name }}"
+            namespace: firefly
+          spec:
+            configuration:
+              destinationPath: "{{ firefly_minio_backup_path }}"
+              endpointURL: http://minio2.site1.thebrownleefamily.net:9000
+              s3Credentials:
+                accessKeyId:
+                  name: minio-credentials
+                  key: ACCESS_KEY_ID
+                secretAccessKey:
+                  name: minio-credentials
+                  key: ACCESS_SECRET_KEY
+#              wal:
+#                compression: gzip
     - name: Ensure a cnpg database exists for firefly (takes a while - waiting up to 10 min.)
       kubernetes.core.k8s:
         state: present

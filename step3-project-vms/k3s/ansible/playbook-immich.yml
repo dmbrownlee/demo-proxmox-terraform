@@ -19,6 +19,29 @@
       kubernetes.core.k8s:
         state: present
         template: secret-immich-minio-credentials.yml.j2
+    - name: Ensure the Barman Objectstore exists for backups
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: barmancloud.cnpg.io/v1
+          kind: ObjectStore
+          metadata:
+            name: "{{ immich_objectstore_name }}"
+            #name: minio2
+            namespace: immich
+          spec:
+            configuration:
+              destinationPath: "{{ immich_minio_backup_path }}"
+              endpointURL: "{{ immich_minio_backup_endpoint }}"
+              s3Credentials:
+                accessKeyId:
+                  name: minio-credentials
+                  key: ACCESS_KEY_ID
+                secretAccessKey:
+                  name: minio-credentials
+                  key: ACCESS_SECRET_KEY
+              wal:
+                compression: gzip
     - name: Ensure a cnpg database exists for immich (takes a while - waiting up to 10 min.)
       kubernetes.core.k8s:
         state: present
