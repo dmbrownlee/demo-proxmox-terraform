@@ -26,9 +26,15 @@ k3s_vip_hostname          = "myk3s"
 
 k3s_cnames            = [
   "alertmanager",
+  "firefly",
   "grafana",
+  "importer",
+  "jellyfin",
+  "longhorn",
+  "photos",
   "prometheus",
   "traefik",
+  "wger",
 ]
 
 enable_live_cnames = true
@@ -78,7 +84,7 @@ ci_password = "change_me!"
 # variable defines the location of the SSH keypair for the cloud-init user.
 # Terraform will search here for the cloud-init user's SSH public key and
 # install it via the cloud-init drive when it clones the VMs.
-ssh_keystore = "~/keys"
+ssh_keystore = "~/.ssh"
 
 
 ###############################################################################
@@ -261,7 +267,7 @@ vms = [
         cores = 2,
         type  = "x86-64-v2-AES"
       }
-      memory = 8192,
+      memory = 16384,
       disks = [
         {
           datastore_id = "local-lvm",
@@ -290,7 +296,7 @@ vms = [
         cores = 2,
         type  = "x86-64-v2-AES"
       }
-      memory = 8192,
+      memory = 16384,
       disks = [
         {
           datastore_id = "local-lvm",
@@ -319,7 +325,7 @@ vms = [
         cores = 2,
         type  = "x86-64-v2-AES"
       }
-      memory = 8192,
+      memory = 16384,
       disks = [
         {
           datastore_id = "local-lvm",

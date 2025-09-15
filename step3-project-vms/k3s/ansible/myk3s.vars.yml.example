@@ -5,7 +5,7 @@
 # With frequent standups and teardowns, you may find a local APT caching proxy
 # (e.g. apt-cacher-ng on Debian) will speed things up.
 use_apt_proxy: false
-apt_proxy_url: "http://truenas1.site1.thebrownleefamily.net:3142"
+apt_proxy_url: "http://aptcache.example.com:3142"
 
 
 ################################################################################
@@ -15,7 +15,7 @@ apt_proxy_url: "http://truenas1.site1.thebrownleefamily.net:3142"
 ###
 ################################################################################
 ################################################################################
-k3s_version: "v1.32.1+k3s1"
+k3s_version: "v1.33.3%2Bk3s1"
 k3s_token: "secret_token"
 k3s_api_url: "https://192.168.10.80:6443"
 k3s_vip: "192.168.10.80"
@@ -40,13 +40,14 @@ persistent_nfs_path: /mnt/pool1/myk3s-nfs
 ###
 ################################################################################
 ################################################################################
-add_ingress_for_live_cnames: false
-add_ingress_for_dev_cnames: true
+add_ingress_for_live_cnames: true
+add_ingress_for_dev_cnames: false
 
 cnames:
   alertmanager: alertmanager.example.com
   firefly: firefly.example.com
   grafana: grafana.example.com
+  importer: importer.example.com
   jellyfin: jellyfin.example.com
   longhorn: longhorn.example.com
   photos: photos.example.com
@@ -68,27 +69,53 @@ cnpg_kubectl_plugin_url: "https://github.com/cloudnative-pg/cloudnative-pg/relea
 ################################################################################
 ################################################################################
 ###
+###  MinIO (external to kubernetes) variables
+###
+################################################################################
+################################################################################
+minio_endpointURL: "http://minio.example.com:9000"
+minio_encryption: ""
+minio_access_key: accesskeyid000000000
+minio_secret_key: secretaccesskey0000000000000000000000000
+
+
+################################################################################
+################################################################################
+###
 ###  Applications
 ###
 ################################################################################
 ################################################################################
+
+install_immich: true
+immich_version: "v1.142.0"
+immich_recover_db_from_backup: false  # "true" if recovering from a backup
+immich_cnpg_imagename: "dmbrownlee/cloudnative-vectorchord:17-0.4.3"
 immich_db_name: immich
 immich_db_hostname: immich-rw
 immich_db_username: immich
 immich_db_password: immich
 immich_db_size: 8Gi
-immich_version: "v1.126.1"
 immich_library_size: 4000Gi
 
-firefly_db_name: firefly       # name of the database
-firefly_db_hostname: firefly-rw       # name of the database-rw
+install_firefly: true
+firefly_version: "latest"
+firefly_recover_db_from_backup: false  # "true" if recovering from a backup
+firefly_db_name: firefly
+firefly_db_hostname: firefly-rw
 firefly_db_username: firefly
 firefly_db_password: firefly
 firefly_db_size: 8Gi
+
 firefly_attachment_storage_size: 1Gi
 
+install_wger: true
+wger_version: "0.2.4-rc.1"
+wger_recover_db_from_backup: false  # "true" if recovering from a backup
 wger_db_name: wger
 wger_db_hostname: wger-rw
 wger_db_username: wger
 wger_db_password: wger
 wger_db_size: 8Gi
+
+install_jellyfin: true
