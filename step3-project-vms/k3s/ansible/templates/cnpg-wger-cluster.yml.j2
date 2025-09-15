@@ -31,6 +31,8 @@ spec:
     recovery:
       database: "{{ wger_db_name }}"
       owner: "{{ wger_db_username }}"
+      secret:
+        name: wger-postgres-user
       source: dbRecoverySource
 
   externalClusters:
@@ -38,8 +40,7 @@ spec:
       plugin:
         name: barman-cloud.cloudnative-pg.io
         parameters:
-          barmanObjectName: "{{ wger_objectstore_name }}"
-          serverName: "wger"
+          barmanObjectName: wger-recovery
 {% else %}
     initdb:
       database: "{{ wger_db_name }}"
@@ -52,6 +53,6 @@ spec:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true
       parameters:
-        barmanObjectName: "{{ wger_objectstore_name }}"
+        barmanObjectName: wger-backups
   storage:
     size: "{{ wger_db_size }}"

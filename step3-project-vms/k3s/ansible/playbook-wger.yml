@@ -27,12 +27,34 @@
           apiVersion: barmancloud.cnpg.io/v1
           kind: ObjectStore
           metadata:
-            name: "{{ wger_objectstore_name }}"
+            name: wger-backups
             namespace: wger
           spec:
             configuration:
-              destinationPath: "{{ wger_minio_backup_path }}"
-              endpointURL: http://minio2.site1.thebrownleefamily.net:9000
+              destinationPath: "s3://{{ k3s_vip_hostname }}-backups"
+              endpointURL: "{{ minio_endpointURL }}"
+              s3Credentials:
+                accessKeyId:
+                  name: minio-credentials
+                  key: ACCESS_KEY_ID
+                secretAccessKey:
+                  name: minio-credentials
+                  key: ACCESS_SECRET_KEY
+#              wal:
+#                compression: gzip
+    - name: Ensure the Barman Objectstore exists for recovery
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: barmancloud.cnpg.io/v1
+          kind: ObjectStore
+          metadata:
+            name: wger-recovery
+            namespace: wger
+          spec:
+            configuration:
+              destinationPath: "s3://{{ k3s_vip_hostname }}-recovery"
+              endpointURL: "{{ minio_endpointURL }}"
               s3Credentials:
                 accessKeyId:
                   name: minio-credentials

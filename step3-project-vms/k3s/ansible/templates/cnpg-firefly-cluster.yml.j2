@@ -19,7 +19,6 @@ spec:
   #       operator: Equal
   #       value: database
 
-
   managed:
     roles:
       - name: "{{ firefly_db_username }}"
@@ -32,6 +31,8 @@ spec:
     recovery:
       database: "{{ firefly_db_name }}"
       owner: "{{ firefly_db_username }}"
+      secret:
+        name: firefly-postgres-user
       source: dbRecoverySource
 
   externalClusters:
@@ -39,8 +40,7 @@ spec:
       plugin:
         name: barman-cloud.cloudnative-pg.io
         parameters:
-          barmanObjectName: "{{ firefly_objectstore_name }}"
-          serverName: "firefly"
+          barmanObjectName: firefly-recovery
 {% else %}
     initdb:
       database: "{{ firefly_db_name }}"
@@ -53,6 +53,6 @@ spec:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true
       parameters:
-        barmanObjectName: "{{ firefly_objectstore_name }}"
+        barmanObjectName: firefly-backups
   storage:
     size: "{{ firefly_db_size }}"
