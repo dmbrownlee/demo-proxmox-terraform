@@ -11,13 +11,14 @@
         api_version: v1
         kind: Namespace
         state: present
-    - name: Ensure immich credentials for cnpg exist
+    - name: Ensure credentials for the immich database exist
       kubernetes.core.k8s:
         state: present
         template: secret-immich-postgres-credentials.yml.j2
     - name: Ensure immich credentials for minio exist
       kubernetes.core.k8s:
         state: present
+        namespace: immich
         template: secret-immich-minio-credentials.yml.j2
     - name: Ensure the Barman Objectstore exists for backups
       kubernetes.core.k8s:
@@ -73,14 +74,14 @@
           type: Ready
           status: "True"
           reason: ClusterIsReady
-    - name: Ensure the helm repo for immich is added
-      kubernetes.core.helm_repository:
-        name: immich
-        repo_url: "https://immich-app.github.io/immich-charts"
     - name: Ensure the immich PVC configuration has been applied
       kubernetes.core.k8s:
         state: present
         template: immich-library-pvc.yml.j2
+    - name: Ensure the helm repo for immich is added
+      kubernetes.core.helm_repository:
+        name: immich
+        repo_url: "https://immich-app.github.io/immich-charts"
     - name: Ensure the immich helm chart is installed
       kubernetes.core.helm:
         name: immich
