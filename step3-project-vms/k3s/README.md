@@ -1,5 +1,6 @@
 # Minimalist Instructions
-> [!note] The name of the variable files must match the name of the workspace for the commands below to work.
+> [!NOTE]
+> The name of the variable files must match the name of the workspace for the commands below to work.
 
 1. Create and initialize a Terraform (or OpenTofu) workspace named "myk3s".
     ```shell
