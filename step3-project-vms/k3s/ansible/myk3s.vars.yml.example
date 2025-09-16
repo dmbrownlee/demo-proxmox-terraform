@@ -63,7 +63,7 @@ cnames:
 ###
 ################################################################################
 ################################################################################
-cnpg_kubectl_plugin_url: "https://github.com/cloudnative-pg/cloudnative-pg/releases/download/v1.25.0/kubectl-cnpg_1.25.0_linux_x86_64.deb"
+cnpg_kubectl_plugin_url: "https://github.com/cloudnative-pg/cloudnative-pg/releases/download/v1.27.0/kubectl-cnpg_1.27.0_linux_x86_64.deb"
 
 
 ################################################################################
@@ -74,7 +74,6 @@ cnpg_kubectl_plugin_url: "https://github.com/cloudnative-pg/cloudnative-pg/relea
 ################################################################################
 ################################################################################
 minio_endpointURL: "http://minio.example.com:9000"
-minio_encryption: ""
 minio_access_key: accesskeyid000000000
 minio_secret_key: secretaccesskey0000000000000000000000000
 
