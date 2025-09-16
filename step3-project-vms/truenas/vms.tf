@@ -31,7 +31,7 @@ variable "vms" {
       network_devices = list(object({
         interface    = string,
         mac_address  = string,
-        vlan_id      = number,
+        #vlan_id      = number,
       }))
     })
   }))
@@ -46,9 +46,6 @@ variable "vms" {
 ###############################################################################
 
 resource "proxmox_virtual_environment_vm" "lab_vms" {
-  depends_on = [
-    proxmox_virtual_environment_network_linux_vlan.vlans,
-  ]
   for_each    = { for vm in var.vms : vm.hostname => vm }
   name        = each.key
   description = "Managed by Terraform"
@@ -60,7 +57,6 @@ resource "proxmox_virtual_environment_vm" "lab_vms" {
   bios = "ovmf"
   boot_order = ["virtio0","ide0"]
   cdrom {
-    enabled = true
     interface = "ide0"
     file_id = each.value.iso_image
   }
@@ -95,7 +91,7 @@ resource "proxmox_virtual_environment_vm" "lab_vms" {
     content {
       bridge      = network_device.value.interface
       mac_address = network_device.value.mac_address
-      vlan_id     = network_device.value.vlan_id
+      #vlan_id     = network_device.value.vlan_id
     }
   }
   on_boot = true
