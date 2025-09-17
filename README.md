@@ -11,7 +11,7 @@ You will need:
 > You can install the Ansible collection for Terraform with `ansible-galaxy collection install cloud.terraform`.
 
 > [!TIP]
-> If you can't or don't want to install Terraform and Ansible, I have a container with the neccessary tools pre-installed in its own repo: https://github.com/dmbrownlee/demo-containers/tree/main/devcontainer.  Of course, that requires podman or docker to use.
+> If you can't or don't want to install Terraform and Ansible, I have a container with the neccessary tools pre-installed in its own repo: https://github.com/dmbrownlee/oci-controller.  Of course, that requires podman or docker to use.
 
 > [!NOTE]
 > I'm actually using Open Tofu, a fork of Terraform and that is what is installed in my container image.  Just substitute `tofu` wherever you see `terraform` in the commands.
@@ -22,7 +22,7 @@ It is assumed you are familiar with Linux and, obviously, the more you already k
 ### Terraform
 This project involves multiple steps, each with its own directory.  As indicated by the directory names, the steps should be done in order.  Change into the directory and read the README.md for the procedure for each step.
 
-Generally, each directory is its own Terraform project which automates an isolated task.  The Terraform projects work as templates for the resources to be managed and can be re-used for multiple distinct cases by using different Terraform variable files (they have a `.tfvars` extension).  For example, there is a directory with a Terraform project that maintains ISO images of installation media downloaded from the Internet and uploaded to the Proxmox cluster.  You can create a `debian.tfvars` variable file containing the details of the installation media for Debian and another `ubuntu.tfvars` variable file containing the details of the installation media for Ubuntu and then use the Terraform project to manage either (or both, described next).
+Generally, each directory is its own sub-project which automates an isolated task.  These sub-project directories work as templates for the resources to be managed and can be re-used for multiple distinct cases by using different Terraform variable files (they have a `.tfvars` extension).  For example, the `step1-installation-media` directory uses Terraform to manage ISO images of installation media in the Proxmox cluster.  You can create a `debian.tfvars` variable file containing the details needed to fetch the installation media for Debian and another `ubuntu.tfvars` variable file containing the same details for Ubuntu and then use Terraform to manage either (or both, described next).
 
 Terraform stores the state of the resources it manages in a "workspace" and you have one workspace by default named "default".  With only one workspace, if you run `terraform apply -var-file debian.tfvars` to download the Debian installation media to your Proxmox ISO storage and then run `terraform apply -var-file ubuntu.tfvars`, Terraform will delete the Debian installation media from your Proxmox cluster before downloading the Ubuntu installation media because the details of the Debian installation media do not exist in the `ubuntu.tfvars` file and Terraform assumes you no longer want those resources.  Likely, this is not what you will want most of the time.  If you want to use multiple variable files simultaneously within a single project directory, you will need to create a workspace for each.  You can create a new workspace called "debian" and switch to it with `terraform workspace new debian`.  Use `terraform workspace list` to list the workspaces which already exist and identify which workspace you are currently using (as denoted with an asterisk).  Use `terraform workspace select ubuntu` to switch to the "ubuntu" workspace (if you have already created one).  For other workspace related commands, there is `terraform workspace help`.
 
@@ -38,7 +38,7 @@ Switching between workspaces is a common occurence so it is helpful to adopt som
 # List all workspaces and note which is current
 alias twl='tofu workspace list'
 
-# Change to a different workspace
+# Change to a different workspace (takes the workspace name as an argument)
 alias tws='tofu workspace select'
 
 # Check the state of the resources in this workspace
