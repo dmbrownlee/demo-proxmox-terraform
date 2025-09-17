@@ -264,7 +264,7 @@ resource "proxmox_virtual_environment_vm" "uefihosts" {
     # }
 
     memory {
-        dedicated      = 4096
+        dedicated      = 8192
         floating       = 0
         keep_hugepages = false
         shared         = 0
@@ -357,7 +357,7 @@ resource "proxmox_virtual_environment_vm" "bioshosts" {
     }
 
     memory {
-        dedicated      = 4096
+        dedicated      = 8192
         floating       = 0
         keep_hugepages = false
         shared         = 0
