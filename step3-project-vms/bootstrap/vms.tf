@@ -76,18 +76,18 @@ variable "admin_laptop" {
 variable "bios_hosts" {
   description = "A single VM object"
   type = list(object({
-    vm_id            = number,
-    hostname         = string,
-    pve_node         = string,
+    vm_id    = number,
+    hostname = string,
+    pve_node = string,
   }))
 }
 
 variable "uefi_hosts" {
   description = "A single VM object"
   type = list(object({
-    vm_id            = number,
-    hostname         = string,
-    pve_node         = string,
+    vm_id    = number,
+    hostname = string,
+    pve_node = string,
   }))
 }
 
@@ -117,7 +117,7 @@ resource "proxmox_virtual_environment_vm" "admin_laptop" {
     resource.dns_a_record_set.admin_laptop,
     data.proxmox_virtual_environment_vms.cloud_init_template,
   ]
-  name        = "${var.admin_laptop.hostname}"
+  name        = var.admin_laptop.hostname
   description = "Managed by Terraform"
   tags        = ["${terraform.workspace}", var.admin_laptop.cloud_init_image]
   node_name   = var.admin_laptop.pve_node
@@ -195,14 +195,14 @@ resource "proxmox_virtual_environment_vm" "admin_laptop" {
   }
   vga {
     memory = 512
-    type = "std"
+    type   = "std"
   }
 }
 
 
 resource "ansible_host" "admin_laptop" {
-  name     = var.admin_laptop.hostname
-  groups   = ["admin_laptop"]
+  name   = var.admin_laptop.hostname
+  groups = ["admin_laptop"]
   depends_on = [
     resource.proxmox_virtual_environment_vm.admin_laptop
   ]
@@ -212,188 +212,186 @@ resource "proxmox_virtual_environment_vm" "uefihosts" {
   lifecycle {
     ignore_changes = [mac_addresses]
   }
-    for_each    = { for vm in var.uefi_hosts : vm.hostname => vm }
-    acpi                    = true
-    bios                    = "ovmf"
-    boot_order              = ["scsi0","net0","ide2"]
-    mac_addresses           = []
-    machine                 = "q35"
-    name                    = each.key
-    node_name               = each.value.pve_node
-    protection              = false
-    scsi_hardware           = "virtio-scsi-single"
-    started                 = false
-    tablet_device           = true
-    tags                    = []
-    template                = false
-    vm_id                   = each.value.vm_id
+  for_each      = { for vm in var.uefi_hosts : vm.hostname => vm }
+  acpi          = true
+  bios          = "ovmf"
+  boot_order    = ["scsi0", "net0", "ide2"]
+  description   = "Managed by Terraform"
+  mac_addresses = []
+  machine       = "q35"
+  name          = each.key
+  node_name     = each.value.pve_node
+  protection    = false
+  scsi_hardware = "virtio-scsi-single"
+  started       = false
+  tablet_device = true
+  tags          = ["${terraform.workspace}"]
+  template      = false
+  vm_id         = each.value.vm_id
 
-    cpu {
-        cores      = 2
-        flags      = []
-        hotplugged = 0
-        limit      = 0
-        numa       = false
-        sockets    = 1
-        type       = "x86-64-v2-AES"
-        units      = 1024
-    }
+  cpu {
+    cores      = 2
+    flags      = []
+    hotplugged = 0
+    limit      = 0
+    numa       = false
+    sockets    = 1
+    type       = "x86-64-v2-AES"
+    units      = 1024
+  }
 
-    cdrom {
-        file_id           = "none"
-        interface         = "ide2"
-    }
+  cdrom {
+    file_id   = "none"
+    interface = "ide2"
+  }
 
-    disk {
-        aio               = "io_uring"
-        backup            = false
-        cache             = "none"
-        datastore_id      = "local-lvm"
-        discard           = "on"
-        file_format       = "raw"
-        interface         = "scsi0"
-        iothread          = true
-        # path_in_datastore = "vm-204-disk-1"
-        replicate         = true
-        size              = 32
-        ssd               = true
-    }
+  disk {
+    aio          = "io_uring"
+    backup       = false
+    cache        = "none"
+    datastore_id = "local-lvm"
+    discard      = "on"
+    file_format  = "raw"
+    interface    = "scsi0"
+    iothread     = true
+    # path_in_datastore = "vm-204-disk-1"
+    replicate = true
+    size      = 32
+    ssd       = true
+  }
 
-    # efi_disk {
-    #     datastore_id      = "local-lvm"
-    #     file_format       = "raw"
-    #     #pre_enrolled_keys = false
-    #     type              = "4m"
-    # }
+  # efi_disk {
+  #     datastore_id      = "local-lvm"
+  #     file_format       = "raw"
+  #     #pre_enrolled_keys = false
+  #     type              = "4m"
+  # }
 
-    memory {
-        dedicated      = 8192
-        floating       = 0
-        keep_hugepages = false
-        shared         = 0
-    }
+  memory {
+    dedicated      = 8192
+    floating       = 0
+    keep_hugepages = false
+    shared         = 0
+  }
 
-    network_device {
-        bridge       = "vmbr1"
-        disconnected = false
-        enabled      = true
-        firewall     = false
-        model        = "virtio"
-        mtu          = 0
-        queues       = 0
-        rate_limit   = 0
-        vlan_id      = 0
-    }
+  network_device {
+    bridge       = "vmbr1"
+    disconnected = false
+    enabled      = true
+    firewall     = false
+    model        = "virtio"
+    mtu          = 0
+    queues       = 0
+    rate_limit   = 0
+    vlan_id      = 0
+  }
 
-    network_device {
-        bridge       = "vmbr1"
-        disconnected = true
-        enabled      = true
-        firewall     = false
-        model        = "virtio"
-        mtu          = 0
-        queues       = 0
-        rate_limit   = 0
-        vlan_id      = 0
-    }
+  network_device {
+    bridge       = "vmbr1"
+    disconnected = true
+    enabled      = true
+    firewall     = false
+    model        = "virtio"
+    mtu          = 0
+    queues       = 0
+    rate_limit   = 0
+    vlan_id      = 0
+  }
 
-    on_boot                 = false
+  on_boot = false
 
-    operating_system {
-        type = "l26"
-    }
+  operating_system {
+    type = "l26"
+  }
 
-    reboot                  = false
-    reboot_after_update     = false
-    serial_device {}
+  reboot              = false
+  reboot_after_update = false
+  serial_device {}
 
-    tpm_state {
-        datastore_id      = "local-lvm"
-        version           = "v2.0"
-    }
-
-    vga {
-      type = "qxl"
-    }
+  tpm_state {
+    datastore_id = "local-lvm"
+    version      = "v2.0"
+  }
 }
 
 resource "proxmox_virtual_environment_vm" "bioshosts" {
   lifecycle {
     ignore_changes = [mac_addresses]
   }
-    for_each    = { for vm in var.bios_hosts : vm.hostname => vm }
-    acpi                    = true
-    bios                    = "seabios"
-    mac_addresses           = []
-    machine                 = "q35"
-    name                    = each.key
-    node_name               = each.value.pve_node
-    protection              = false
-    scsi_hardware           = "virtio-scsi-single"
-    started                 = false
-    tablet_device           = true
-    tags                    = []
-    template                = false
-    vm_id                   = each.value.vm_id
+  for_each      = { for vm in var.bios_hosts : vm.hostname => vm }
+  acpi          = true
+  bios          = "seabios"
+  description   = "Managed by Terraform"
+  mac_addresses = []
+  machine       = "q35"
+  name          = each.key
+  node_name     = each.value.pve_node
+  protection    = false
+  scsi_hardware = "virtio-scsi-single"
+  started       = false
+  tablet_device = true
+  tags          = ["${terraform.workspace}"]
+  template      = false
+  vm_id         = each.value.vm_id
 
-    cpu {
-        cores      = 2
-        flags      = []
-        hotplugged = 0
-        limit      = 0
-        numa       = false
-        sockets    = 1
-        type       = "x86-64-v2-AES"
-        units      = 1024
-    }
+  cpu {
+    cores      = 2
+    flags      = []
+    hotplugged = 0
+    limit      = 0
+    numa       = false
+    sockets    = 1
+    type       = "x86-64-v2-AES"
+    units      = 1024
+  }
 
-    disk {
-        aio               = "io_uring"
-        backup            = false
-        cache             = "none"
-        datastore_id      = "local-lvm"
-        discard           = "on"
-        file_format       = "raw"
-        interface         = "scsi0"
-        iothread          = true
-        #path_in_datastore = "vm-205-disk-0"
-        replicate         = true
-        size              = 32
-        ssd               = true
-    }
+  disk {
+    aio          = "io_uring"
+    backup       = false
+    cache        = "none"
+    datastore_id = "local-lvm"
+    discard      = "on"
+    file_format  = "raw"
+    interface    = "scsi0"
+    iothread     = true
+    #path_in_datastore = "vm-205-disk-0"
+    replicate = true
+    size      = 32
+    ssd       = true
+  }
 
-    memory {
-        dedicated      = 8192
-        floating       = 0
-        keep_hugepages = false
-        shared         = 0
-    }
+  memory {
+    dedicated      = 8192
+    floating       = 0
+    keep_hugepages = false
+    shared         = 0
+  }
 
-    network_device {
-        bridge       = "vmbr1"
-        disconnected = false
-        enabled      = true
-        firewall     = false
-        model        = "virtio"
-        mtu          = 0
-        queues       = 0
-        rate_limit   = 0
-        vlan_id      = 0
-    }
+  network_device {
+    bridge       = "vmbr1"
+    disconnected = false
+    enabled      = true
+    firewall     = false
+    model        = "virtio"
+    mtu          = 0
+    queues       = 0
+    rate_limit   = 0
+    vlan_id      = 0
+  }
 
-    network_device {
-        bridge       = "vmbr0"
-        disconnected = true
-        enabled      = true
-        firewall     = false
-        model        = "virtio"
-        mtu          = 0
-        queues       = 0
-        rate_limit   = 0
-        vlan_id      = 0
-    }
+  network_device {
+    bridge       = "vmbr0"
+    disconnected = true
+    enabled      = true
+    firewall     = false
+    model        = "virtio"
+    mtu          = 0
+    queues       = 0
+    rate_limit   = 0
+    vlan_id      = 0
+  }
 
-    operating_system {
-        type = "l26"
-    }
+  operating_system {
+    type = "l26"
+  }
 }
