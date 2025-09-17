@@ -34,6 +34,8 @@
     - name: Ensure common packages are installed
       ansible.builtin.apt:
         name:
-          - tshark
+          - vim
+          - curl
+          - apt-transport-https
         cache_valid_time: 300
         lock_timeout: 180

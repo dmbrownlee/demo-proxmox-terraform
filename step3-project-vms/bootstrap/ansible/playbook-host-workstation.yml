@@ -1,0 +1,14 @@
+---
+- name: Establish baseline for the host
+  hosts: all
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
+  tasks:
+    - name: Ensure workstation packages are installed
+      ansible.builtin.apt:
+        name:
+          - gnome
+          - tshark
+        cache_valid_time: 300
+        lock_timeout: 180
