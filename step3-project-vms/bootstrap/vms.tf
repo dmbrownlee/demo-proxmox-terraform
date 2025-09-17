@@ -194,7 +194,8 @@ resource "proxmox_virtual_environment_vm" "admin_laptop" {
     order = 1
   }
   vga {
-    type = "qxl"
+    memory = 512
+    type = "std"
   }
 }
 
