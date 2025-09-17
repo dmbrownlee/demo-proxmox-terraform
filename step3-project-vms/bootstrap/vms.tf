@@ -209,6 +209,9 @@ resource "ansible_host" "admin_laptop" {
 }
 
 resource "proxmox_virtual_environment_vm" "uefihosts" {
+  lifecycle {
+    ignore_changes = [mac_addresses]
+  }
     for_each    = { for vm in var.uefi_hosts : vm.hostname => vm }
     acpi                    = true
     bios                    = "ovmf"
@@ -315,6 +318,9 @@ resource "proxmox_virtual_environment_vm" "uefihosts" {
 }
 
 resource "proxmox_virtual_environment_vm" "bioshosts" {
+  lifecycle {
+    ignore_changes = [mac_addresses]
+  }
     for_each    = { for vm in var.bios_hosts : vm.hostname => vm }
     acpi                    = true
     bios                    = "seabios"
