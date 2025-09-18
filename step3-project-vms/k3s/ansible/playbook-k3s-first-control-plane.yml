@@ -120,6 +120,8 @@
               additionalArguments:
                 - "--api.dashboard=true"
                 - "--api.insecure=true"
+                - "--entrypoints.web.transport.respondingTimeouts.readTimeout=0s"
+                - "--entrypoints.websecure.transport.respondingTimeouts.readTimeout=0s"
               ports:
                 metrics:
                   port: 9100
