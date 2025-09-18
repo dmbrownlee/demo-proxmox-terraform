@@ -9,6 +9,17 @@
       ansible.builtin.apt:
         name:
           - gnome
+          - linux-image-amd64
           - tshark
         cache_valid_time: 300
         lock_timeout: 180
+    - name: Ensure the grub timeout provides enough time to pick correct kernel
+      ansible.builtin.lineinfile:
+        path: /etc/default/grub.d/15_timeout.cfg
+        regexp: '^GRUB_TIMEOUT=.*$'
+        line: GRUB_TIMEOUT=30
+      register: grub_timeout
+    - name: Ensure grub is updated if the timeout changed
+      ansible.builtin.command:
+        cmd: update-grub
+      when: grub_timeout.changed
