@@ -100,4 +100,5 @@ resource "proxmox_virtual_environment_vm" "lab_vms" {
   vga {
     type = "qxl"
   }
+  started = false
 }
