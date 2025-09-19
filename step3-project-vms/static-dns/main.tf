@@ -4,11 +4,11 @@
 # numbers are updated).  The '~>' notation is like >= except that the actual
 # version must have the same major number.
 terraform {
-  required_version = "~> 1.8.8"
+  required_version = "~> 1.9.1"
   required_providers {
     dns = {
       source  = "hashicorp/dns"
-      version = "~> 3.4.2"
+      version = "~> 3.4.3"
     }
   }
 }
