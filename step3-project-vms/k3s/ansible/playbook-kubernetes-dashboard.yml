@@ -1,0 +1,30 @@
+---
+- name: Install the kubernetes dashboard into the cluster
+  hosts: k3s_first_control_plane
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
+  tasks:
+    - name: Ensure the helm repo for the kubernetes dashboard is added
+      kubernetes.core.helm_repository:
+        name: kubernetes-dashboard
+        repo_url: "https://kubernetes.github.io/dashboard"
+    - name: Ensure the kubernetes dashboard helm chart is installed
+      kubernetes.core.helm:
+        name: kubernetes-dashboard
+        chart_ref: kubernetes-dashboard/kubernetes-dashboard
+        release_namespace: kubernetes-dashboard
+        create_namespace: true
+        values:
+          kong:
+            proxy:
+              type: NodePort
+        wait: true
+    - name: Ensure the kubernetes-dashboard RBAC configuration has been applied
+      kubernetes.core.k8s:
+        state: present
+        template: rbac-kubernetes-dashboard.yml.j2
+    - name: Ensure the kubernetes-dashboard access token exists
+      kubernetes.core.k8s:
+        state: present
+        template: secret-kubernetes-dashboard.yml.j2

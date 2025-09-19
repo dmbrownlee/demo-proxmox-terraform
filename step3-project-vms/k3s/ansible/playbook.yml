@@ -21,5 +21,7 @@
 - import_playbook: playbook-longhorn.yml
 - import_playbook: playbook-cnpg.yml
 - import_playbook: playbook-prometheus.yml
+- import_playbook: playbook-kubernetes-dashboard.yml
+  when: install_kubernetes_dashboard
 
 # Optional apps have been moved to playbook-apps.yml
