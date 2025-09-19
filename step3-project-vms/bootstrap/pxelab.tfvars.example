@@ -1,0 +1,115 @@
+###############################################################################
+###############################################################################
+##
+##  Terraform/OpenTofu provider variables
+##
+###############################################################################
+###############################################################################
+#==================== bpg/proxmox ====================
+# Here is where we specify the URL for the web API for the Proxmox cluster.
+endpoint = "https://pve1.example.com:8006/"
+
+# The API Token is the combination of the ID and secret:
+api_token = "terraform@pve!mytoken=12345678-90ab-cdef-1234-567890abcdef"
+
+#==================== hashicorp/dns ====================
+dns_server        = "192.168.1.1"
+dns_key_name      = "update-key."
+dns_key_secret    = "SuperSecretKey+SuperSecretKey+SuperSecretKey="
+dns_key_algorithm = "hmac-sha256"
+
+###############################################################################
+###############################################################################
+##
+##  Workspace-specific values
+##
+###############################################################################
+###############################################################################
+# ansible.tf
+ci_user     = "groot"
+
+# data.tf
+ssh_keystore = "~/.ssh"
+
+#vms.tf
+ci_password = "change_me!"
+vm_template_storage = {
+  node = "pve1"
+  name = "local-lvm"
+}
+
+vlans = [
+  {
+    comment          = "VLAN_10",
+    interface        = "vmbr0"
+    node_name        = "pve1"
+    vlan_id          = 10,
+    ipv4_gateway     = "192.168.1.254",
+    ipv4_dns_servers = ["192.168.1.1"]
+    netblock         = "192.168.1.0/24"
+  },
+  {
+    comment          = "vmbr1",
+    interface        = "vmbr1"
+    node_name        = "pve1"
+    vlan_id          = 0,
+    ipv4_gateway     = "",
+    ipv4_dns_servers = ["192.168.1.1"]
+    netblock         = "192.168.2.0/24"
+  },
+]
+
+admin_laptop = {
+  vm_id            = 200,
+  hostname         = "admin-laptop",
+  domain           = "site1.example.com",
+  pve_node         = "pve1",
+  cloud_init_image = "debian13-genericcloud-20250911"
+  ipv4_address     = "192.168.1.175/24"
+  dns = {
+    zone = "site1.example.com",
+    rr_a = "192.168.1.175"
+  }
+  hardware = {
+    cpu = {
+      cores = 2,
+      type  = "x86-64-v2-AES"
+    }
+    memory = 8192,
+    disks = [
+      {
+        datastore_id = "local-lvm",
+        interface    = "scsi0",
+        size         = 50
+      },
+    ]
+    network_devices = [
+      {
+        interface   = "vmbr0",
+        mac_address = "ca:fe:01:96:f9:01",
+        vlan_id     = 0,
+      },
+      {
+        interface   = "vmbr1",
+        mac_address = "ca:fe:01:96:f9:02",
+        vlan_id     = 0,
+      },
+    ]
+  }
+}
+
+bios_hosts = [
+  {
+    vm_id    = 201,
+    hostname = "bioshost1",
+    pve_node = "pve1",
+  },
+]
+
+uefi_hosts = [
+  {
+    vm_id    = 202,
+    hostname = "uefihost",
+    pve_node = "pve1",
+  },
+]
