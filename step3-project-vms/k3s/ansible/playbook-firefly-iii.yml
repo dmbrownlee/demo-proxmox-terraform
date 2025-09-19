@@ -64,6 +64,12 @@
                   key: ACCESS_SECRET_KEY
 #              wal:
 #                compression: gzip
+    - name: Ensure we ask if the recovery bucket is ready when doing recovery
+      ansible.builtin.pause:
+        prompt: "Does the recovery bucket have the backup you want to restore? (yes/no)"
+      register: confirm_continue
+      failed_when: not (confirm_continue.user_input | bool)
+      when: firefly_recover_db_from_backup
     - name: Ensure a cnpg database exists for firefly (takes a while - waiting up to 10 min.)
       kubernetes.core.k8s:
         state: present
