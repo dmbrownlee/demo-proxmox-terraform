@@ -36,6 +36,7 @@
         name:
           - docker.io
           - docker-compose
+          - rsync
         cache_valid_time: 300
         lock_timeout: 180
     - name: Ensure Portainer has a volume
