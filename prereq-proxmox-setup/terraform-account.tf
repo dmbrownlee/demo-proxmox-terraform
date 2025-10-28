@@ -58,8 +58,6 @@ resource "proxmox_virtual_environment_role" "role_terraform" {
     "VM.GuestAgent.FileSystemMgmt",
     "VM.GuestAgent.FileWrite",
     "VM.GuestAgent.Unrestricted",
-    "VM.GuestAgent.",
-    "VM.GuestAgent.",
     "VM.Migrate",
     "VM.PowerMgmt",
     "VM.Replicate",
