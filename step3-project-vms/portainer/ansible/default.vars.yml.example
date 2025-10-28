@@ -6,5 +6,9 @@
 # (e.g. apt-cacher-ng on Debian) will speed things up.
 use_apt_proxy: false
 apt_proxy_url: "http://aptcache.exammple.com:3142"
+docker_network:
+  name: SERVER_VLAN
+  subnet: 192.168.1.0/24
+  gateway: 192.168.1.254
 
 

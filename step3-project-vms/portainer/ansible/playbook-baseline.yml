@@ -47,7 +47,7 @@
         name: portainer
     - name: Ensure an ipvlan network exists
       docker_network:
-        name: SERVER_VLAN
+        name: "{{ docker_network.name }}"
         attachable: false
         driver: ipvlan
         driver_options:
@@ -55,8 +55,8 @@
         enable_ipv6: false
         internal: false
         ipam_config:
-          - subnet: 10.48.16.0/24
-            gateway: 10.48.16.254
+          - subnet: "{{ docker_network.subnet }}"
+            gateway: "{{ docker_network.gateway }}"
         scope: local
     - name: Ensure Portainer is deployed
       community.docker.docker_container:
