@@ -24,8 +24,8 @@ iso_storage = {
 # Each cloud-init entry specifies its download URL and the local file name to
 # save it as.
 cloud_init_images = {
-  noble-server-cloudimg-amd64-20250211 = {
-    url       = "https://cloud-images.ubuntu.com/noble/20250211/noble-server-cloudimg-amd64.img",
-    file_name = "noble-server-cloudimg-amd64-20250211.img",
+  noble-server-cloudimg-amd64-20251026 = {
+    url       = "https://cloud-images.ubuntu.com/noble/20251026/noble-server-cloudimg-amd64.img",
+    file_name = "noble-server-cloudimg-amd64-20251026.img",
   },
 }

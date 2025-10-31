@@ -8,11 +8,11 @@
 # id to use.
 
 vm_templates = {
-  noble-server-cloudimg-amd64-20250211 = {
+  noble-server-cloudimg-amd64-20251026 = {
     vm_id     = 989,
-    file_name = "local-lvm:iso/noble-server-cloudimg-amd64-20250211.img",
+    file_name = "local-lvm:iso/noble-server-cloudimg-amd64-20251026.img",
     node_name = "pve1"
     datastore = "local-lvm"
-    disk_size = 4,
+    disk_size = 20,
   },
 }
