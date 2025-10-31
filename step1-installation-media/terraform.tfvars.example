@@ -1,0 +1,8 @@
+#==========================================
+# Proxmox connectivity and authentication
+#==========================================
+# Here is where we specify the URL for the web API for the Proxmox cluster.
+endpoint = "https://pve1.example.com:8006/"
+
+# The API Token is the combination of the ID and secret:
+api_token = "terraform@pve!demo=12345678-90ab-cdef-1234-567890abcdef"
