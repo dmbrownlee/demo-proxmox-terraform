@@ -144,7 +144,7 @@
       when: inventory_hostname in groups["k8s_control_plane_nodes"]
     - name: Ensure helm is installed
       ansible.builtin.unarchive:
-        src: https://get.helm.sh/helm-v3.14.3-linux-amd64.tar.gz
+        src: "{{ helm_url }}"
         dest: /usr/local/bin
         remote_src: yes
         owner: root
@@ -153,15 +153,6 @@
         extra_opts:
           - --strip-components=1
         creates: /usr/local/bin/helm
-    # - name: Ensure command completion for kubectl and helm are setup in bashrc file
-    #   ansible.builtin.blockinfile:
-    #     path: /home/ansible/.bashrc
-    #     block: |
-    #       export KUBECONFIG=$HOME/.kube/config
-    #       source <(kubectl completion bash)
-    #       source <(helm completion bash)
-    #       alias k="kubectl"
-    #       complete -o default -F __start_kubectl k
     - name: Ensure command completion for CLI commands are setup for root
       ansible.builtin.blockinfile:
         path: /root/.bashrc
