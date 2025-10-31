@@ -1,0 +1,28 @@
+---
+- name: Ensure the default kernel is installed
+  ansible.builtin.apt:
+    name:
+      - linux-image-amd64
+    cache_valid_time: 300
+    lock_timeout: 180
+  failed_when: false
+- name: Ensure the cloud-init kernel is removed
+  ansible.builtin.apt:
+    name:
+      - linux-image-*cloud-amd64
+    state: absent
+  failed_when: false
+  register: kernel
+- name: Ensure the laptop is rebooted when the kernel has changed
+  ansible.builtin.reboot:
+  when: kernel.changed
+- name: Ensure workstation packages are installed
+  ansible.builtin.apt:
+    name:
+      - gnome
+    cache_valid_time: 300
+    lock_timeout: 180
+  register: target_runlevel
+- name: Ensure the laptop is rebooted if the runlevel target has changed
+  ansible.builtin.reboot:
+  when: target_runlevel.changed

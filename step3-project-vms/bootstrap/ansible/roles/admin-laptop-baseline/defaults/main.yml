@@ -1,0 +1,5 @@
+---
+admin_user_username: admin
+admin_user_gid: 1001
+admin_user_uid: 1001
+admin_user_shell: /bin/bash

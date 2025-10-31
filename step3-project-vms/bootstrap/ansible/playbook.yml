@@ -1,21 +1,33 @@
 ---
-# This top level playbook is only for including smaller playbooks which can be
-# developed and tested separately before adding them here.  The included
-# playbooks can (and do) use "${{ tf_workspace }}.vars.yml" as a vars-file so
-# that you can have different variable files for each workspace allowing you
-# to use the same playbooks for multiple projects.  When you run the
-# ansible-playbook command, be sure to use the -e option to pass a value for
-# tf_workspace.
-#
-# example:
-# ansible-playbook -e tf_workspace=$(tofu workspace show) ansible/playbook.yml
-#
-- import_playbook: playbook-host-baseline.yml
-- import_playbook: playbook-host-workstation.yml
-- import_playbook: playbook-configure-firewall.yml
-- import_playbook: playbook-configure-networking.yml
-- import_playbook: playbook-dns.yml
-- import_playbook: playbook-dhcp.yml
-- import_playbook: playbook-netbootxyz.yml
-
-# Optional apps have been moved to playbook-apps.yml
+- name: Configure admin laptop
+  hosts: admin_laptop
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
+  roles:
+    - admin-laptop-baseline
+    - gnome-workstation
+- name: Add admin laptop users
+  hosts: admin_laptop
+  vars_files:
+    - "{{ tf_workspace }}.vars.yml"
+  become: true
+  tasks:
+    - name: Ensure admin user's group exists
+      ansible.builtin.group:
+        name: "{{ admin_account_username }}"
+        gid: "{{ admin_account_gid }}"
+    - name: Ensure admin user's account exists
+      ansible.builtin.user:
+        name: "{{ admin_account_username }}"
+        uid: "{{ admin_account_uid }}"
+        group: "{{ admin_account_username }}"
+        shell: "{{ admin_account_shell }}"
+        groups: sudo
+        append: yes
+        password: "{{ admin_account_initial_password | password_hash('sha256','random42') }}"
+        update_password: on_create
+      register: admin_account
+    - name: Ensure admin account's password is expired if it was just created
+      ansible.builtin.command: chage -d 0 "{{ admin_account_username }}"
+      when: admin_account.changed
