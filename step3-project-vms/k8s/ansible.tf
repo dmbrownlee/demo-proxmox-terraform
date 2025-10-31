@@ -26,6 +26,7 @@ inventory=.terraform-dynamic-inventory.yml
 remote_user=${var.ci_user}
 host_key_checking=false
 stdout_callback=debug
+interpreter_python=/usr/bin/python3
 EOF
 }
 
