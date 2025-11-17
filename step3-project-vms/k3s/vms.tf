@@ -65,6 +65,7 @@ resource "proxmox_virtual_environment_vm" "k3s_initial_cp" {
   tags        = ["${terraform.workspace}", each.value.cloud_init_image]
   node_name   = each.value.pve_node
   vm_id       = each.value.vm_id
+  started     = true
 
   clone {
     datastore_id = var.vm_template_storage.name
@@ -120,7 +121,7 @@ resource "proxmox_virtual_environment_vm" "k3s_initial_cp" {
       vlan_id     = network_device.value.vlan_id
     }
   }
-  on_boot = true
+  on_boot = false
   connection {
     type  = "ssh"
     user  = var.ci_user
@@ -152,6 +153,7 @@ resource "proxmox_virtual_environment_vm" "k3s_servers" {
   tags        = ["${terraform.workspace}", each.value.cloud_init_image]
   node_name   = each.value.pve_node
   vm_id       = each.value.vm_id
+  started     = true
 
   clone {
     datastore_id = var.vm_template_storage.name
@@ -207,7 +209,7 @@ resource "proxmox_virtual_environment_vm" "k3s_servers" {
       vlan_id     = network_device.value.vlan_id
     }
   }
-  on_boot = true
+  on_boot = false
   connection {
     type  = "ssh"
     user  = var.ci_user
@@ -239,6 +241,7 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
   tags        = ["${terraform.workspace}", each.value.cloud_init_image]
   node_name   = each.value.pve_node
   vm_id       = each.value.vm_id
+  started     = true
 
   clone {
     datastore_id = var.vm_template_storage.name
@@ -294,7 +297,7 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
       vlan_id     = network_device.value.vlan_id
     }
   }
-  on_boot = true
+  on_boot = false
   connection {
     type  = "ssh"
     user  = var.ci_user
@@ -327,6 +330,7 @@ resource "proxmox_virtual_environment_vm" "k3s_db_workers" {
   tags        = ["${terraform.workspace}", each.value.cloud_init_image]
   node_name   = each.value.pve_node
   vm_id       = each.value.vm_id
+  started     = true
 
   clone {
     datastore_id = var.vm_template_storage.name
@@ -382,7 +386,7 @@ resource "proxmox_virtual_environment_vm" "k3s_db_workers" {
       vlan_id     = network_device.value.vlan_id
     }
   }
-  on_boot = true
+  on_boot = false
   connection {
     type  = "ssh"
     user  = var.ci_user
