@@ -88,7 +88,7 @@ minio_secret_key: secretaccesskey0000000000000000000000000
 ################################################################################
 
 install_immich: true
-immich_version: "v1.142.0"
+immich_version: "v2.2.3"
 immich_recover_db_from_backup: false  # "true" if recovering from a backup
 immich_cnpg_imagename: "dmbrownlee/cloudnative-vectorchord:17-0.4.3"
 immich_db_name: immich
@@ -110,7 +110,7 @@ firefly_db_size: 8Gi
 firefly_attachment_storage_size: 1Gi
 
 install_wger: true
-wger_version: "0.2.4-rc.1"
+wger_version: "0.2.4"
 wger_recover_db_from_backup: false  # "true" if recovering from a backup
 wger_db_name: wger
 wger_db_hostname: wger-rw
