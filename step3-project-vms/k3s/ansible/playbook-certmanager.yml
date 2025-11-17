@@ -13,10 +13,6 @@
       kubernetes.core.k8s:
         state: present
         src: https://github.com/cert-manager/cert-manager/releases/download/v1.16.2/cert-manager.crds.yaml
-    - name: Ensure the cluster CA is configured
-      kubernetes.core.k8s:
-        state: present
-        template: ca.yml.j2
     - name: Ensure the cert-manager helm chart is installed
       kubernetes.core.helm:
         name: cert-manager
@@ -24,6 +20,10 @@
         release_namespace: cert-manager
         create_namespace: true
         wait: true
+    - name: Ensure the cluster CA is configured
+      kubernetes.core.k8s:
+        state: present
+        template: ca.yml.j2
 - name: Install cert-manager CLI on the first control plane node
   hosts: k3s_first_control_plane
   vars_files:
