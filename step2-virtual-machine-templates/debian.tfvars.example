@@ -8,18 +8,18 @@
 # id to use.
 
 vm_templates = {
-  debian13-genericcloud-20250806 = {
-    file_name = "local-lvm:iso/debian-13-genericcloud-amd64-20250806.qcow2.img",
-    node_name = "pve1"
-    vm_id     = 998,
-    datastore = "local-lvm"
-    disk_size = 4,
-  },
   debian13-genericcloud-20250911 = {
     file_name = "local-lvm:iso/debian-13-genericcloud-amd64-20250911.qcow2.img",
     node_name = "pve1"
-    vm_id     = 999,
+    vm_id     = 991,
     datastore = "local-lvm"
-    disk_size = 4,
+    disk_size = 50,
+  },
+  debian13-genericcloud-20251006 = {
+    file_name = "local-lvm:iso/debian-13-genericcloud-amd64-20251006.qcow2.img",
+    node_name = "pve1"
+    vm_id     = 992,
+    datastore = "local-lvm"
+    disk_size = 50,
   },
 }
