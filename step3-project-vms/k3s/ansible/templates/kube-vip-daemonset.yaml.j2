@@ -13,7 +13,7 @@ metadata:
   creationTimestamp: null
   labels:
     app.kubernetes.io/name: kube-vip-ds
-    app.kubernetes.io/version: v0.7.2
+    app.kubernetes.io/version: "{{ kube_vip_tag }}"
   name: kube-vip-ds
   namespace: kube-system
 spec:
@@ -25,7 +25,7 @@ spec:
       creationTimestamp: null
       labels:
         app.kubernetes.io/name: kube-vip-ds
-        app.kubernetes.io/version: v0.7.2
+        app.kubernetes.io/version: "{{ kube_vip_tag }}"
     spec:
       affinity:
         nodeAffinity:
@@ -79,7 +79,7 @@ spec:
           value: "6443"
         - name: lb_fwdmethod
           value: local
-        image: ghcr.io/kube-vip/kube-vip:v0.7.2
+        image: ghcr.io/kube-vip/kube-vip:{{ kube_vip_tag }}
         imagePullPolicy: Always
         name: kube-vip
         resources: {}
