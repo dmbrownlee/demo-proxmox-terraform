@@ -1,6 +1,7 @@
 ---
 - name: Configure worker nodes
   hosts: k3s_worker_nodes
+  serial: 1
   vars_files:
     - "{{ tf_workspace }}.vars.yml"
   environment:
@@ -21,3 +22,6 @@
         state: started
         enabled: true
         daemon_reload: true
+    - name: Pause between hosts
+      ansible.builtin.pause:
+        seconds: 10
