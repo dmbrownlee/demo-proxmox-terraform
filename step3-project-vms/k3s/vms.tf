@@ -26,7 +26,8 @@ variable "vms" {
     role             = string,
     pve_node         = string,
     cloud_init_image = string,
-    ipv4_address     = string
+    ipv4_address     = string,
+    on_boot          = bool,
     hardware = object({
       cpu = object({
         cores = number,
@@ -121,7 +122,7 @@ resource "proxmox_virtual_environment_vm" "k3s_initial_cp" {
       vlan_id     = network_device.value.vlan_id
     }
   }
-  on_boot = false
+  on_boot = each.value.on_boot
   connection {
     type  = "ssh"
     user  = var.ci_user
@@ -209,7 +210,7 @@ resource "proxmox_virtual_environment_vm" "k3s_servers" {
       vlan_id     = network_device.value.vlan_id
     }
   }
-  on_boot = false
+  on_boot = each.value.on_boot
   connection {
     type  = "ssh"
     user  = var.ci_user
@@ -297,7 +298,7 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
       vlan_id     = network_device.value.vlan_id
     }
   }
-  on_boot = false
+  on_boot = each.value.on_boot
   connection {
     type  = "ssh"
     user  = var.ci_user
@@ -386,7 +387,7 @@ resource "proxmox_virtual_environment_vm" "k3s_db_workers" {
       vlan_id     = network_device.value.vlan_id
     }
   }
-  on_boot = false
+  on_boot = each.value.on_boot
   connection {
     type  = "ssh"
     user  = var.ci_user

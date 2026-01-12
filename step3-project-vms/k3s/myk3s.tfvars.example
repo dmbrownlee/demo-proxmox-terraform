@@ -38,7 +38,7 @@ k3s_cnames            = [
 ]
 
 enable_live_cnames = true
-enable_dev_cnames = false
+enable_dev_cnames  = false
 
 
 ###############################################################################
@@ -175,6 +175,7 @@ vms = [
     pve_node         = "pve1",
     cloud_init_image = "debian13-genericcloud-20250911"
     ipv4_address     = "192.168.1.81/24"
+    on_boot          = true
     hardware = {
       cpu = {
         cores = 2,
@@ -204,6 +205,7 @@ vms = [
     pve_node         = "pve2",
     cloud_init_image = "debian13-genericcloud-20250911"
     ipv4_address     = "192.168.1.82/24"
+    on_boot          = true
     hardware = {
       cpu = {
         cores = 2,
@@ -233,6 +235,7 @@ vms = [
     pve_node         = "pve3",
     cloud_init_image = "debian13-genericcloud-20250911"
     ipv4_address     = "192.168.1.83/24"
+    on_boot          = true
     hardware = {
       cpu = {
         cores = 2,
@@ -262,6 +265,7 @@ vms = [
     pve_node         = "pve1",
     cloud_init_image = "debian13-genericcloud-20250911"
     ipv4_address     = "192.168.1.84/24"
+    on_boot          = true
     hardware = {
       cpu = {
         cores = 2,
@@ -291,6 +295,7 @@ vms = [
     pve_node         = "pve2",
     cloud_init_image = "debian13-genericcloud-20250911"
     ipv4_address     = "192.168.1.85/24"
+    on_boot          = true
     hardware = {
       cpu = {
         cores = 2,
@@ -320,6 +325,7 @@ vms = [
     pve_node         = "pve3",
     cloud_init_image = "debian13-genericcloud-20250911"
     ipv4_address     = "192.168.1.86/24"
+    on_boot          = true
     hardware = {
       cpu = {
         cores = 2,
