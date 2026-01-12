@@ -164,6 +164,16 @@ resource "proxmox_virtual_environment_vm" "portainer" {
 }
 
 
+resource "proxmox_virtual_environment_haresource" "portainer" {
+  depends_on = [
+    resource.proxmox_virtual_environment_vm.portainer
+  ]
+  for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "portainer" }
+  resource_id = "vm:${each.value.vm_id}"
+  state       = "started"
+}
+
+
 resource "ansible_group" "portainer" {
   name = "portainer"
   variables = {
