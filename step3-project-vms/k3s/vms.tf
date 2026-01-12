@@ -28,20 +28,20 @@ variable "vms" {
     cloud_init_image = string,
     ipv4_address     = string
     hardware = object({
-      cpu       = object({
+      cpu = object({
         cores = number,
         type  = string,
       })
-      disks     = list(object({
+      disks = list(object({
         datastore_id = string,
         interface    = string,
         size         = number
       }))
-      memory    = number
+      memory = number
       network_devices = list(object({
-        interface    = string,
-        mac_address  = string,
-        vlan_id      = number,
+        interface   = string,
+        mac_address = string,
+        vlan_id     = number,
       }))
     })
   }))
