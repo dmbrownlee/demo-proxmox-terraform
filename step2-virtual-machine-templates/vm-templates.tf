@@ -62,7 +62,7 @@ resource "proxmox_virtual_environment_vm" "vm_templates" {
   }
 
   initialization {
-    datastore_id = "local-lvm"
+    datastore_id = each.value.datastore
     ip_config {
       ipv4 {
         address = "dhcp"
