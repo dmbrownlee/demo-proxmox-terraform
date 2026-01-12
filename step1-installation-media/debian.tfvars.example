@@ -24,12 +24,12 @@ iso_storage = {
 # Each cloud-init entry specifies its download URL and the local file name to
 # save it as.
 cloud_init_images = {
-  debian13-genericcloud-20250911 = {
-    url       = "https://cloud.debian.org/images/cloud/trixie/20250911-2232/debian-13-genericcloud-amd64-20250911-2232.qcow2",
-    file_name = "debian-13-genericcloud-amd64-20250911.qcow2.img",
-  },
   debian13-genericcloud-20251006 = {
     url       = "https://cloud.debian.org/images/cloud/trixie/20251006-2257/debian-13-genericcloud-amd64-20251006-2257.qcow2",
     file_name = "debian-13-genericcloud-amd64-20251006.qcow2.img",
+  },
+  debian13-genericcloud-20251117 = {
+    url       = "https://cloud.debian.org/images/cloud/trixie/20251117-2299/debian-13-genericcloud-amd64-20251117-2299.qcow2",
+    file_name = "debian-13-genericcloud-amd64-20251117.qcow2.img",
   },
 }
