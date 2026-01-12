@@ -40,6 +40,22 @@
         path: /etc/apt/apt.conf.d/00aptproxy
         state: absent
       when: not use_apt_proxy
+    - name: Ensure package cache is updated
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      register: apt_update
+      until: apt_update is success
+      retries: 10
+      delay: 30
+    - name: Ensure default system packages are up to date
+      ansible.builtin.apt:
+        upgrade: yes
+        autoclean: yes
+      register: apt_upgrade
+      until: apt_upgrade is success
+      retries: 10
+      delay: 30
     - name: Ensure common packages are installed
       ansible.builtin.apt:
         name:
