@@ -48,7 +48,8 @@ variable "vms" {
     role             = string,
     pve_node         = string,
     cloud_init_image = string,
-    ipv4_address     = string
+    ipv4_address     = string,
+    on_boot          = bool,
     hardware = object({
       cpu = object({
         cores = number,
@@ -59,6 +60,9 @@ variable "vms" {
         interface    = string,
         size         = number
       }))
+      initialization = object({
+        datastore_id = string,
+      })
       memory = number
       network_devices = list(object({
         interface   = string,
@@ -87,6 +91,7 @@ resource "proxmox_virtual_environment_vm" "portainer" {
   tags        = ["${terraform.workspace}", each.value.cloud_init_image]
   node_name   = each.value.pve_node
   vm_id       = each.value.vm_id
+  started     = true
 
   clone {
     datastore_id = var.vm_template_storage.name
@@ -112,8 +117,7 @@ resource "proxmox_virtual_environment_vm" "portainer" {
     }
   }
   initialization {
-    #datastore_id = var.vm_storage
-    datastore_id = "local-lvm"
+    datastore_id = each.value.hardware.initialization.datastore_id
     dns {
       servers = var.vlans[index(var.vlans.*.vlan_id, each.value.hardware.network_devices[0].vlan_id)].ipv4_dns_servers
       domain  = each.value.domain
@@ -142,7 +146,7 @@ resource "proxmox_virtual_environment_vm" "portainer" {
       vlan_id     = network_device.value.vlan_id
     }
   }
-  on_boot = true
+  on_boot = each.value.on_boot
   connection {
     type  = "ssh"
     user  = var.ci_user

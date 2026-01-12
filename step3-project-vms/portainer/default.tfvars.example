@@ -1,27 +1,6 @@
 ###############################################################################
 ###############################################################################
 ##
-##  Proxmox
-##
-###############################################################################
-###############################################################################
-# Here is where we specify the URL for the web API for the Proxmox cluster.
-endpoint = "https://pve1.example.com:8006/"
-
-# The API Token is the combination of the ID and secret:
-api_token = "terraform@pve!mytoken=12345678-90ab-cdef-1234-567890abcdef"
-
-# This is the Proxmox storage location for VM template images that will
-# get cloned rather then VMs.
-vm_template_storage = {
-  node = "pve1",
-  name = "local-lvm"
-}
-
-
-###############################################################################
-###############################################################################
-##
 ##  DNS
 ##
 ###############################################################################
@@ -81,6 +60,27 @@ ssh_keystore = "~/keys"
 ###############################################################################
 ###############################################################################
 ##
+##  Proxmox
+##
+###############################################################################
+###############################################################################
+# Here is where we specify the URL for the web API for the Proxmox cluster.
+endpoint = "https://pve1.example.com:8006/"
+
+# The API Token is the combination of the ID and secret:
+api_token = "terraform@pve!mytoken=12345678-90ab-cdef-1234-567890abcdef"
+
+# This is the Proxmox storage location for VM template images that will
+# get cloned rather then VMs.
+vm_template_storage = {
+  node = "pve1",
+  name = "local-lvm"
+}
+
+
+###############################################################################
+###############################################################################
+##
 ##  VLANs
 ##
 ###############################################################################
@@ -134,8 +134,9 @@ vms = [
     domain           = "example.com",
     role             = "portainer",
     pve_node         = "pve1",
-    cloud_init_image = "debian13-genericcloud-20250806"
+    cloud_init_image = "debian13-genericcloud-20251117"
     ipv4_address     = "192.168.1.99/24"
+    on_boot          = true
     hardware = {
       cpu = {
         cores = 2,
@@ -149,6 +150,9 @@ vms = [
           size         = 50
         },
       ]
+      initialization = {
+        datastore_id = "local-lvm"
+      }
       network_devices = [
         {
           interface   = "vmbr0",
