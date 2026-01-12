@@ -20,10 +20,24 @@ terraform {
     }
     proxmox = {
       source  = "bpg/proxmox"
-      version = "~> 0.83.2"
+      version = "~> 0.93.0"
     }
   }
 }
+
+# This block configures the hashicorp/dns provider.  The dns_server variable is
+# the IP address of the bind9 server that accepts dynamic updates and the key_*
+# variables are for the key generated with tsig-genkey and added to the
+# named.conf.
+provider "dns" {
+  update {
+    server        = var.dns_server
+    key_name      = var.dns_key_name
+    key_algorithm = var.dns_key_algorithm
+    key_secret    = var.dns_key_secret
+  }
+}
+
 
 # This block configures the bpg/proxmox provider.  The variables for endpoint,
 # rootaccount, and rootpassword are defined in the variables.tf file.  The
@@ -53,13 +67,3 @@ provider "proxmox" {
     username = "root"
   }
 }
-
-provider "dns" {
-  update {
-    server        = var.dns_server
-    key_name      = var.dns_key_name
-    key_algorithm = var.dns_key_algorithm
-    key_secret    = var.dns_key_secret
-  }
-}
-

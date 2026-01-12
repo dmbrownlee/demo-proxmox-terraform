@@ -16,10 +16,11 @@ terraform {
     }
     proxmox = {
       source  = "bpg/proxmox"
-      version = "~> 0.83.2"
+      version = "~> 0.93.0"
     }
   }
 }
+
 
 # This block configures the bpg/proxmox provider.  The variables for endpoint,
 # rootaccount, and rootpassword are defined in the variables.tf file.  The
