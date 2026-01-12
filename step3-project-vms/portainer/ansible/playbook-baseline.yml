@@ -61,7 +61,7 @@
     - name: Ensure Portainer is deployed
       community.docker.docker_container:
         name: portainer
-        image: portainer/portainer-ce:lts
+        image: portainer/portainer-ce:{{ portainer_tag }}
         state: started
         detach: true
         restart_policy: unless-stopped

@@ -10,5 +10,5 @@ docker_network:
   name: SERVER_VLAN
   subnet: 192.168.1.0/24
   gateway: 192.168.1.254
-
-
+#portainer_tag: "2.27.3-linux-amd64"
+portainer_tag: "lts"
