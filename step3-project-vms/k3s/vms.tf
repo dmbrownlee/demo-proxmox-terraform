@@ -147,6 +147,15 @@ resource "proxmox_virtual_environment_vm" "k3s_initial_cp" {
   }
 }
 
+resource "proxmox_virtual_environment_haresource" "k3s_initial_cp" {
+  depends_on = [
+    resource.proxmox_virtual_environment_vm.k3s_initial_cp
+  ]
+  for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_initial_cp" }
+  resource_id = "vm:${each.value.vm_id}"
+  state       = "started"
+}
+
 resource "proxmox_virtual_environment_vm" "k3s_servers" {
   depends_on = [
     resource.dns_a_record_set.k3s_servers,
@@ -236,6 +245,15 @@ resource "proxmox_virtual_environment_vm" "k3s_servers" {
   }
 }
 
+resource "proxmox_virtual_environment_haresource" "k3s_servers" {
+  depends_on = [
+    resource.proxmox_virtual_environment_vm.k3s_servers
+  ]
+  for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_server" }
+  resource_id = "vm:${each.value.vm_id}"
+  state       = "started"
+}
+
 resource "proxmox_virtual_environment_vm" "k3s_agents" {
   depends_on = [
     resource.dns_a_record_set.k3s_agents,
@@ -323,6 +341,15 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
   vga {
     type = "qxl"
   }
+}
+
+resource "proxmox_virtual_environment_haresource" "k3s_agents" {
+  depends_on = [
+    resource.proxmox_virtual_environment_vm.k3s_agents
+  ]
+  for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "k3s_agent" }
+  resource_id = "vm:${each.value.vm_id}"
+  state       = "started"
 }
 
 
