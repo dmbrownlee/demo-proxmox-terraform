@@ -138,7 +138,9 @@ resource "proxmox_virtual_environment_vm" "k3s_initial_cp" {
     inline = ["hostnamectl"]
   }
   startup {
-    order = 1
+    down_delay = -1
+    order      = 1
+    up_delay   = -1
   }
   vga {
     type = "qxl"
@@ -225,7 +227,9 @@ resource "proxmox_virtual_environment_vm" "k3s_servers" {
     inline = ["hostnamectl"]
   }
   startup {
-    order = 10
+    down_delay = -1
+    order      = 10
+    up_delay   = 30
   }
   vga {
     type = "qxl"
@@ -312,7 +316,9 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
     inline = ["hostnamectl"]
   }
   startup {
-    order = 20
+    down_delay = -1
+    order      = 20
+    up_delay   = 60
   }
   vga {
     type = "qxl"
