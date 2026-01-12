@@ -35,6 +35,11 @@
         line: Acquire::http::Proxy "{{ apt_proxy_url }}";
         create: true
       when: use_apt_proxy
+    - name: Ensure apt is NOT configured to use local caching server
+      ansible.builtin.file:
+        path: /etc/apt/apt.conf.d/00aptproxy
+        state: absent
+      when: not use_apt_proxy
     - name: Ensure common packages are installed
       ansible.builtin.apt:
         name:
