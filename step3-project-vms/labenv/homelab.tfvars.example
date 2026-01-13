@@ -26,7 +26,7 @@ dns_key_algorithm = "hmac-sha256"
 ###############################################################################
 ###############################################################################
 # ansible.tf
-ci_user     = "groot"
+ci_user = "groot"
 
 # data.tf
 ssh_keystore = "~/.ssh"
@@ -59,57 +59,61 @@ vlans = [
   },
 ]
 
-admin_laptop = {
-  vm_id            = 200,
-  hostname         = "admin-laptop",
-  domain           = "site1.example.com",
-  pve_node         = "pve1",
-  cloud_init_image = "debian13-genericcloud-20250911"
-  ipv4_address     = "192.168.1.175/24"
-  dns = {
-    zone = "site1.example.com",
-    rr_a = "192.168.1.175"
-  }
-  hardware = {
-    cpu = {
-      cores = 2,
-      type  = "x86-64-v2-AES"
+laptops = [
+  {
+    vm_id            = 200,
+    hostname         = "admin-laptop",
+    pve_node         = "pve1",
+    iso_image        = "none",
+    boot_order       = ["scsi0", "net0"]
+    bios             = "ovmf"
+    domain           = "site1.example.com",
+    cloud_init_image = "debian13-genericcloud-20251117"
+    ipv4_address     = "192.168.1.175/24"
+    dns = {
+      zone = "site1.example.com",
+      rr_a = "192.168.1.175"
     }
-    memory = 8192,
-    disks = [
-      {
-        datastore_id = "local-lvm",
-        interface    = "scsi0",
-        size         = 50
-      },
-    ]
-    network_devices = [
-      {
-        interface   = "vmbr0",
-        mac_address = "ca:fe:01:96:f9:01",
-        vlan_id     = 0,
-      },
-      {
-        interface   = "vmbr1",
-        mac_address = "ca:fe:01:96:f9:02",
-        vlan_id     = 0,
-      },
-    ]
-  }
+    hardware = {
+      cpu = {
+        cores = 2,
+        type  = "x86-64-v2-AES"
+      }
+      disks = [
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi0",
+          size         = 50
+        },
+      ]
+      memory = 8192,
+      network_devices = [
+        {
+          disconnected = false,
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:01:96:f9:01",
+          vlan_id      = 0,
+        },
+        {
+          disconnected = false,
+          interface    = "vmbr1",
+          mac_address  = "ca:fe:01:96:f9:02",
+          vlan_id      = 0,
+        },
+      ],
+      vga = {
+        memory = 128,
+        type   = "qxl"
+      }
+    }
+  },
+]
+
+vms = []
+
+media_mapping = {
+  comment = "USB Recovery Media"
+  name    = "SanDisk"
+  id      = "1234:1234"
+  node    = "pve1"
 }
-
-bios_hosts = [
-  {
-    vm_id    = 201,
-    hostname = "bioshost1",
-    pve_node = "pve1",
-  },
-]
-
-uefi_hosts = [
-  {
-    vm_id    = 202,
-    hostname = "uefihost",
-    pve_node = "pve1",
-  },
-]

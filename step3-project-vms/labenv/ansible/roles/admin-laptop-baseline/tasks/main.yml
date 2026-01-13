@@ -6,8 +6,12 @@
   ansible.builtin.apt:
     name:
       - apt-transport-https
+      - bash-completion
+      - ca-certificates
       - curl
       - firewalld
+      - git
+      - gnupg
       - neovim
       - network-manager
       - tmux
@@ -68,7 +72,7 @@
     method4: manual
     ip4:
       - "{{ laptop_wan_address }}/{{ networks.WAN.network_prefix }}"
-    #gw4: "{{ networks.wan.network_gateway }}"
+    gw4: "{{ networks.WAN.network_gateway }}"
     zone: external
     state: present
 - name: Ensure the "LAN" connection exists

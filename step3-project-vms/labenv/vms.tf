@@ -40,15 +40,18 @@ variable "vlans" {
   }))
 }
 
-variable "admin_laptop" {
-  description = "A single VM object"
-  type = object({
+variable "laptops" {
+  description = "A list of VMs to be cloned from cloud-init images"
+  type = list(object({
     vm_id            = number,
     hostname         = string,
-    domain           = string,
     pve_node         = string,
+    iso_image        = string,
+    boot_order       = list(string),
     cloud_init_image = string,
     ipv4_address     = string,
+    domain           = string,
+    bios             = string,
     dns = object({
       zone = string,
       rr_a = string,
@@ -63,32 +66,64 @@ variable "admin_laptop" {
         interface    = string,
         size         = number
       }))
-      memory = number
+      memory = number,
       network_devices = list(object({
-        interface   = string,
-        mac_address = string,
-        vlan_id     = number,
+        disconnected = bool,
+        interface    = string,
+        mac_address  = string,
+        vlan_id      = number,
       }))
+      vga = object({
+        memory = number,
+        type   = string,
+      })
     })
+  }))
+}
+
+variable "vms" {
+  description = "A list of VMs to be created without an installed OS"
+  type = list(object({
+    vm_id      = number,
+    hostname   = string,
+    pve_node   = string,
+    iso_image  = string,
+    boot_order = list(string),
+    bios       = string,
+    hardware = object({
+      cpu = object({
+        cores = number,
+        type  = string,
+      })
+      disks = list(object({
+        datastore_id = string,
+        interface    = string,
+        size         = number,
+        serial       = string
+      }))
+      memory = number,
+      network_devices = list(object({
+        disconnected = bool,
+        interface    = string,
+        mac_address  = string,
+        vlan_id      = number,
+      }))
+      vga = object({
+        memory = number,
+        type   = string,
+      })
+    })
+  }))
+}
+
+variable "media_mapping" {
+  description = "A mapping for USB recovery media"
+  type = object({
+    comment = string,
+    name    = string,
+    id      = string,
+    node    = string,
   })
-}
-
-variable "bios_hosts" {
-  description = "A single VM object"
-  type = list(object({
-    vm_id    = number,
-    hostname = string,
-    pve_node = string,
-  }))
-}
-
-variable "uefi_hosts" {
-  description = "A single VM object"
-  type = list(object({
-    vm_id    = number,
-    hostname = string,
-    pve_node = string,
-  }))
 }
 
 ###############################################################################
@@ -98,65 +133,130 @@ variable "uefi_hosts" {
 ##
 ###############################################################################
 ###############################################################################
-resource "dns_a_record_set" "admin_laptop" {
-  zone      = "${var.admin_laptop.dns.zone}."
-  name      = var.admin_laptop.hostname
-  addresses = ["${var.admin_laptop.dns.rr_a}"]
+resource "dns_a_record_set" "laptops" {
+  for_each  = { for vm in var.laptops : vm.hostname => vm }
+  zone      = "${each.value.dns.zone}."
+  name      = each.key
+  addresses = ["${each.value.dns.rr_a}"]
   ttl       = 300
 }
 
-# resource "dns_ptr_record" "admin_laptop" {
-#   zone = "${var.bootstrap_mgmt_dns.reverse_zone}."
-#   name = var.bootstrap_mgmt_dns.ptr_rr
-#   ptr  = "${var.bootstrap_mgmt_dns.hostname}.${var.bootstrap_mgmt_dns.zone}."
-#   ttl  = 300
-# }
 
-resource "proxmox_virtual_environment_vm" "admin_laptop" {
+resource "ansible_host" "laptops" {
+  for_each = { for vm in var.laptops : vm.hostname => vm }
+  name     = each.key
+  groups   = ["admin_laptop"]
   depends_on = [
-    resource.dns_a_record_set.admin_laptop,
-    data.proxmox_virtual_environment_vms.cloud_init_template,
+    resource.proxmox_virtual_environment_vm.laptops,
+    resource.proxmox_virtual_environment_hardware_mapping_usb.SanDisk
   ]
-  name        = var.admin_laptop.hostname
-  description = "Managed by Terraform"
-  tags        = ["${terraform.workspace}", var.admin_laptop.cloud_init_image]
-  node_name   = var.admin_laptop.pve_node
-  vm_id       = var.admin_laptop.vm_id
+}
+
+
+resource "proxmox_virtual_environment_hardware_mapping_usb" "SanDisk" {
+  comment = var.media_mapping.comment
+  name    = var.media_mapping.name
+  map = [
+    {
+      id   = var.media_mapping.id
+      node = var.media_mapping.node
+    },
+  ]
+}
+
+
+resource "proxmox_virtual_environment_vm" "laptops" {
+  depends_on = [
+    resource.dns_a_record_set.laptops,
+    resource.proxmox_virtual_environment_hardware_mapping_usb.SanDisk
+  ]
+  lifecycle {
+    ignore_changes = [
+      started,
+      mac_addresses,
+      cdrom[0].file_id,
+      network_device[0].disconnected,
+    network_device[1].disconnected]
+  }
+  for_each      = { for vm in var.laptops : vm.hostname => vm }
+  acpi          = true
+  bios          = each.value.bios # [ovmf/seabios]
+  boot_order    = each.value.boot_order
+  description   = "Managed by Terraform"
+  mac_addresses = []
+  machine       = "q35"
+  name          = each.key
+  node_name     = each.value.pve_node
+  protection    = false
+  scsi_hardware = "virtio-scsi-single"
+  started       = true
+  tablet_device = true
+  tags          = ["${terraform.workspace}", each.value.cloud_init_image]
+  template      = false
+  vm_id         = each.value.vm_id
+
+  cdrom {
+    file_id   = each.value.iso_image
+    interface = "ide2"
+  }
 
   clone {
     datastore_id = var.vm_template_storage.name
     node_name    = var.vm_template_storage.node
-    vm_id        = data.proxmox_virtual_environment_vms.cloud_init_template.vms[index(data.proxmox_virtual_environment_vms.cloud_init_template.vms[*].name, var.admin_laptop.cloud_init_image)].vm_id
+    vm_id        = data.proxmox_virtual_environment_vms.cloud_init_template.vms[index(data.proxmox_virtual_environment_vms.cloud_init_template.vms[*].name, each.value.cloud_init_image)].vm_id
     full         = true
   }
+
   cpu {
-    sockets = 1
-    cores   = var.admin_laptop.hardware.cpu.cores
-    type    = var.admin_laptop.hardware.cpu.type
+    cores      = each.value.hardware.cpu.cores
+    flags      = []
+    hotplugged = 0
+    limit      = 0
+    numa       = false
+    sockets    = 1
+    type       = each.value.hardware.cpu.type
+    units      = 1024
   }
+
   dynamic "disk" {
-    for_each = var.admin_laptop.hardware.disks
+    for_each = each.value.hardware.disks
     content {
+      aio          = "io_uring"
+      backup       = false
+      cache        = "none"
       datastore_id = disk.value.datastore_id
-      interface    = disk.value.interface
-      size         = disk.value.size
       discard      = "on"
       file_format  = "raw"
+      interface    = disk.value.interface
       iothread     = true
-      ssd          = true
+      replicate    = true
+      size         = disk.value.size
+      ssd          = false
     }
   }
+
+  # dns = {
+  #   zone = "site1.thebrownleefamily.net"
+  #   rr_a = "10.48.16.175"
+  # }
+
+  efi_disk {
+    datastore_id      = "local-lvm"
+    file_format       = "raw"
+    pre_enrolled_keys = true
+    type              = "4m"
+  }
+
   initialization {
-    #datastore_id = var.vm_storage
     datastore_id = "local-lvm"
     dns {
-      servers = var.vlans[index(var.vlans.*.vlan_id, var.admin_laptop.hardware.network_devices[0].vlan_id)].ipv4_dns_servers
-      domain  = var.admin_laptop.domain
+      servers = var.vlans[index(var.vlans.*.vlan_id, each.value.hardware.network_devices[0].vlan_id)].ipv4_dns_servers
+      domain  = each.value.domain
     }
     ip_config {
       ipv4 {
-        address = var.admin_laptop.ipv4_address
-        gateway = var.vlans[index(var.vlans.*.vlan_id, var.admin_laptop.hardware.network_devices[0].vlan_id)].ipv4_gateway
+        address = each.value.ipv4_address
+        gateway = var.vlans[index(var.vlans.*.vlan_id, each.value.hardware.network_devices[0].vlan_id)].ipv4_gateway
       }
     }
     user_account {
@@ -165,140 +265,55 @@ resource "proxmox_virtual_environment_vm" "admin_laptop" {
       keys     = [trimspace(data.local_file.ci_ssh_public_key_file.content)]
     }
   }
-  memory {
-    dedicated = var.admin_laptop.hardware.memory
-    floating  = var.admin_laptop.hardware.memory
-  }
-  dynamic "network_device" {
-    for_each = var.admin_laptop.hardware.network_devices
-    content {
-      bridge      = network_device.value.interface
-      mac_address = network_device.value.mac_address
-      vlan_id     = network_device.value.vlan_id
-    }
-  }
-  on_boot = true
-  connection {
-    type  = "ssh"
-    user  = var.ci_user
-    agent = true
-    host  = "${self.name}.${var.admin_laptop.domain}"
-  }
-  provisioner "local-exec" {
-    command = "sleep ${var.sleep_seconds_before_remote_provisioning}"
-  }
-  provisioner "remote-exec" {
-    inline = ["hostnamectl"]
-  }
-  startup {
-    order = 1
-  }
-  vga {
-    memory = 512
-    type   = "std"
-  }
-}
-
-
-resource "ansible_host" "admin_laptop" {
-  name   = var.admin_laptop.hostname
-  groups = ["admin_laptop"]
-  depends_on = [
-    resource.proxmox_virtual_environment_vm.admin_laptop
-  ]
-}
-
-resource "proxmox_virtual_environment_vm" "uefihosts" {
-  lifecycle {
-    ignore_changes = [mac_addresses]
-  }
-  for_each      = { for vm in var.uefi_hosts : vm.hostname => vm }
-  acpi          = true
-  bios          = "ovmf"
-  boot_order    = ["scsi0", "net0", "ide2"]
-  description   = "Managed by Terraform"
-  mac_addresses = []
-  machine       = "q35"
-  name          = each.key
-  node_name     = each.value.pve_node
-  protection    = false
-  scsi_hardware = "virtio-scsi-single"
-  started       = false
-  tablet_device = true
-  tags          = ["${terraform.workspace}"]
-  template      = false
-  vm_id         = each.value.vm_id
-
-  cpu {
-    cores      = 2
-    flags      = []
-    hotplugged = 0
-    limit      = 0
-    numa       = false
-    sockets    = 1
-    type       = "x86-64-v2-AES"
-    units      = 1024
-  }
-
-  cdrom {
-    file_id   = "none"
-    interface = "ide2"
-  }
-
-  disk {
-    aio          = "io_uring"
-    backup       = false
-    cache        = "none"
-    datastore_id = "local-lvm"
-    discard      = "on"
-    file_format  = "raw"
-    interface    = "scsi0"
-    iothread     = true
-    # path_in_datastore = "vm-204-disk-1"
-    replicate = true
-    size      = 32
-    ssd       = true
-  }
-
-  # efi_disk {
-  #     datastore_id      = "local-lvm"
-  #     file_format       = "raw"
-  #     #pre_enrolled_keys = false
-  #     type              = "4m"
-  # }
 
   memory {
-    dedicated      = 8192
-    floating       = 0
+    dedicated      = each.value.hardware.memory
+    floating       = each.value.hardware.memory
     keep_hugepages = false
     shared         = 0
   }
 
-  network_device {
-    bridge       = "vmbr1"
-    disconnected = false
-    enabled      = true
-    firewall     = false
-    model        = "virtio"
-    mtu          = 0
-    queues       = 0
-    rate_limit   = 0
-    vlan_id      = 0
-  }
-
-  network_device {
-    bridge       = "vmbr1"
-    disconnected = true
-    enabled      = true
-    firewall     = false
-    model        = "virtio"
-    mtu          = 0
-    queues       = 0
-    rate_limit   = 0
-    vlan_id      = 0
+  dynamic "network_device" {
+    for_each = each.value.hardware.network_devices
+    content {
+      bridge       = network_device.value.interface
+      disconnected = network_device.value.disconnected
+      enabled      = true
+      firewall     = false
+      model        = "virtio"
+      mac_address  = network_device.value.mac_address
+      mtu          = 0
+      queues       = 0
+      rate_limit   = 0
+      vlan_id      = network_device.value.vlan_id
+    }
   }
 
   on_boot = false
+
+  connection {
+    type  = "ssh"
+    user  = var.ci_user
+    agent = true
+    host  = "${self.name}.${each.value.domain}"
+  }
+
+  provisioner "local-exec" {
+    command = "sleep ${var.sleep_seconds_before_remote_provisioning}"
+  }
+
+  provisioner "remote-exec" {
+    inline = ["hostnamectl"]
+  }
+
+  startup {
+    order = 1
+  }
+
+  vga {
+    memory = each.value.hardware.vga.memory
+    type   = each.value.hardware.vga.type
+  }
 
   operating_system {
     type = "l26"
@@ -312,15 +327,27 @@ resource "proxmox_virtual_environment_vm" "uefihosts" {
     datastore_id = "local-lvm"
     version      = "v2.0"
   }
+
+  usb {
+    mapping = "SanDisk"
+    usb3    = true
+  }
 }
 
-resource "proxmox_virtual_environment_vm" "bioshosts" {
+
+resource "proxmox_virtual_environment_vm" "vms" {
   lifecycle {
-    ignore_changes = [mac_addresses]
+    ignore_changes = [
+      started,
+      mac_addresses,
+      cdrom[0].file_id,
+      network_device[0].disconnected,
+    network_device[1].disconnected]
   }
-  for_each      = { for vm in var.bios_hosts : vm.hostname => vm }
+  for_each      = { for vm in var.vms : vm.hostname => vm }
   acpi          = true
-  bios          = "seabios"
+  bios          = each.value.bios # [ovmf/seabios]
+  boot_order    = each.value.boot_order
   description   = "Managed by Terraform"
   mac_addresses = []
   machine       = "q35"
@@ -331,67 +358,88 @@ resource "proxmox_virtual_environment_vm" "bioshosts" {
   started       = false
   tablet_device = true
   tags          = ["${terraform.workspace}"]
-  template      = false
-  vm_id         = each.value.vm_id
+  #tags          = ["${terraform.workspace}", each.value.cloud_init_image]
+  template = false
+  vm_id    = each.value.vm_id
+
+  cdrom {
+    file_id   = each.value.iso_image
+    interface = "ide2"
+  }
 
   cpu {
-    cores      = 2
+    cores      = each.value.hardware.cpu.cores
     flags      = []
     hotplugged = 0
     limit      = 0
     numa       = false
     sockets    = 1
-    type       = "x86-64-v2-AES"
+    type       = each.value.hardware.cpu.type
     units      = 1024
   }
 
-  disk {
-    aio          = "io_uring"
-    backup       = false
-    cache        = "none"
-    datastore_id = "local-lvm"
-    discard      = "on"
-    file_format  = "raw"
-    interface    = "scsi0"
-    iothread     = true
-    #path_in_datastore = "vm-205-disk-0"
-    replicate = true
-    size      = 32
-    ssd       = true
+  dynamic "disk" {
+    for_each = each.value.hardware.disks
+    content {
+      aio          = "io_uring"
+      backup       = false
+      cache        = "none"
+      datastore_id = disk.value.datastore_id
+      discard      = "on"
+      file_format  = "raw"
+      interface    = disk.value.interface
+      iothread     = true
+      replicate    = true
+      serial       = disk.value.serial
+      size         = disk.value.size
+      ssd          = false
+    }
   }
 
   memory {
-    dedicated      = 8192
-    floating       = 0
+    dedicated      = each.value.hardware.memory
+    floating       = each.value.hardware.memory
     keep_hugepages = false
     shared         = 0
   }
 
-  network_device {
-    bridge       = "vmbr1"
-    disconnected = false
-    enabled      = true
-    firewall     = false
-    model        = "virtio"
-    mtu          = 0
-    queues       = 0
-    rate_limit   = 0
-    vlan_id      = 0
+  dynamic "network_device" {
+    for_each = each.value.hardware.network_devices
+    content {
+      bridge       = network_device.value.interface
+      disconnected = network_device.value.disconnected
+      enabled      = true
+      firewall     = false
+      model        = "virtio"
+      mac_address  = network_device.value.mac_address
+      mtu          = 0
+      queues       = 0
+      rate_limit   = 0
+      vlan_id      = network_device.value.vlan_id
+    }
   }
 
-  network_device {
-    bridge       = "vmbr0"
-    disconnected = true
-    enabled      = true
-    firewall     = false
-    model        = "virtio"
-    mtu          = 0
-    queues       = 0
-    rate_limit   = 0
-    vlan_id      = 0
+  on_boot = false
+
+  startup {
+    order = 1
+  }
+
+  vga {
+    memory = each.value.hardware.vga.memory
+    type   = each.value.hardware.vga.type
   }
 
   operating_system {
     type = "l26"
+  }
+
+  reboot              = false
+  reboot_after_update = false
+  serial_device {}
+
+  tpm_state {
+    datastore_id = "local-lvm"
+    version      = "v2.0"
   }
 }

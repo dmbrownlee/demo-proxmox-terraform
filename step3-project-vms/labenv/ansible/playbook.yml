@@ -31,3 +31,14 @@
     - name: Ensure admin account's password is expired if it was just created
       ansible.builtin.command: chage -d 0 "{{ admin_account_username }}"
       when: admin_account.changed
+    - name: Ensure the default gateway is removed from "WAN" connection after install
+      community.general.nmcli:
+        type: ethernet
+        conn_name: 'WAN'
+        ifname: "{{ laptop_wan_interface }}"
+        method4: manual
+        ip4:
+          - "{{ laptop_wan_address }}/{{ networks.WAN.network_prefix }}"
+        gw4: ""
+        zone: external
+        state: present

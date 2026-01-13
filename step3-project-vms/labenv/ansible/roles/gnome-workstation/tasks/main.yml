@@ -23,6 +23,27 @@
     cache_valid_time: 300
     lock_timeout: 180
   register: target_runlevel
+- name: Ensure the GPG key for the Brave apt repo is installed
+  ansible.builtin.get_url:
+    url: https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+    dest: /etc/apt/trusted.gpg.d/brave.asc
+- name: Ensure Brave registry is configured
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/brave.asc] https://brave-browser-apt-release.s3.brave.com/ stable main
+    filename: brave
+  register: brave_repo
+- name: Ensure package cache is updated if new repos have been added
+  ansible.builtin.apt:
+    update_cache: yes
+  when: brave_repo.changed
+  register: apt_update
+  until: apt_update is success
+  retries: 10
+  delay: 30
+- name: Ensure Brave is installed
+  ansible.builtin.apt:
+    name:
+      - brave-browser
 - name: Ensure the laptop is rebooted if the runlevel target has changed
   ansible.builtin.reboot:
   when: target_runlevel.changed
