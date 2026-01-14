@@ -116,14 +116,14 @@ variable "vms" {
   }))
 }
 
-variable "media_mapping" {
-  description = "A mapping for USB recovery media"
-  type = object({
+variable "media_mappings" {
+  description = "A list of mappings for media"
+  type = list(object({
     comment = string,
     name    = string,
     id      = string,
     node    = string,
-  })
+  }))
 }
 
 ###############################################################################
@@ -154,12 +154,13 @@ resource "ansible_host" "laptops" {
 
 
 resource "proxmox_virtual_environment_hardware_mapping_usb" "SanDisk" {
-  comment = var.media_mapping.comment
-  name    = var.media_mapping.name
+  for_each = { for media_mapping in var.media_mappings : media_mapping.name => media_mapping }
+  comment  = each.value.comment
+  name     = each.value.name
   map = [
     {
-      id   = var.media_mapping.id
-      node = var.media_mapping.node
+      id   = each.value.id
+      node = each.value.node
     },
   ]
 }

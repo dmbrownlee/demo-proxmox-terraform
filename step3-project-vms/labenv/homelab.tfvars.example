@@ -59,21 +59,16 @@ vlans = [
   },
 ]
 
-laptops = [
+laptops = []
+
+vms = [
   {
-    vm_id            = 200,
-    hostname         = "admin-laptop",
-    pve_node         = "pve1",
-    iso_image        = "none",
-    boot_order       = ["scsi0", "net0"]
-    bios             = "ovmf"
-    domain           = "site1.example.com",
-    cloud_init_image = "debian13-genericcloud-20251117"
-    ipv4_address     = "192.168.1.175/24"
-    dns = {
-      zone = "site1.example.com",
-      rr_a = "192.168.1.175"
-    }
+    vm_id      = 201,
+    hostname   = "fw1",
+    pve_node   = "pve1",
+    iso_image  = "local-lvm:iso/vyos-2025.09.17-0018-rolling-generic-amd64.iso",
+    boot_order = ["scsi0", "ide2", "net1"]
+    bios       = "ovmf"
     hardware = {
       cpu = {
         cores = 2,
@@ -83,6 +78,238 @@ laptops = [
         {
           datastore_id = "local-lvm",
           interface    = "scsi0",
+          serial       = "scsi0",
+          size         = 50
+        },
+      ]
+      memory = 8192,
+      network_devices = [
+        {
+          disconnected = true,
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:01:96:f8:01",
+          vlan_id      = 0,
+        },
+        {
+          disconnected = false,
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:02:02:02:02",
+          vlan_id      = 96,
+        },
+      ],
+      vga = {
+        memory = 512,
+        type   = "std"
+      }
+    }
+  },
+  {
+    vm_id      = 202,
+    hostname   = "nas1",
+    pve_node   = "pve1",
+    iso_image  = "local-lvm:iso/TrueNAS-SCALE-25.10.0.1.iso",
+    boot_order = ["virtio0", "ide2", "net0"]
+    bios       = "ovmf"
+    hardware = {
+      cpu = {
+        cores = 2,
+        type  = "x86-64-v2-AES"
+      }
+      disks = [
+        {
+          datastore_id = "local-lvm",
+          interface    = "virtio0",
+          serial       = "virtio0",
+          size         = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi0",
+          serial       = "scsi0",
+          size         = 10
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi1",
+          serial       = "scsi1",
+          size         = 10
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi2",
+          serial       = "scsi2",
+          size         = 10
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi3",
+          serial       = "scsi3",
+          size         = 10
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi4",
+          serial       = "scsi4",
+          size         = 10
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi5",
+          serial       = "scsi5",
+          size         = 10
+        },
+      ]
+      memory = 8192,
+      network_devices = [
+        {
+          disconnected = false,
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:02:02:03:01",
+          vlan_id      = 96,
+        },
+        {
+          disconnected = false,
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:02:02:03:02",
+          vlan_id      = 96,
+        },
+      ],
+      vga = {
+        memory = 512,
+        type   = "virtio"
+      }
+    }
+  },
+  {
+    vm_id      = 203,
+    hostname   = "nas2",
+    pve_node   = "pve1",
+    iso_image  = "local-lvm:iso/TrueNAS-SCALE-25.10.0.1.iso",
+    boot_order = ["virtio0", "ide2", "net0"]
+    bios       = "ovmf"
+    hardware = {
+      cpu = {
+        cores = 2,
+        type  = "x86-64-v2-AES"
+      }
+      disks = [
+        {
+          datastore_id = "local-lvm",
+          interface    = "virtio0",
+          serial       = "virtio0",
+          size         = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi0",
+          serial       = "scsi0",
+          size         = 10
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi1",
+          serial       = "scsi1",
+          size         = 10
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi2",
+          serial       = "scsi2",
+          size         = 10
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi3",
+          serial       = "scsi3",
+          size         = 10
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi4",
+          serial       = "scsi4",
+          size         = 10
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi5",
+          serial       = "scsi5",
+          size         = 10
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi6",
+          serial       = "scsi6",
+          size         = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi7",
+          serial       = "scsi7",
+          size         = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi8",
+          serial       = "scsi8",
+          size         = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi9",
+          serial       = "scsi9",
+          size         = 20
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi10",
+          serial       = "scsi10",
+          size         = 5
+        },
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi11",
+          serial       = "scsi11",
+          size         = 5
+        },
+      ]
+      memory = 8192,
+      network_devices = [
+        {
+          disconnected = false,
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:02:02:04:01",
+          vlan_id      = 96,
+        },
+        {
+          disconnected = false,
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:02:02:04:02",
+          vlan_id      = 96,
+        },
+      ],
+      vga = {
+        memory = 512,
+        type   = "virtio"
+      }
+    }
+  },
+  {
+    vm_id      = 204,
+    hostname   = "pve1",
+    pve_node   = "pve1",
+    iso_image  = "none",
+    boot_order = ["scsi0", "net0"]
+    bios       = "ovmf"
+    hardware = {
+      cpu = {
+        cores = 2,
+        type  = "host"
+      }
+      disks = [
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi0",
+          serial       = "scsi0",
           size         = 50
         },
       ]
@@ -91,29 +318,186 @@ laptops = [
         {
           disconnected = false,
           interface    = "vmbr0",
-          mac_address  = "ca:fe:01:96:f9:01",
-          vlan_id      = 0,
+          mac_address  = "ca:fe:02:02:05:01",
+          vlan_id      = 96,
         },
         {
           disconnected = false,
-          interface    = "vmbr1",
-          mac_address  = "ca:fe:01:96:f9:02",
-          vlan_id      = 0,
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:02:02:05:02",
+          vlan_id      = 96,
         },
       ],
       vga = {
-        memory = 128,
-        type   = "qxl"
+        memory = 512,
+        type   = "std"
+      }
+    }
+  },
+  {
+    vm_id      = 205,
+    hostname   = "pve2",
+    pve_node   = "pve1",
+    iso_image  = "none",
+    boot_order = ["scsi0", "net0"]
+    bios       = "ovmf"
+    hardware = {
+      cpu = {
+        cores = 2,
+        type  = "host"
+      }
+      disks = [
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi0",
+          serial       = "scsi0",
+          size         = 50
+        },
+      ]
+      memory = 8192,
+      network_devices = [
+        {
+          disconnected = false,
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:02:02:06:01",
+          vlan_id      = 96,
+        },
+        {
+          disconnected = false,
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:02:02:06:02",
+          vlan_id      = 96,
+        },
+      ],
+      vga = {
+        memory = 512,
+        type   = "std"
+      }
+    }
+  },
+  {
+    vm_id      = 206,
+    hostname   = "pve3",
+    pve_node   = "pve1",
+    iso_image  = "none",
+    boot_order = ["scsi0", "net0"]
+    bios       = "ovmf"
+    hardware = {
+      cpu = {
+        cores = 2,
+        type  = "host"
+      }
+      disks = [
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi0",
+          serial       = "scsi0",
+          size         = 50
+        },
+      ]
+      memory = 8192,
+      network_devices = [
+        {
+          disconnected = false,
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:02:02:07:01",
+          vlan_id      = 96,
+        },
+        {
+          disconnected = false,
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:02:02:07:02",
+          vlan_id      = 96,
+        },
+      ],
+      vga = {
+        memory = 512,
+        type   = "std"
+      }
+    }
+  },
+  {
+    vm_id      = 207,
+    hostname   = "workstation",
+    pve_node   = "pve1",
+    iso_image  = "none",
+    boot_order = ["scsi0", "net0"]
+    bios       = "ovmf"
+    hardware = {
+      cpu = {
+        cores = 2,
+        type  = "x86-64-v2-AES"
+      }
+      disks = [
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi0",
+          serial       = "scsi0",
+          size         = 40
+        },
+      ]
+      memory = 8192,
+      network_devices = [
+        {
+          disconnected = false,
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:02:02:08:01",
+          vlan_id      = 96,
+        },
+        {
+          disconnected = false,
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:02:02:08:02",
+          vlan_id      = 96,
+        },
+      ],
+      vga = {
+        memory = 512,
+        type   = "std"
+      }
+    }
+  },
+  {
+    vm_id      = 208,
+    hostname   = "bioshost1",
+    pve_node   = "pve1",
+    iso_image  = "none",
+    boot_order = ["scsi0", "net0"]
+    bios       = "seabios"
+    hardware = {
+      cpu = {
+        cores = 2,
+        type  = "x86-64-v2-AES"
+      }
+      disks = [
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi0",
+          serial       = "scsi0",
+          size         = 20
+        },
+      ]
+      memory = 8192,
+      network_devices = [
+        {
+          disconnected = false,
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:02:02:09:01",
+          vlan_id      = 96,
+        },
+        {
+          disconnected = false,
+          interface    = "vmbr0",
+          mac_address  = "ca:fe:02:02:09:02",
+          vlan_id      = 96,
+        },
+      ],
+      vga = {
+        memory = 512,
+        type   = "std"
       }
     }
   },
 ]
 
-vms = []
-
-media_mapping = {
-  comment = "USB Recovery Media"
-  name    = "SanDisk"
-  id      = "1234:1234"
-  node    = "pve1"
-}
+media_mappings = []
