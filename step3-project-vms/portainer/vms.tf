@@ -75,6 +75,7 @@ variable "vms" {
 ###############################################################################
 resource "proxmox_virtual_environment_vm" "portainer" {
   depends_on = [
+    resource.dns_a_record_set.portainer,
     data.proxmox_virtual_environment_vms.cloud_init_template,
   ]
   for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "portainer" }
