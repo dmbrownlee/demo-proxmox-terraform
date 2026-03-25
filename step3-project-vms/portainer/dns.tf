@@ -1,31 +1,6 @@
 ###############################################################################
 ###############################################################################
 ##
-##  Variable Definitions
-##
-###############################################################################
-###############################################################################
-# variable "k3s_cnames" {
-#   description = "List of CNAME resource records to point to the cluster"
-#   type        = list(string)
-#   default     = []
-# }
-#
-# variable "enable_live_cnames" {
-#   description = "Create additional CNAME resource records for live services?"
-#   type        = bool
-#   default     = false
-# }
-#
-# variable "enable_dev_cnames" {
-#   description = "Create additional CNAME resource records for dev services?"
-#   type        = bool
-#   default     = false
-# }
-
-###############################################################################
-###############################################################################
-##
 ##  Resource Definitions
 ##
 ###############################################################################
