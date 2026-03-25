@@ -16,16 +16,6 @@ variable "ci_password" {
   sensitive   = true
 }
 
-variable "vlans" {
-  description = "Map of VLAN objects indexed on name"
-  type = list(object({
-    vlan_id          = number,
-    comment          = string
-    ipv4_gateway     = string,
-    ipv4_dns_servers = list(string)
-  }))
-}
-
 variable "sleep_seconds_before_remote_provisioning" {
   description = "The number of seconds to wait after booting before trying SSH"
   type        = number
@@ -49,6 +39,8 @@ variable "vms" {
     pve_node         = string,
     cloud_init_image = string,
     ipv4_address     = string,
+    nameservers      = list(string),
+    gateway          = string,
     on_boot          = bool,
     hardware = object({
       cpu = object({
@@ -119,13 +111,13 @@ resource "proxmox_virtual_environment_vm" "portainer" {
   initialization {
     datastore_id = each.value.hardware.initialization.datastore_id
     dns {
-      servers = var.vlans[index(var.vlans.*.vlan_id, each.value.hardware.network_devices[0].vlan_id)].ipv4_dns_servers
+      servers = each.value.nameservers
       domain  = each.value.domain
     }
     ip_config {
       ipv4 {
         address = each.value.ipv4_address
-        gateway = var.vlans[index(var.vlans.*.vlan_id, each.value.hardware.network_devices[0].vlan_id)].ipv4_gateway
+        gateway = each.value.gateway
       }
     }
     user_account {

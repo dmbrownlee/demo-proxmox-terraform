@@ -1,0 +1,125 @@
+###############################################################################
+###############################################################################
+##
+##  DNS
+##
+###############################################################################
+###############################################################################
+dns_server        = "192.168.1.1"
+dns_key_name      = "update-key."
+dns_key_secret    = "SuperSecretKey+SuperSecretKey+SuperSecretKey="
+dns_key_algorithm = "hmac-sha256"
+
+
+###############################################################################
+###############################################################################
+##
+##  Ansible
+##
+###############################################################################
+###############################################################################
+# This delay, in seconds, is to reduce output of failed connections attempts
+# while we're waiting for the SSH service to start.
+sleep_seconds_before_remote_provisioning = 15
+
+
+###############################################################################
+###############################################################################
+##
+##  Cloud-init
+##
+###############################################################################
+###############################################################################
+# This is where we specify the user credentials for the administrative user
+# cloud-init will create on each VM cloned from a cloud-init template image.
+# Since we will be using Ansible for configuration management, it makes sense
+# for this to be the "ansible" user.  If any other users need to be configured,
+# Ansible can do that.  After Terraform has created and booted the VM, it will
+# run Ansible to do further machine configuration.  The corresponding private
+# SSH key should be added to your SSH agent as SSH is usually configured to
+# disallow password logins.  Note, the public key does not include the comment
+# you see at the end of the line in the .pub file.
+ci_user     = "groot"
+ci_password = "change_me!"
+
+
+###############################################################################
+###############################################################################
+##
+##  Control host
+##
+###############################################################################
+###############################################################################
+# These variables are specific to your control host.  In particular, this
+# variable defines the location of the SSH keypair for the cloud-init user.
+# Terraform will search here for the cloud-init user's SSH public key and
+# install it via the cloud-init drive when it clones the VMs.
+ssh_keystore = "~/.ssh"
+
+
+###############################################################################
+###############################################################################
+##
+##  Proxmox
+##
+###############################################################################
+###############################################################################
+# Here is where we specify the URL for the web API for the Proxmox cluster.
+endpoint = "https://pve1.site1.example.com:8006/"
+
+# The API Token is the combination of the ID and secret:
+api_token = "terraform@pve!mytoken=12345678-90ab-cdef-1234-567890abcdef"
+
+# This is the Proxmox storage location for VM template images that will
+# get cloned rather then VMs.
+vm_template_storage = {
+  node = "pve1",
+  name = "local-lvm"
+}
+
+
+###############################################################################
+###############################################################################
+##
+##  Virtual Machines
+##
+###############################################################################
+###############################################################################
+vms = [
+  {
+    vm_id            = 351,
+    hostname         = "portainer1",
+    domain           = "site1.example.com",
+    role             = "portainer",
+    pve_node         = "pve1",
+    cloud_init_image = "debian13-genericcloud-20251117"
+    ipv4_address     = "192.168.1.53/24"
+    nameservers      = ["192.168.1.1"]
+    gateway          = "192.168.1.254"
+    on_boot          = true
+    hardware = {
+      cpu = {
+        cores = 2,
+        type  = "x86-64-v2-AES"
+      }
+      memory = 8192,
+      disks = [
+        {
+          datastore_id = "local-lvm",
+          interface    = "scsi0",
+          size         = 50
+        },
+      ]
+      initialization = {
+        datastore_id = "local-lvm"
+      }
+      network_devices = [
+        {
+          interface   = "vmbr0",
+          mac_address = "ca:fe:01:10:03:01",
+          vlan_id     = 0,
+        },
+      ]
+    }
+  },
+]
