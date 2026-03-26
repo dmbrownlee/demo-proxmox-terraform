@@ -1,0 +1,28 @@
+###############################################################################
+###############################################################################
+##
+##  DNS Provider
+##
+###############################################################################
+###############################################################################
+dns_server        = "192.168.10.1"
+dns_key_name      = "update-key."
+dns_key_secret    = "SuperSecretKey+SuperSecretKey+SuperSecretKey="
+dns_key_algorithm = "hmac-sha256"
+
+
+###############################################################################
+###############################################################################
+##
+##  Proxmox Provider
+##
+###############################################################################
+###############################################################################
+# Here is where we specify the URL for the web API for the Proxmox cluster.
+endpoint = "https://pve1.example.com:8006/"
+
+# The API Token is the combination of the ID and secret:
+api_token = "terraform@pve!mytoken=12345678-90ab-cdef-1234-567890abcdef"
+# Managing cloud-init images is now handled separate from building the VM
+# templates so that you don't needlessly delete and re-download cloud-init
+# images while you are experimenting with different template settings.
