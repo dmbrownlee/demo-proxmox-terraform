@@ -5,15 +5,6 @@
 ##
 ###############################################################################
 ###############################################################################
-# dns_domainname is used in two places.  First, it is used as the DNS domain
-# when creating the cloud-init drive for VMs.  Second, it is used as the
-# FQDN's suffix when connecting via SSH.
-variable "dns_domainname" {
-  description = "The DNS domain for all VMs"
-  type        = string
-  default     = "example.com"
-}
-
 # Proxmox will return the VM has booted even though the OS is still starting.
 # This is the number of seconds to wait after Proxmox says the VM has started
 # before attempting to verify that SSH is working.  If your Proxmox VMs are
@@ -21,6 +12,16 @@ variable "dns_domainname" {
 variable "sleep_seconds_before_testing_connectivity" {
   description = "The number of seconds to wait before testing SSH"
   type        = number
+}
+
+variable "ubuntu_cloud_image" {
+  description = "Attribute of the Ubuntu cloud image to use for all VMs"
+  type        = object({
+    node_name    = string,
+    datastore_id = string,
+    version      = string,
+    release      = string
+  })
 }
 
 
@@ -31,6 +32,13 @@ variable "sleep_seconds_before_testing_connectivity" {
 ##
 ###############################################################################
 ###############################################################################
+data "proxmox_virtual_environment_file" "ubuntu_cloud_image" {
+  content_type = "import"
+  node_name    = var.ubuntu_cloud_image.node_name
+  datastore_id = var.ubuntu_cloud_image.datastore_id
+  file_name    = "ubuntu-${var.ubuntu_cloud_image.version}-server-${var.ubuntu_cloud_image.release}.qcow2"
+}
+
 resource "proxmox_virtual_environment_vm" "k8s_control_plane_nodes" {
   depends_on = [
     data.proxmox_virtual_environment_vms.cloud_init_template
@@ -38,16 +46,10 @@ resource "proxmox_virtual_environment_vm" "k8s_control_plane_nodes" {
   for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "k8s_first_control_plane_node" || vm.role == "k8s_control_plane_node" }
   name        = each.key
   description = "Managed by Terraform"
-  tags        = ["${terraform.workspace}", each.value.cloud_init_image]
+  tags        = ["${terraform.workspace}", "ubuntu-${var.ubuntu_cloud_image.version}-server-${var.ubuntu_cloud_image.release}"]
   node_name   = each.value.pve_node
   vm_id       = each.value.vm_id
 
-  clone {
-    datastore_id = var.vm_template_storage.name
-    node_name    = var.vm_template_storage.node
-    vm_id        = data.proxmox_virtual_environment_vms.cloud_init_template.vms[index(data.proxmox_virtual_environment_vms.cloud_init_template.vms[*].name, each.value.cloud_init_image)].vm_id
-    full         = true
-  }
   cpu {
     sockets = 1
     cores   = each.value.hardware.cpu_cores
@@ -55,25 +57,25 @@ resource "proxmox_virtual_environment_vm" "k8s_control_plane_nodes" {
   }
   disk {
     datastore_id = var.vm_storage
-    interface    = "scsi0"
-    size         = each.value.hardware.disk
     discard      = "on"
+    import_from  = data.proxmox_virtual_environment_file.ubuntu_cloud_image.id
+    interface    = "scsi0"
     iothread     = true
+    size         = each.value.hardware.disk
     ssd          = true
   }
   initialization {
     datastore_id = var.vm_storage
     dns {
-      servers = var.vlans[index(var.vlans.*.vlan_id, each.value.vlan_id)].ipv4_dns_servers
-      domain  = var.dns_domainname
+      servers = each.value.ipv4_dns_servers
+      domain  = each.value.domain
     }
     ip_config {
       ipv4 {
         address = each.value.ipv4_address
-        gateway = var.vlans[index(var.vlans.*.vlan_id, each.value.vlan_id)].ipv4_gateway
+        gateway = each.value.ipv4_gateway
       }
     }
-    #upgrade = false
     user_account {
       username = var.ci_user
       password = var.ci_password
@@ -94,7 +96,7 @@ resource "proxmox_virtual_environment_vm" "k8s_control_plane_nodes" {
     type  = "ssh"
     user  = var.ci_user
     agent = true
-    host  = "${self.name}.${var.dns_domainname}"
+    host  = "${self.name}.${each.value.domain}"
   }
   provisioner "local-exec" {
     command = "sleep ${var.sleep_seconds_before_testing_connectivity}"
@@ -102,6 +104,7 @@ resource "proxmox_virtual_environment_vm" "k8s_control_plane_nodes" {
   provisioner "remote-exec" {
     inline = ["hostnamectl"]
   }
+  scsi_hardware = "virtio-scsi-single"
   startup {
     order = 10
   }
@@ -117,16 +120,10 @@ resource "proxmox_virtual_environment_vm" "k8s_worker_nodes" {
   for_each    = { for vm in var.vms : vm.hostname => vm if vm.role == "k8s_worker_node" }
   name        = each.key
   description = "Managed by Terraform"
-  tags        = ["${terraform.workspace}", each.value.cloud_init_image]
+  tags        = ["${terraform.workspace}", "ubuntu-${var.ubuntu_cloud_image.version}-server-${var.ubuntu_cloud_image.release}"]
   node_name   = each.value.pve_node
   vm_id       = each.value.vm_id
 
-  clone {
-    datastore_id = var.vm_template_storage.name
-    node_name    = var.vm_template_storage.node
-    vm_id        = data.proxmox_virtual_environment_vms.cloud_init_template.vms[index(data.proxmox_virtual_environment_vms.cloud_init_template.vms[*].name, each.value.cloud_init_image)].vm_id
-    full         = true
-  }
   cpu {
     sockets = 1
     cores   = each.value.hardware.cpu_cores
@@ -134,25 +131,25 @@ resource "proxmox_virtual_environment_vm" "k8s_worker_nodes" {
   }
   disk {
     datastore_id = var.vm_storage
-    interface    = "scsi0"
-    size         = each.value.hardware.disk
     discard      = "on"
+    import_from  = data.proxmox_virtual_environment_file.ubuntu_cloud_image.id
+    interface    = "scsi0"
     iothread     = true
+    size         = each.value.hardware.disk
     ssd          = true
   }
   initialization {
     datastore_id = var.vm_storage
     dns {
-      servers = var.vlans[index(var.vlans.*.vlan_id, each.value.vlan_id)].ipv4_dns_servers
-      domain  = var.dns_domainname
+      servers = each.value.ipv4_dns_servers
+      domain  = each.value.domain
     }
     ip_config {
       ipv4 {
         address = each.value.ipv4_address
-        gateway = var.vlans[index(var.vlans.*.vlan_id, each.value.vlan_id)].ipv4_gateway
+        gateway = each.value.ipv4_gateway
       }
     }
-    #upgrade = false
     user_account {
       username = var.ci_user
       password = var.ci_password
@@ -173,14 +170,19 @@ resource "proxmox_virtual_environment_vm" "k8s_worker_nodes" {
     type  = "ssh"
     user  = var.ci_user
     agent = true
-    host  = "${self.name}.${var.dns_domainname}"
+    host  = "${self.name}.${each.value.domain}"
   }
   provisioner "local-exec" {
     command = "sleep ${var.sleep_seconds_before_testing_connectivity}"
   }
   provisioner "remote-exec" {
-    inline = ["hostnamectl"]
+    inline = [
+      "echo Waiting for cloud-init to complete on ${each.key}...",
+      "cloud-init status --wait > /dev/null",
+      "hostnamectl"
+    ]
   }
+  scsi_hardware = "virtio-scsi-single"
   startup {
     order = 20
   }

@@ -8,21 +8,48 @@ terraform {
   required_providers {
     ansible = {
       source  = "ansible/ansible"
-      version = "~> 1.3.0"
+      version = "~> 1.4.0"
     }
     dns = {
       source  = "hashicorp/dns"
-      version = "~> 3.4.3"
+      version = "~> 3.5.0"
     }
     local = {
       source  = "hashicorp/local"
-      version = "~> 2.5.3"
+      version = "~> 2.7.0"
     }
     proxmox = {
       source  = "bpg/proxmox"
-      version = "~> 0.93.0"
+      version = "~> 0.99.0"
     }
   }
+}
+
+###############################################################################
+###############################################################################
+##
+##  Dynamic DNS
+##
+###############################################################################
+###############################################################################
+# These variables allow Terraform to dynamically update DNS with resource
+# records for the VMs it creates (RFC 2845)
+variable "dns_server" {
+  description = "DNS server to receive updates"
+  type        = string
+}
+variable "dns_key_name" {
+  description = ""
+  type        = string
+}
+variable "dns_key_algorithm" {
+  description = ""
+  type        = string
+  default     = "hmac-md5"
+}
+variable "dns_key_secret" {
+  description = ""
+  type        = string
 }
 
 # This block configures the hashicorp/dns provider.  The dns_server variable is
@@ -38,6 +65,23 @@ provider "dns" {
   }
 }
 
+
+###############################################################################
+###############################################################################
+##
+##  Proxmox
+##
+###############################################################################
+###############################################################################
+variable "endpoint" {
+  description = "URL of the Proxmox cluster API"
+  type        = string
+}
+
+variable "api_token" {
+  description = "Proxmox API token"
+  type        = string
+}
 
 # This block configures the bpg/proxmox provider.  The variables for endpoint,
 # rootaccount, and rootpassword are defined in the variables.tf file.  The
