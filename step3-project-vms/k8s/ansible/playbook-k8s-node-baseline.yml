@@ -39,6 +39,7 @@
           - apt-transport-https
           - bash-completion
           - ca-certificates
+          - conntrack
           - curl
           - git
           - gnupg
