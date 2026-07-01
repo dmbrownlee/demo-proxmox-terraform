@@ -12,7 +12,7 @@ terraform {
     }
     dns = {
       source  = "hashicorp/dns"
-      version = "~> 3.4.3"
+      version = "~> 3.6.1"
     }
     local = {
       source  = "hashicorp/local"
