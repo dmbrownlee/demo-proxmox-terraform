@@ -45,22 +45,37 @@
           - gnupg
           - socat
           - vim
-    - name: Ensure the GPG key for the docker apt repo is installed
-      ansible.builtin.apt_key:
-        url: https://download.docker.com/linux/debian/gpg
-        keyring: /etc/apt/trusted.gpg.d/docker.gpg
-    - name: Ensure the GPG key for the kubernetes apt repo is installed
-      ansible.builtin.apt_key:
+    - name: Download GPG key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: "/tmp/docker-repo-key.gpg"
+        mode: '0644'
+    - name: Download GPG key
+      ansible.builtin.get_url:
         url: https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/deb/Release.key
-        keyring: /etc/apt/trusted.gpg.d/kubernetes.gpg
+        dest: "/tmp/kubernetes-repo-key.gpg"
+        mode: '0644'
+    - name: Ensure the GPG key for the docker apt repo is installed
+      ansible.builtin.command:
+        cmd: "gpg --dearmor -o /usr/share/keyrings/docker-repo-key.gpg /tmp/docker-repo-key.gpg"
+        creates: "/usr/share/keyrings/docker-repo-key.gpg"
+    - name: Ensure the GPG key for the kubernetes apt repo is installed
+      ansible.builtin.command:
+        cmd: "gpg --dearmor -o /usr/share/keyrings/kubernetes-repo-key.gpg /tmp/kubernetes-repo-key.gpg"
+        creates: "/usr/share/keyrings/kubernetes-repo-key.gpg"
     - name: Ensure docker registry is configured
-      ansible.builtin.apt_repository:
-        repo: deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker.gpg] https://download.docker.com/linux/debian bookworm stable
-        filename: docker
+      ansible.builtin.deb822_repository:
+        name: docker
+        types: deb
+        uris: https://download.docker.com/linux/ubuntu
+        suites: resolute
+        components: stable
+        architectures: amd64
+        signed_by: /usr/share/keyrings/docker-repo-key.gpg
       register: docker_repo
     - name: Ensure kubernetes registry is configured
       ansible.builtin.apt_repository:
-        repo: deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/kubernetes.gpg] https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/deb/ /
+        repo: deb [arch=amd64 signed-by=/usr/share/keyrings/kubernetes-repo-key.gpg] https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/deb/ /
         filename: kubernetes
       register: kubernetes_repo
     - name: Ensure package cache is updated if new repos have been added

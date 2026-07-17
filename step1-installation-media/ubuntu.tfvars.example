@@ -11,9 +11,14 @@
 # of that node's datastore where you would like to save the cloud-init image
 # file.
 
+cloud_init_storage = {
+  node_name    = "pve1",
+  datastore_id = "local-lvm"
+}
+
 iso_storage = {
-  node = "pve1",
-  name = "local-lvm"
+  node_name = "pve1",
+  datastore_id = "local-lvm"
 }
 
 ################################################################################
@@ -24,8 +29,10 @@ iso_storage = {
 # Each cloud-init entry specifies its download URL and the local file name to
 # save it as.
 cloud_init_images = {
-  noble-server-cloudimg-amd64-20251026 = {
-    url       = "https://cloud-images.ubuntu.com/noble/20251026/noble-server-cloudimg-amd64.img",
-    file_name = "noble-server-cloudimg-amd64-20251026.img",
+  ubuntu-26_04-server-20260627 = {
+    url       = "https://cloud-images.ubuntu.com/releases/26.04/release-20260627/ubuntu-26.04-server-cloudimg-amd64.img",
+    file_name = "ubuntu-26.04-server-20260627.qcow2",
   },
 }
+
+iso_media = {}
